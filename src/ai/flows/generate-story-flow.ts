@@ -55,6 +55,7 @@ async function toWav(
 
 const storyPrompt = ai.definePrompt({
     name: 'storyPrompt',
+    model: googleAI.model('gemini-1.5-flash'),
     input: {schema: z.object({ topic: z.string() })},
     output: {schema: z.object({ story: z.string() })},
     prompt: `You are a master storyteller for young children (ages 3-5). 
