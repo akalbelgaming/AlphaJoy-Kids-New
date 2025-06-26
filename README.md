@@ -1,5 +1,5 @@
-# Firebase Studio
+# Trace & Earn
 
-This is a NextJS starter in Firebase Studio.
+A fun and educational game for kids to learn letters and numbers by tracing, with an interactive story time feature.
 
-To get started, take a look at src/app/page.tsx.
+This app is built with Next.js and Firebase Studio.
