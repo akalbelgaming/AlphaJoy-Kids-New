@@ -14,13 +14,16 @@ import {
   Users,
   TrendingUp,
   Loader2,
+  Image as ImageIcon,
 } from "lucide-react";
 import { numbers, alphabet } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
+import { ColoringCanvas } from "@/components/coloring-canvas";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
 import { getAdaptiveDifficulty } from "@/app/actions";
 import { getImageForWord } from "@/lib/images";
+import { getColoringPage } from "@/lib/coloring";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,7 +39,7 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Mode = "numbers" | "alphabet";
+type Mode = "numbers" | "alphabet" | "coloring";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -63,6 +66,9 @@ export default function GameClient() {
 
   const [characterImage, setCharacterImage] = useState<string | null>(null);
   const [isImageLoading, setIsImageLoading] = useState(false);
+  const [coloringPageUrl, setColoringPageUrl] = useState<string | null>(null);
+  const [isColoringPageLoading, setIsColoringPageLoading] = useState(false);
+
 
   const { toast } = useToast();
 
@@ -81,25 +87,45 @@ export default function GameClient() {
 
   useEffect(() => {
     setStartTime(Date.now());
-    if (mode === 'alphabet' && imageHint) {
-      const fetchImage = async () => {
+    const isAlphabetMode = mode === 'alphabet';
+    const isColoringMode = mode === 'coloring';
+
+    if ((isAlphabetMode || isColoringMode) && imageHint) {
+      const fetchImages = async () => {
         setIsImageLoading(true);
         setCharacterImage(null);
-        const response = await getImageForWord(imageHint);
-        if (response.success && response.data) {
-          setCharacterImage(response.data.imageUrl);
+        const imageResponse = await getImageForWord(imageHint);
+        if (imageResponse.success && imageResponse.data) {
+          setCharacterImage(imageResponse.data.imageUrl);
         } else {
           toast({
             variant: "destructive",
-            title: "Could not load image",
-            description: response.error,
+            title: "Could not load hint image",
+            description: imageResponse.error,
           });
         }
         setIsImageLoading(false);
+
+        if (isColoringMode) {
+          setIsColoringPageLoading(true);
+          setColoringPageUrl(null);
+          const coloringResponse = await getColoringPage(imageHint);
+          if (coloringResponse.success && coloringResponse.data) {
+            setColoringPageUrl(coloringResponse.data.imageUrl);
+          } else {
+             toast({
+              variant: "destructive",
+              title: "Could not load coloring page",
+              description: coloringResponse.error,
+            });
+          }
+          setIsColoringPageLoading(false);
+        }
       };
-      fetchImage();
+      fetchImages();
     } else {
       setCharacterImage(null);
+      setColoringPageUrl(null);
     }
   }, [currentIndex, mode, imageHint, toast]);
 
@@ -318,7 +344,7 @@ export default function GameClient() {
           <Button variant="ghost" size="icon" onClick={handlePrev}>
             <ArrowLeft />
           </Button>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Button
               onClick={() => handleModeChange("alphabet")}
               variant={mode === "alphabet" ? "default" : "outline"}
@@ -333,6 +359,13 @@ export default function GameClient() {
             >
               <Hash className="mr-2" /> Numbers
             </Button>
+            <Button
+              onClick={() => handleModeChange("coloring")}
+              variant={mode === "coloring" ? "default" : "outline"}
+              className="w-32"
+            >
+              <ImageIcon className="mr-2" /> Coloring
+            </Button>
           </div>
           <Button variant="ghost" size="icon" onClick={handleNext}>
             <ArrowRight />
@@ -340,7 +373,7 @@ export default function GameClient() {
         </div>
 
         <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-center gap-6">
-          {mode === 'alphabet' && (
+          {(mode === 'alphabet' || mode === 'coloring') && (
             <div className="w-full lg:w-2/5 flex-shrink-0">
               <Card className="overflow-hidden shadow-lg">
                 <CardHeader className="p-4 bg-muted/50">
@@ -369,16 +402,28 @@ export default function GameClient() {
           )}
 
           <div className="flex-1 flex flex-col items-center justify-center w-full">
-            <TracingCanvas
-              key={`${mode}-${currentIndex}`}
-              character={letter}
-              onComplete={handleCompletion}
-              onClear={handleClear}
-              strokeColor={strokeColor}
-              strokeWidth={strokeWidth}
-              difficulty={difficulty}
-              fontFamily={fontFamily}
-            />
+            {mode === 'coloring' ? (
+              <ColoringCanvas
+                key={`${mode}-${currentIndex}`}
+                imageUrl={coloringPageUrl}
+                isLoading={isColoringPageLoading}
+                onComplete={handleCompletion}
+                onClear={handleClear}
+                strokeColor={strokeColor}
+                strokeWidth={strokeWidth}
+              />
+            ) : (
+              <TracingCanvas
+                key={`${mode}-${currentIndex}`}
+                character={letter}
+                onComplete={handleCompletion}
+                onClear={handleClear}
+                strokeColor={strokeColor}
+                strokeWidth={strokeWidth}
+                difficulty={difficulty}
+                fontFamily={fontFamily}
+              />
+            )}
           </div>
         </div>
         
