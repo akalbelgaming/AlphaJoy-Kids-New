@@ -79,34 +79,47 @@ export default function GameClient() {
   
   const letter = useMemo(() => typeof currentCharacter === 'string' ? currentCharacter : currentCharacter.letter, [currentCharacter]);
   const word = useMemo(() => typeof currentCharacter === 'string' ? undefined : currentCharacter.word, [currentCharacter]);
-  const imageHint = useMemo(() => typeof currentCharacter === 'string' ? undefined : currentCharacter.hint, [currentCharacter]);
 
   useEffect(() => {
     setStartTime(Date.now());
     
-    if (mode === 'coloring' && imageHint) {
+    if (mode === 'coloring') {
       const fetchColoringPage = async () => {
-        // Fetch coloring page
+        const hint = (typeof currentCharacter === 'object' && currentCharacter.hint) ? currentCharacter.hint : null;
+        if (!hint) {
+            setColoringPageUrl(null);
+            return;
+        }
+
         setIsColoringPageLoading(true);
         setColoringPageUrl(null);
-        const coloringResponse = await getColoringPage(imageHint);
-        if (coloringResponse.success && coloringResponse.data) {
-          setColoringPageUrl(coloringResponse.data.imageUrl);
-        } else {
-           toast({
-            variant: "destructive",
-            title: "Could not load coloring page",
-            description: coloringResponse.error,
-          });
+        try {
+            const coloringResponse = await getColoringPage(hint);
+            if (coloringResponse.success && coloringResponse.data) {
+              setColoringPageUrl(coloringResponse.data.imageUrl);
+            } else {
+               toast({
+                variant: "destructive",
+                title: "Could not load coloring page",
+                description: coloringResponse.error,
+              });
+            }
+        } catch (e) {
+             toast({
+                variant: "destructive",
+                title: "Error fetching coloring page",
+                description: "An unexpected error occurred.",
+            });
+        } finally {
+            setIsColoringPageLoading(false);
         }
-        setIsColoringPageLoading(false);
       };
       fetchColoringPage();
     } else {
       // Clear coloring page if not in coloring mode
       setColoringPageUrl(null);
     }
-  }, [currentIndex, mode, imageHint, toast]);
+  }, [currentIndex, mode, currentCharacter, toast]);
 
 
   const handleNext = useCallback(() => {
