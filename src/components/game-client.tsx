@@ -87,11 +87,10 @@ export default function GameClient() {
 
   useEffect(() => {
     setStartTime(Date.now());
-    const isAlphabetMode = mode === 'alphabet';
-    const isColoringMode = mode === 'coloring';
-
-    if ((isAlphabetMode || isColoringMode) && imageHint) {
+    
+    if (mode === 'coloring' && imageHint) {
       const fetchImages = async () => {
+        // Fetch reference image
         setIsImageLoading(true);
         setCharacterImage(null);
         const imageResponse = await getImageForWord(imageHint);
@@ -106,24 +105,24 @@ export default function GameClient() {
         }
         setIsImageLoading(false);
 
-        if (isColoringMode) {
-          setIsColoringPageLoading(true);
-          setColoringPageUrl(null);
-          const coloringResponse = await getColoringPage(imageHint);
-          if (coloringResponse.success && coloringResponse.data) {
-            setColoringPageUrl(coloringResponse.data.imageUrl);
-          } else {
-             toast({
-              variant: "destructive",
-              title: "Could not load coloring page",
-              description: coloringResponse.error,
-            });
-          }
-          setIsColoringPageLoading(false);
+        // Fetch coloring page
+        setIsColoringPageLoading(true);
+        setColoringPageUrl(null);
+        const coloringResponse = await getColoringPage(imageHint);
+        if (coloringResponse.success && coloringResponse.data) {
+          setColoringPageUrl(coloringResponse.data.imageUrl);
+        } else {
+           toast({
+            variant: "destructive",
+            title: "Could not load coloring page",
+            description: coloringResponse.error,
+          });
         }
+        setIsColoringPageLoading(false);
       };
       fetchImages();
     } else {
+      // Clear images if not in coloring mode or no hint
       setCharacterImage(null);
       setColoringPageUrl(null);
     }
@@ -373,7 +372,7 @@ export default function GameClient() {
         </div>
 
         <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-center gap-6">
-          {(mode === 'alphabet' || mode === 'coloring') && (
+          {mode === 'coloring' && (
             <div className="w-full lg:w-2/5 flex-shrink-0">
               <Card className="overflow-hidden shadow-lg">
                 <CardHeader className="p-4 bg-muted/50">
