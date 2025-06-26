@@ -33,16 +33,18 @@ const generateColoringPageFlow = ai.defineFlow(
     outputSchema: GenerateColoringPageOutputSchema,
   },
   async (input) => {
-    const {media} = await ai.generate({
+    const {media, finishReason} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `Coloring book outline of a ${input.prompt}. Simple, single object. Thick black lines on a white background. For a small child.`,
+      prompt: `A simple, single object for a coloring book page: ${input.prompt}. Thick black lines on a plain white background. For a small child.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },
     });
 
-    if (!media || !media.url) {
-      throw new Error('Coloring page generation failed.');
+    if (!media || !media.url || finishReason !== 'STOP') {
+      const reason = finishReason ? `Finish reason: ${finishReason}` : 'No media URL returned.';
+      console.error('Coloring page generation failed.', { finishReason });
+      throw new Error(`Coloring page generation failed. ${reason}`);
     }
 
     return { imageUrl: media.url };
