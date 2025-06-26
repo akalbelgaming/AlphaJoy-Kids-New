@@ -34,9 +34,9 @@ export function TracingCanvas({
   const svgRef = useRef<SVGSVGElement>(null);
 
   const difficultyStyles = {
-    easy: 'opacity-50',
-    medium: 'opacity-30',
-    hard: 'opacity-10',
+    easy: 'opacity-60',
+    medium: 'opacity-40',
+    hard: 'opacity-20',
   };
 
   const getPointInSVG = (e: React.PointerEvent<SVGSVGElement>): Point | null => {
@@ -111,7 +111,7 @@ export function TracingCanvas({
             y="50%"
             dy="0.35em"
             textAnchor="middle"
-            className={cn("select-none text-[350px] font-bold fill-muted pointer-events-none", difficultyStyles[difficulty])}
+            className={cn("select-none text-[350px] font-bold fill-muted-foreground pointer-events-none", difficultyStyles[difficulty])}
             style={{ fontFamily }}
           >
             {character}
