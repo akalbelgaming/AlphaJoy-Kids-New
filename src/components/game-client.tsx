@@ -82,29 +82,33 @@ export default function GameClient() {
 
   useEffect(() => {
     setStartTime(Date.now());
-    
+
     if (mode === 'coloring') {
       const fetchColoringPage = async () => {
+        setIsColoringPageLoading(true);
+        setColoringPageUrl(null);
+        
         const hint = (typeof currentCharacter === 'object' && currentCharacter.hint) ? currentCharacter.hint : null;
         if (!hint) {
+            setIsColoringPageLoading(false);
             setColoringPageUrl(null);
             return;
         }
 
-        setIsColoringPageLoading(true);
-        setColoringPageUrl(null);
         try {
             const coloringResponse = await getColoringPage(hint);
-            if (coloringResponse.success && coloringResponse.data) {
+            if (coloringResponse.success && coloringResponse.data?.imageUrl) {
               setColoringPageUrl(coloringResponse.data.imageUrl);
             } else {
+               setColoringPageUrl(null);
                toast({
                 variant: "destructive",
-                title: "Could not load coloring page",
-                description: coloringResponse.error,
+                title: "Could not draw this",
+                description: coloringResponse.error || "The AI had trouble drawing this shape. Please try the next one!",
               });
             }
         } catch (e) {
+             setColoringPageUrl(null);
              toast({
                 variant: "destructive",
                 title: "Error fetching coloring page",
@@ -119,7 +123,7 @@ export default function GameClient() {
       // Clear coloring page if not in coloring mode
       setColoringPageUrl(null);
     }
-  }, [currentIndex, mode, currentCharacter, toast]);
+  }, [currentIndex, mode, characterSet, toast]);
 
 
   const handleNext = useCallback(() => {
