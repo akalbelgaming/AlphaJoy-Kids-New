@@ -13,7 +13,6 @@ import {
   Sparkles,
   Users,
   TrendingUp,
-  Loader2,
   Image as ImageIcon,
 } from "lucide-react";
 import { numbers, alphabet } from "@/lib/characters";
@@ -22,7 +21,6 @@ import { ColoringCanvas } from "@/components/coloring-canvas";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
 import { getAdaptiveDifficulty } from "@/app/actions";
-import { getImageForWord } from "@/lib/images";
 import { getColoringPage } from "@/lib/coloring";
 
 import { Button } from "@/components/ui/button";
@@ -64,8 +62,6 @@ export default function GameClient() {
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [animationTrigger, setAnimationTrigger] = useState(0);
 
-  const [characterImage, setCharacterImage] = useState<string | null>(null);
-  const [isImageLoading, setIsImageLoading] = useState(false);
   const [coloringPageUrl, setColoringPageUrl] = useState<string | null>(null);
   const [isColoringPageLoading, setIsColoringPageLoading] = useState(false);
 
@@ -89,22 +85,7 @@ export default function GameClient() {
     setStartTime(Date.now());
     
     if (mode === 'coloring' && imageHint) {
-      const fetchImages = async () => {
-        // Fetch reference image
-        setIsImageLoading(true);
-        setCharacterImage(null);
-        const imageResponse = await getImageForWord(imageHint);
-        if (imageResponse.success && imageResponse.data) {
-          setCharacterImage(imageResponse.data.imageUrl);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Could not load hint image",
-            description: imageResponse.error,
-          });
-        }
-        setIsImageLoading(false);
-
+      const fetchColoringPage = async () => {
         // Fetch coloring page
         setIsColoringPageLoading(true);
         setColoringPageUrl(null);
@@ -120,10 +101,9 @@ export default function GameClient() {
         }
         setIsColoringPageLoading(false);
       };
-      fetchImages();
+      fetchColoringPage();
     } else {
-      // Clear images if not in coloring mode or no hint
-      setCharacterImage(null);
+      // Clear coloring page if not in coloring mode
       setColoringPageUrl(null);
     }
   }, [currentIndex, mode, imageHint, toast]);
@@ -371,46 +351,22 @@ export default function GameClient() {
           </Button>
         </div>
 
-        <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-center gap-6">
-          {mode === 'coloring' && (
-            <div className="w-full lg:w-2/5 flex-shrink-0">
-              <Card className="overflow-hidden shadow-lg">
-                <CardHeader className="p-4 bg-muted/50">
-                   <CardTitle className="text-center text-primary text-2xl tracking-wide">{word ? `${letter} is for ${word}`: letter}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  {isImageLoading ? (
-                     <div className="aspect-square w-full flex items-center justify-center bg-muted rounded-lg">
-                       <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                     </div>
-                  ) : characterImage ? (
-                     <img
-                       src={characterImage}
-                       alt={word || ''}
-                       className="w-full aspect-square object-contain rounded-lg bg-white p-2"
-                       data-ai-hint={imageHint}
-                     />
-                  ) : (
-                    <div className="aspect-square w-full flex items-center justify-center bg-muted rounded-lg text-muted-foreground">
-                      {imageHint && <p>Image not available</p>}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          <div className="flex-1 flex flex-col items-center justify-center w-full">
+        <div className="w-full flex-1 flex flex-col items-center justify-center">
             {mode === 'coloring' ? (
-              <ColoringCanvas
-                key={`${mode}-${currentIndex}`}
-                imageUrl={coloringPageUrl}
-                isLoading={isColoringPageLoading}
-                onComplete={handleCompletion}
-                onClear={handleClear}
-                strokeColor={strokeColor}
-                strokeWidth={strokeWidth}
-              />
+              <>
+                <h2 className="text-3xl font-bold text-primary mb-4 text-center">
+                  {word ? `${letter} is for ${word}` : `Color the image`}
+                </h2>
+                <ColoringCanvas
+                  key={`${mode}-${currentIndex}`}
+                  imageUrl={coloringPageUrl}
+                  isLoading={isColoringPageLoading}
+                  onComplete={handleCompletion}
+                  onClear={handleClear}
+                  strokeColor={strokeColor}
+                  strokeWidth={strokeWidth}
+                />
+              </>
             ) : (
               <TracingCanvas
                 key={`${mode}-${currentIndex}`}
@@ -423,7 +379,6 @@ export default function GameClient() {
                 fontFamily={fontFamily}
               />
             )}
-          </div>
         </div>
         
         <div className="w-full max-w-lg mt-4 self-center">
