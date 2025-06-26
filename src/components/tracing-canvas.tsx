@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Eraser, Check, Loader2 } from 'lucide-react';
+import { Eraser, Check } from 'lucide-react';
 
 interface Point {
   x: number;
@@ -12,9 +12,6 @@ interface Point {
 
 interface TracingCanvasProps {
   character: string;
-  word?: string;
-  imageUrl?: string | null;
-  isImageLoading?: boolean;
   onComplete: () => void;
   onClear: () => void;
   strokeColor: string;
@@ -25,9 +22,6 @@ interface TracingCanvasProps {
 
 export function TracingCanvas({
   character,
-  word,
-  imageUrl,
-  isImageLoading,
   onComplete,
   onClear,
   strokeColor,
@@ -111,18 +105,6 @@ export function TracingCanvas({
           onPointerLeave={handlePointerUp}
           viewBox="0 0 500 500"
         >
-          {/* Background Image */}
-          {isImageLoading && (
-            <foreignObject x="0" y="0" width="500" height="500">
-                <div className="w-full h-full flex items-center justify-center bg-muted/30">
-                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                </div>
-            </foreignObject>
-          )}
-          {imageUrl && !isImageLoading && (
-            <image href={imageUrl} x="50" y="50" height="400" width="400" className="opacity-20 pointer-events-none" />
-          )}
-
           {/* Guide character */}
           <text
             x="50%"
@@ -149,12 +131,6 @@ export function TracingCanvas({
             />
           ))}
         </svg>
-
-        {word && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/80 px-4 py-2 rounded-lg border shadow">
-             <p className="text-2xl font-bold text-primary">{`${character} for ${word}`}</p>
-          </div>
-        )}
       </div>
       <div className="flex gap-4">
         <Button variant="outline" size="lg" onClick={handleClear} className="w-32">

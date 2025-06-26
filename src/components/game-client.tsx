@@ -13,6 +13,7 @@ import {
   Sparkles,
   Users,
   TrendingUp,
+  Loader2,
 } from "lucide-react";
 import { numbers, alphabet } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
@@ -99,7 +100,7 @@ export default function GameClient() {
     } else {
       setCharacterImage(null);
     }
-  }, [currentCharacter, mode, imageHint, toast]);
+  }, [currentIndex, mode, imageHint, toast]);
 
 
   const handleNext = useCallback(() => {
@@ -307,7 +308,7 @@ export default function GameClient() {
         <AdBanner />
       </aside>
 
-      <main className="flex-1 flex flex-col items-center justify-center relative">
+      <main className="flex-1 flex flex-col items-center justify-start relative">
         <PointAnimation
           points={POINTS_PER_COMPLETION}
           trigger={animationTrigger}
@@ -337,20 +338,50 @@ export default function GameClient() {
           </Button>
         </div>
 
-        <TracingCanvas
-          key={`${mode}-${currentIndex}`}
-          character={letter}
-          word={word}
-          imageUrl={characterImage}
-          isImageLoading={isImageLoading}
-          onComplete={handleCompletion}
-          onClear={handleClear}
-          strokeColor={strokeColor}
-          strokeWidth={strokeWidth}
-          difficulty={difficulty}
-          fontFamily={fontFamily}
-        />
-        <div className="w-full max-w-lg mt-4">
+        <div className="w-full flex-1 flex flex-col lg:flex-row items-center justify-center gap-6">
+          {mode === 'alphabet' && (
+            <div className="w-full lg:w-2/5 flex-shrink-0">
+              <Card className="overflow-hidden shadow-lg">
+                <CardHeader className="p-4 bg-muted/50">
+                   <CardTitle className="text-center text-primary text-2xl tracking-wide">{word ? `${letter} is for ${word}`: letter}</CardTitle>
+                </CardHeader>
+                <CardContent className="p-4">
+                  {isImageLoading ? (
+                     <div className="aspect-square w-full flex items-center justify-center bg-muted rounded-lg">
+                       <Loader2 className="w-16 h-16 text-primary animate-spin" />
+                     </div>
+                  ) : characterImage ? (
+                     <img
+                       src={characterImage}
+                       alt={word || ''}
+                       className="w-full aspect-square object-contain rounded-lg bg-white p-2"
+                       data-ai-hint={imageHint}
+                     />
+                  ) : (
+                    <div className="aspect-square w-full flex items-center justify-center bg-muted rounded-lg text-muted-foreground">
+                      {imageHint && <p>Image not available</p>}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          <div className="flex-1 flex flex-col items-center justify-center w-full">
+            <TracingCanvas
+              key={`${mode}-${currentIndex}`}
+              character={letter}
+              onComplete={handleCompletion}
+              onClear={handleClear}
+              strokeColor={strokeColor}
+              strokeWidth={strokeWidth}
+              difficulty={difficulty}
+              fontFamily={fontFamily}
+            />
+          </div>
+        </div>
+        
+        <div className="w-full max-w-lg mt-4 self-center">
           <AdBanner />
         </div>
       </main>
