@@ -13,15 +13,15 @@ import {
   Sparkles,
   Users,
   TrendingUp,
-  Image as ImageIcon,
+  BookCopy,
 } from "lucide-react";
 import { numbers, alphabet } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
-import { ColoringCanvas } from "@/components/coloring-canvas";
+import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
 import { getAdaptiveDifficulty } from "@/app/actions";
-import { getColoringPage } from "@/lib/coloring";
+import { getStory } from "@/lib/story";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +37,7 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Mode = "numbers" | "alphabet" | "coloring";
+type Mode = "numbers" | "alphabet" | "story";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -62,9 +62,9 @@ export default function GameClient() {
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [animationTrigger, setAnimationTrigger] = useState(0);
 
-  const [coloringPageUrl, setColoringPageUrl] = useState<string | null>(null);
-  const [isColoringPageLoading, setIsColoringPageLoading] = useState(false);
-
+  const [story, setStory] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isStoryLoading, setIsStoryLoading] = useState(false);
 
   const { toast } = useToast();
 
@@ -83,47 +83,44 @@ export default function GameClient() {
   useEffect(() => {
     setStartTime(Date.now());
 
-    if (mode === 'coloring') {
-      const fetchColoringPage = async () => {
-        setIsColoringPageLoading(true);
-        setColoringPageUrl(null);
+    if (mode === 'story') {
+      const fetchStory = async () => {
+        setIsStoryLoading(true);
+        setStory(null);
+        setAudioUrl(null);
         
-        const hint = (typeof currentCharacter === 'object' && currentCharacter.hint) ? currentCharacter.hint : null;
-        if (!hint) {
-            setIsColoringPageLoading(false);
-            setColoringPageUrl(null);
+        const storyWord = (typeof currentCharacter === 'object' && currentCharacter.word) ? currentCharacter.word : null;
+        
+        if (!storyWord) {
+            setIsStoryLoading(false);
             return;
         }
 
         try {
-            const coloringResponse = await getColoringPage(hint);
-            if (coloringResponse.success && coloringResponse.data?.imageUrl) {
-              setColoringPageUrl(coloringResponse.data.imageUrl);
+            const storyResponse = await getStory(storyWord);
+            if (storyResponse.success && storyResponse.data) {
+              setStory(storyResponse.data.story);
+              setAudioUrl(storyResponse.data.audioUrl);
             } else {
-               setColoringPageUrl(null);
                toast({
                 variant: "destructive",
-                title: "Could not draw this",
-                description: coloringResponse.error || "The AI had trouble drawing this shape. Please try the next one!",
+                title: "Could not create a story",
+                description: storyResponse.error || "The AI storyteller is taking a break. Please try the next one!",
               });
             }
         } catch (e) {
-             setColoringPageUrl(null);
              toast({
                 variant: "destructive",
-                title: "Error fetching coloring page",
+                title: "Error fetching story",
                 description: "An unexpected error occurred.",
             });
         } finally {
-            setIsColoringPageLoading(false);
+            setIsStoryLoading(false);
         }
       };
-      fetchColoringPage();
-    } else {
-      // Clear coloring page if not in coloring mode
-      setColoringPageUrl(null);
+      fetchStory();
     }
-  }, [currentIndex, mode, characterSet, toast]);
+  }, [currentIndex, mode, characterSet, toast, currentCharacter]);
 
 
   const handleNext = useCallback(() => {
@@ -356,11 +353,11 @@ export default function GameClient() {
               <Hash className="mr-2" /> Numbers
             </Button>
             <Button
-              onClick={() => handleModeChange("coloring")}
-              variant={mode === "coloring" ? "default" : "outline"}
+              onClick={() => handleModeChange("story")}
+              variant={mode === "story" ? "default" : "outline"}
               className="w-32"
             >
-              <ImageIcon className="mr-2" /> Coloring
+              <BookCopy className="mr-2" /> Story Time
             </Button>
           </div>
           <Button variant="ghost" size="icon" onClick={handleNext}>
@@ -369,21 +366,15 @@ export default function GameClient() {
         </div>
 
         <div className="w-full flex-1 flex flex-col items-center justify-center">
-            {mode === 'coloring' ? (
-              <>
-                <h2 className="text-3xl font-bold text-primary mb-4 text-center">
-                  {word ? `${letter} is for ${word}` : `Color the image`}
-                </h2>
-                <ColoringCanvas
+            {mode === 'story' ? (
+              <StoryDisplay
                   key={`${mode}-${currentIndex}`}
-                  imageUrl={coloringPageUrl}
-                  isLoading={isColoringPageLoading}
+                  word={(typeof currentCharacter === 'object' && currentCharacter.word) ? currentCharacter.word : ''}
+                  story={story}
+                  audioUrl={audioUrl}
+                  isLoading={isStoryLoading}
                   onComplete={handleCompletion}
-                  onClear={handleClear}
-                  strokeColor={strokeColor}
-                  strokeWidth={strokeWidth}
                 />
-              </>
             ) : (
               <TracingCanvas
                 key={`${mode}-${currentIndex}`}
