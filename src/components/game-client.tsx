@@ -18,7 +18,7 @@ import { numbers, alphabet } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
-import { getAdaptiveDifficulty } from "@/app/actions";
+import { getAdaptiveDifficulty, getImageForWord } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,7 +39,7 @@ type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const POINTS_PER_COMPLETION = 10;
-const INTERSTITIAL_AD_FREQUENCY = 3;
+const INTERSTITIAL_AD_FREQUENCY = 5;
 
 export default function GameClient() {
   const [mode, setMode] = useState<Mode>("alphabet");
@@ -59,6 +59,9 @@ export default function GameClient() {
   const [showInterstitial, setShowInterstitial] = useState(false);
   const [animationTrigger, setAnimationTrigger] = useState(0);
 
+  const [characterImage, setCharacterImage] = useState<string | null>(null);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+
   const { toast } = useToast();
 
   const characterSet = useMemo(
@@ -69,10 +72,35 @@ export default function GameClient() {
     () => characterSet[currentIndex],
     [characterSet, currentIndex]
   );
+  
+  const letter = useMemo(() => typeof currentCharacter === 'string' ? currentCharacter : currentCharacter.letter, [currentCharacter]);
+  const word = useMemo(() => typeof currentCharacter === 'string' ? undefined : currentCharacter.word, [currentCharacter]);
+  const imageHint = useMemo(() => typeof currentCharacter === 'string' ? undefined : currentCharacter.hint, [currentCharacter]);
 
   useEffect(() => {
     setStartTime(Date.now());
-  }, [currentCharacter, mode]);
+    if (mode === 'alphabet' && imageHint) {
+      const fetchImage = async () => {
+        setIsImageLoading(true);
+        setCharacterImage(null);
+        const response = await getImageForWord(imageHint);
+        if (response.success && response.data) {
+          setCharacterImage(response.data.imageUrl);
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Could not load image",
+            description: response.error,
+          });
+        }
+        setIsImageLoading(false);
+      };
+      fetchImage();
+    } else {
+      setCharacterImage(null);
+    }
+  }, [currentCharacter, mode, imageHint, toast]);
+
 
   const handleNext = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % characterSet.length);
@@ -95,7 +123,7 @@ export default function GameClient() {
     const newCompletions = completions + 1;
     setCompletions(newCompletions);
 
-    if (newCompletions % INTERSTITIAL_AD_FREQUENCY === 0) {
+    if (newCompletions > 0 && newCompletions % INTERSTITIAL_AD_FREQUENCY === 0) {
       setShowInterstitial(true);
     } else {
       handleNext();
@@ -310,7 +338,11 @@ export default function GameClient() {
         </div>
 
         <TracingCanvas
-          character={currentCharacter}
+          key={`${mode}-${currentIndex}`}
+          character={letter}
+          word={word}
+          imageUrl={characterImage}
+          isImageLoading={isImageLoading}
           onComplete={handleCompletion}
           onClear={handleClear}
           strokeColor={strokeColor}

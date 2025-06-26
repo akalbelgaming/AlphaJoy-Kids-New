@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { VenetianMask } from "lucide-react";
+import { PlayCircle, Video } from "lucide-react";
 
 export function AdBanner({ className }: { className?: string }) {
   return (
@@ -11,9 +11,9 @@ export function AdBanner({ className }: { className?: string }) {
         className
       )}
     >
-      <div className="flex flex-col items-center gap-2">
-        <VenetianMask className="h-6 w-6" />
-        <p className="text-sm font-medium">Advertisement</p>
+      <div className="flex items-center gap-3">
+        <Video className="h-6 w-6" />
+        <p className="text-sm font-medium">Video Advertisement</p>
       </div>
     </div>
   );
@@ -29,38 +29,32 @@ export function InterstitialAd({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[101] bg-black/80 flex items-center justify-center p-4">
-      <div className="relative bg-background rounded-lg shadow-xl w-full max-w-md h-[80vh] flex flex-col items-center justify-center text-center p-6 border">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 bg-background rounded-full p-1.5 text-foreground/70 hover:text-foreground hover:bg-muted"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="h-5 w-5"
+    <div className="fixed inset-0 z-[101] bg-black/90 flex items-center justify-center p-4">
+      <div className="relative bg-black rounded-lg w-full max-w-md h-[80vh] flex flex-col items-center justify-between p-6 border border-gray-700">
+        <div className="w-full flex justify-between items-center text-white">
+          <p className="text-sm">Video will play automatically</p>
+          <button
+            onClick={onClose}
+            className="bg-gray-800/50 rounded-full p-1.5 text-white hover:bg-gray-700"
           >
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          <span className="sr-only">Close</span>
-        </button>
-        <div className="flex flex-col items-center gap-4">
-          <VenetianMask className="h-12 w-12 text-muted-foreground" />
-          <h2 className="text-2xl font-bold font-headline">Advertisement</h2>
-          <p className="text-muted-foreground">
-            Your content will resume shortly.
-          </p>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span className="sr-only">Close</span>
+          </button>
         </div>
-        <div className="absolute bottom-4 text-xs text-muted-foreground">
-          Ad placeholder
+
+        <div className="flex flex-col items-center gap-4 text-white">
+          <PlayCircle className="h-20 w-20 text-white/50" />
+          <h2 className="text-2xl font-bold">Advertisement</h2>
+        </div>
+
+        <div className="w-full">
+          <p className="text-xs text-white/50 text-right">Your content will resume shortly.</p>
+          <div className="w-full bg-gray-600 rounded-full h-1 mt-1">
+            <div className="bg-yellow-400 h-1 rounded-full animate-pulse" style={{ width: '45%' }}></div>
+          </div>
         </div>
       </div>
     </div>
