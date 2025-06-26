@@ -35,7 +35,7 @@ const generateColoringPageFlow = ai.defineFlow(
   async (input) => {
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `A simple, clean, black and white coloring book outline of a ${input.prompt}, on a clean white background, for a children's educational game. The lines should be thick and clear, and the shape should be easy for a child to recognize and color in.`,
+      prompt: `Create a coloring book page for a child. The subject is a ${input.prompt}. The image must be a simple, bold, black-and-white outline drawing on a plain white background. The lines must be thick and solid. The object should be centered and easy for a young child to recognize and color inside the lines. Do not include any shading, complex details, or background elements.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },
