@@ -19,7 +19,8 @@ import { numbers, alphabet } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
-import { getAdaptiveDifficulty, getImageForWord } from "@/app/actions";
+import { getAdaptiveDifficulty } from "@/app/actions";
+import { getImageForWord } from "@/lib/images";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
