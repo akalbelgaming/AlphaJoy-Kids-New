@@ -1,24 +1,49 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { PlayCircle, Video } from "lucide-react";
+import Image from "next/image";
+import { PlayCircle, Video, X } from "lucide-react";
 
+/**
+ * A component that visually simulates a Google AdMob banner test ad.
+ */
 export function AdBanner({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-center bg-muted/50 border border-dashed rounded-lg text-muted-foreground p-4 min-h-[60px]",
+        "flex w-full items-center justify-start bg-gray-100 border border-gray-300 rounded-lg text-black p-2 min-h-[60px] shadow-sm",
         className
       )}
     >
-      <div className="flex items-center gap-3">
-        <Video className="h-6 w-6" />
-        <p className="text-sm font-medium">Video Advertisement</p>
+      <div className="flex w-full items-center gap-3">
+        <div className="flex-shrink-0">
+          <Image 
+            src="https://placehold.co/50x50.png" 
+            data-ai-hint="logo"
+            alt="Ad icon" 
+            width={50} 
+            height={50} 
+            className="rounded-md"
+          />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-bold bg-yellow-400 px-1 rounded-[3px]">Ad</span>
+            <p className="text-sm font-bold">Test Ad: Awesome Game</p>
+          </div>
+          <p className="text-xs text-gray-600">Install this great new game now!</p>
+        </div>
+        <button className="bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+          Install
+        </button>
       </div>
     </div>
   );
 }
 
+/**
+ * A component that visually simulates a Google AdMob interstitial test ad.
+ */
 export function InterstitialAd({
   isOpen,
   onClose,
@@ -29,33 +54,45 @@ export function InterstitialAd({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[101] bg-black/90 flex items-center justify-center p-4">
-      <div className="relative bg-black rounded-lg w-full max-w-md h-[80vh] flex flex-col items-center justify-between p-6 border border-gray-700">
-        <div className="w-full flex justify-between items-center text-white">
-          <p className="text-sm">Video will play automatically</p>
-          <button
-            onClick={onClose}
-            className="bg-gray-800/50 rounded-full p-1.5 text-white hover:bg-gray-700"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            <span className="sr-only">Close</span>
-          </button>
+    <div className="fixed inset-0 z-[101] bg-black/90 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="relative bg-black rounded-lg w-full max-w-md h-[90vh] flex flex-col items-center justify-center p-2 border border-gray-700 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="w-full flex justify-between items-center absolute top-2 left-2 right-2 px-2">
+            <span className="text-xs font-bold bg-yellow-400 px-1 rounded-[3px] text-black">Ad</span>
+            <button
+                onClick={onClose}
+                className="bg-gray-800/80 rounded-full p-1.5 text-white hover:bg-gray-700"
+            >
+                <X className="h-5 w-5" />
+                <span className="sr-only">Close Ad</span>
+            </button>
         </div>
 
-        <div className="flex flex-col items-center gap-4 text-white">
-          <PlayCircle className="h-20 w-20 text-white/50" />
-          <h2 className="text-2xl font-bold">Advertisement</h2>
+        <div className="flex-1 w-full flex flex-col items-center justify-center gap-4 text-white bg-gray-900 my-12">
+            <Video className="h-20 w-20 text-white/50" />
+            <h2 className="text-xl font-bold">Test Video Ad</h2>
+            <p className="text-sm text-gray-400">Your content will resume after the ad.</p>
+        </div>
+        
+        <div className="w-full bg-white p-3 flex items-center gap-3">
+             <div className="flex-shrink-0">
+                <Image 
+                    src="https://placehold.co/50x50.png"
+                    data-ai-hint="logo" 
+                    alt="Ad icon" 
+                    width={50} 
+                    height={50} 
+                    className="rounded-md"
+                />
+            </div>
+            <div className="flex-1">
+                <p className="text-base font-bold text-black">Test Ad: Awesome Game</p>
+                <p className="text-sm text-gray-700">Install this great new game now!</p>
+            </div>
+            <button className="bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+                Install
+            </button>
         </div>
 
-        <div className="w-full">
-          <p className="text-xs text-white/50 text-right">Your content will resume shortly.</p>
-          <div className="w-full bg-gray-600 rounded-full h-1 mt-1">
-            <div className="bg-yellow-400 h-1 rounded-full animate-pulse" style={{ width: '45%' }}></div>
-          </div>
-        </div>
       </div>
     </div>
   );
