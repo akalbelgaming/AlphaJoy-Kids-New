@@ -20,6 +20,8 @@ interface TracingCanvasProps {
   fontFamily: string;
 }
 
+const MIN_PATH_LENGTH_FOR_COMPLETION = 100; // Heuristic value for minimum drawing effort
+
 export function TracingCanvas({
   character,
   onComplete,
@@ -31,7 +33,10 @@ export function TracingCanvas({
 }: TracingCanvasProps) {
   const [paths, setPaths] = useState<string[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [pathLength, setPathLength] = useState(0);
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const isComplete = pathLength >= MIN_PATH_LENGTH_FOR_COMPLETION;
 
   const difficultyStyles = {
     easy: 'opacity-40',
@@ -65,6 +70,7 @@ export function TracingCanvas({
     if (!isDrawing) return;
     const point = getPointInSVG(e);
     if (point) {
+      setPathLength(prev => prev + 1); // Increment path length as user draws
       setPaths(prev => {
         const newPaths = [...prev];
         newPaths[newPaths.length - 1] += ` L ${point.x} ${point.y}`;
@@ -79,18 +85,21 @@ export function TracingCanvas({
 
   const handleClear = () => {
     setPaths([]);
+    setPathLength(0);
     onClear();
   };
 
   const handleComplete = () => {
-    if (paths.length > 0) {
+    if (isComplete) {
       onComplete();
       setPaths([]);
+      setPathLength(0);
     }
   };
 
   useEffect(() => {
     setPaths([]);
+    setPathLength(0);
   }, [character, fontFamily]);
 
   return (
@@ -137,7 +146,7 @@ export function TracingCanvas({
           <Eraser className="mr-2 h-5 w-5" />
           Clear
         </Button>
-        <Button size="lg" onClick={handleComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Button size="lg" onClick={handleComplete} disabled={!isComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground">
           <Check className="mr-2 h-5 w-5" />
           Done!
         </Button>
