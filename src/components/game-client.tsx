@@ -408,7 +408,7 @@ export default function GameClient() {
                 max={24}
                 step={2}
                 value={[strokeWidth]}
-                onValuege={(v) => setStrokeWidth(v[0])}
+                onValueChange={(v) => setStrokeWidth(v[0])}
               />
             </div>
           </CardContent>
