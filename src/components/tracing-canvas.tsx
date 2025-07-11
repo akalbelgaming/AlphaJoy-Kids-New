@@ -102,6 +102,9 @@ export function TracingCanvas({
     setPaths([]);
     setPathLength(0);
   }, [character, fontFamily]);
+  
+  // Adjust font size for words vs single characters
+  const fontSize = character.length > 1 ? 'text-[150px]' : 'text-[350px]';
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
@@ -121,7 +124,7 @@ export function TracingCanvas({
             y="50%"
             dy="0.35em"
             textAnchor="middle"
-            className={cn("select-none text-[350px] font-bold fill-muted-foreground pointer-events-none", difficultyStyles[difficulty])}
+            className={cn("select-none font-bold fill-muted-foreground pointer-events-none", fontSize, difficultyStyles[difficulty])}
             style={{ fontFamily }}
           >
             {character}
