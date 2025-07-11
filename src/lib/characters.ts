@@ -36,7 +36,7 @@ export const alphabet: AlphabetCharacter[] = [
   { letter: 'U', word: 'Umbrella', hint: 'rain umbrella' },
   { letter: 'V', word: 'Violin', hint: 'musical violin' },
   { letter: 'W', word: 'Watch', hint: 'wrist watch' },
-  { letter: 'X', word: 'Xylophone', hint: 'colorful xylophone' },
+  { letter: 'X', word: 'X-ray', hint: 'bone x-ray' },
   { letter: 'Y', word: 'Yacht', hint: 'sailing yacht' },
   { letter: 'Z', word: 'Zebra', hint: 'striped zebra' },
 ];
