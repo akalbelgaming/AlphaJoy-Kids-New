@@ -53,17 +53,6 @@ async function toWav(
   });
 }
 
-const storyPrompt = ai.definePrompt({
-    name: 'storyPrompt',
-    model: googleAI.model('gemini-1.5-flash'),
-    input: {schema: z.object({ topic: z.string() })},
-    output: {schema: z.object({ story: z.string() })},
-    prompt: `You are a master storyteller for young children (ages 3-5). 
-    Write a very short, simple, and happy story about a "{{topic}}".
-    The story should be only 2-3 sentences long.
-    Use simple words and a positive tone.`,
-});
-
 const generateStoryFlow = ai.defineFlow(
   {
     name: 'generateStoryFlow',
@@ -72,12 +61,19 @@ const generateStoryFlow = ai.defineFlow(
   },
   async (input) => {
     // 1. Generate the story text
-    const { output } = await storyPrompt({ topic: input.topic });
-    const storyText = output?.story;
+    const { text } = await ai.generate({
+      model: googleAI.model('gemini-1.5-flash'),
+      prompt: `You are a master storyteller for young children (ages 3-5). 
+    Write a very short, simple, and happy story about a "${input.topic}".
+    The story should be only 2-3 sentences long.
+    Use simple words and a positive tone. Do not add any formatting.`,
+    });
     
-    if (!storyText) {
+    if (!text) {
       throw new Error('Failed to generate story text.');
     }
+    
+    const storyText = text;
     
     // 2. Generate the audio for the story
     const { media } = await ai.generate({
