@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
@@ -19,7 +20,7 @@ import {
   ScanEye,
   PenSquare,
 } from "lucide-react";
-import { numbers, alphabet, shapes, readingWords } from "@/lib/characters";
+import { numbers, alphabet, shapes, readingWords, type ShapeCharacter } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -27,6 +28,7 @@ import { PointAnimation } from "@/components/point-animation";
 import { getAdaptiveDifficulty, getStory, getImageForWord } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
+import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -100,13 +102,12 @@ export default function GameClient() {
   );
   
   const itemToTrace = useMemo(() => {
-      if (!currentCharacter) return '';
+      if (mode === 'shapes' || !currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
       if ('letter' in currentCharacter) return currentCharacter.letter;
-      if ('shape' in currentCharacter) return currentCharacter.shape;
       if ('word' in currentCharacter) return currentCharacter.word;
       return '';
-  }, [currentCharacter]);
+  }, [mode, currentCharacter]);
 
   const itemForStory = useMemo(() => {
     if (!currentCharacter) return '';
@@ -119,6 +120,11 @@ export default function GameClient() {
     return parseInt(currentCharacter as string, 10);
   }, [mode, currentCharacter]);
 
+  const itemForShapes = useMemo(() => {
+    if (mode !== 'shapes' || !currentCharacter) return null;
+    return currentCharacter as ShapeCharacter;
+  }, [mode, currentCharacter]);
+
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
@@ -126,12 +132,13 @@ export default function GameClient() {
             setIsStoryLoading(true);
             setStory(null);
             setAudioUrl(null);
-            if (!itemForStory) {
+            const wordForStory = (currentCharacter as any)?.word
+            if (!wordForStory) {
                 setIsStoryLoading(false);
                 return;
             }
             try {
-                const storyResponse = await getStory(itemForStory);
+                const storyResponse = await getStory(wordForStory);
                 if (storyResponse.success && storyResponse.data) {
                   setStory(storyResponse.data.story);
                   setAudioUrl(storyResponse.data.audioUrl);
@@ -167,20 +174,20 @@ export default function GameClient() {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast]);
+  }, [currentIndex, mode, currentCharacter, itemForCounting, toast]);
 
 
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev + 1) % characterSet.length);
     }
-  }, [characterSet.length]);
+  }, [characterSet]);
 
   const handlePrev = useCallback(() => {
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev - 1 + characterSet.length) % characterSet.length);
     }
-  }, [characterSet.length]);
+  }, [characterSet]);
 
   const handleCompletion = useCallback(() => {
     const endTime = Date.now();
@@ -243,7 +250,6 @@ export default function GameClient() {
     switch (mode) {
       case "alphabet":
       case "numbers":
-      case "shapes":
       case "reading":
         return (
           <TracingCanvas
@@ -257,11 +263,26 @@ export default function GameClient() {
             fontFamily={fontFamily}
           />
         );
+      case "shapes":
+        const shape = itemForShapes;
+        if (!shape) return null;
+        return (
+            <ShapeColoringCanvas
+                key={`${mode}-${currentIndex}`}
+                shapeName={shape.name}
+                shapePath={shape.path}
+                shapeViewBox={shape.viewBox}
+                onComplete={handleCompletion}
+                onClear={handleClear}
+                strokeColor={strokeColor}
+                strokeWidth={strokeWidth}
+            />
+        );
       case "story":
         return (
           <StoryDisplay
             key={`${mode}-${currentIndex}`}
-            word={itemForStory}
+            word={(currentCharacter as any)?.word || ''}
             story={story}
             audioUrl={audioUrl}
             isLoading={isStoryLoading}
@@ -388,6 +409,7 @@ export default function GameClient() {
                           ? "border-primary ring-2 ring-offset-2 ring-primary"
                           : "border-transparent"
                       )}
+                      suppressHydrationWarning={true}
                     >
                       <span className="sr-only">{color}</span>
                     </button>

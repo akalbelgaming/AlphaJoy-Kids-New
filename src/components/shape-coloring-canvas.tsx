@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Eraser, Check } from 'lucide-react';
@@ -11,39 +11,34 @@ interface Point {
   y: number;
 }
 
-interface TracingCanvasProps {
-  character: string;
+interface ShapeColoringCanvasProps {
+  shapeName: string;
+  shapePath: string;
+  shapeViewBox: string;
   onComplete: () => void;
   onClear: () => void;
   strokeColor: string;
   strokeWidth: number;
-  difficulty: 'easy' | 'medium' | 'hard';
-  fontFamily: string;
 }
 
-const MIN_PATH_LENGTH_FOR_COMPLETION = 100; // Heuristic value for minimum drawing effort
+const COMPLETION_THRESHOLD = 0.3; // Requires 30% of the shape to be "colored"
 
-export function TracingCanvas({
-  character,
+export function ShapeColoringCanvas({
+  shapeName,
+  shapePath,
+  shapeViewBox,
   onComplete,
   onClear,
   strokeColor,
   strokeWidth,
-  difficulty,
-  fontFamily,
-}: TracingCanvasProps) {
+}: ShapeColoringCanvasProps) {
   const [paths, setPaths] = useState<string[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [pathLength, setPathLength] = useState(0);
+  const [fillRatio, setFillRatio] = useState(0);
   const svgRef = useRef<SVGSVGElement>(null);
+  const shapeRef = useRef<SVGPathElement>(null);
 
-  const isComplete = pathLength >= MIN_PATH_LENGTH_FOR_COMPLETION;
-
-  const difficultyStyles = {
-    easy: 'opacity-40',
-    medium: 'opacity-25',
-    hard: 'opacity-15',
-  };
+  const isComplete = fillRatio >= COMPLETION_THRESHOLD;
 
   const getPointInSVG = (e: React.PointerEvent<SVGSVGElement>): Point | null => {
     if (!svgRef.current) return null;
@@ -58,6 +53,26 @@ export function TracingCanvas({
     return null;
   };
 
+  const calculateFillRatio = useCallback(() => {
+    if (!shapeRef.current || paths.length === 0) return 0;
+
+    const shapePath = shapeRef.current;
+    let totalLength = 0;
+    paths.forEach(pathData => {
+      const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      tempPath.setAttribute("d", pathData);
+      totalLength += tempPath.getTotalLength();
+    });
+
+    const shapeBBox = shapePath.getBBox();
+    const shapeDiagonal = Math.sqrt(shapeBBox.width ** 2 + shapeBBox.height ** 2);
+    
+    // Heuristic: compare drawn length to a diagonal of the shape's bounding box
+    const ratio = Math.min(1, totalLength / (shapeDiagonal * 2)); // *2 is an adjustment factor
+    setFillRatio(ratio);
+  }, [paths]);
+
+
   const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     e.preventDefault();
     setIsDrawing(true);
@@ -71,7 +86,6 @@ export function TracingCanvas({
     if (!isDrawing) return;
     const point = getPointInSVG(e);
     if (point) {
-      setPathLength(prev => prev + 1); // Increment path length as user draws
       setPaths(prev => {
         const newPaths = [...prev];
         newPaths[newPaths.length - 1] += ` L ${point.x} ${point.y}`;
@@ -82,11 +96,12 @@ export function TracingCanvas({
 
   const handlePointerUp = () => {
     setIsDrawing(false);
+    calculateFillRatio();
   };
 
   const handleClear = () => {
     setPaths([]);
-    setPathLength(0);
+    setFillRatio(0);
     onClear();
   };
 
@@ -94,17 +109,18 @@ export function TracingCanvas({
     if (isComplete) {
       onComplete();
       setPaths([]);
-      setPathLength(0);
+      setFillRatio(0);
     }
   };
 
   useEffect(() => {
     setPaths([]);
-    setPathLength(0);
-  }, [character, fontFamily]);
+    setFillRatio(0);
+  }, [shapePath]);
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
+        <h2 className="text-4xl font-bold text-primary">{shapeName}</h2>
       <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border touch-none overflow-hidden">
         <svg
           ref={svgRef}
@@ -113,19 +129,18 @@ export function TracingCanvas({
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerUp}
-          viewBox="0 0 500 500"
+          viewBox={shapeViewBox}
         >
-          {/* Guide character */}
-          <text
-            x="50%"
-            y="50%"
-            dy="0.35em"
-            textAnchor="middle"
-            className={cn("select-none text-[350px] font-bold fill-muted-foreground pointer-events-none", difficultyStyles[difficulty])}
-            style={{ fontFamily }}
-          >
-            {character}
-          </text>
+          {/* Guide Shape */}
+           <path
+              ref={shapeRef}
+              d={shapePath}
+              strokeWidth="5"
+              stroke="hsl(var(--muted-foreground))"
+              fill="transparent"
+              strokeLinejoin="round"
+              className="opacity-50 pointer-events-none"
+            />
           
           {/* User drawing */}
           {paths.map((path, index) => (
@@ -141,6 +156,11 @@ export function TracingCanvas({
             />
           ))}
         </svg>
+        <div className="absolute bottom-2 right-2">
+            <div className="text-xs text-muted-foreground">
+                Fill: {Math.round(fillRatio * 100)}%
+            </div>
+        </div>
       </div>
       <div className="flex gap-4">
         <Button variant="outline" size="lg" onClick={handleClear} className="w-32">
