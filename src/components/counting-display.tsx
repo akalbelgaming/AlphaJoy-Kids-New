@@ -47,6 +47,7 @@ export function CountingDisplay({
                             fill
                             className="object-contain"
                             sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 5vw"
+                            unoptimized
                         />
                     </div>
                 ))}
