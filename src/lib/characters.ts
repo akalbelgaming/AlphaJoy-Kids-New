@@ -4,7 +4,12 @@ export interface AlphabetCharacter {
   hint: string;
 }
 
-export const numbers: string[] = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
+export interface ShapeCharacter {
+  shape: string;
+  hint: string;
+}
+
+export const numbers: string[] = Array.from({ length: 10 }, (_, i) => (i + 1).toString());
 
 export const alphabet: AlphabetCharacter[] = [
   { letter: 'A', word: 'Apple', hint: 'apple' },
@@ -33,4 +38,24 @@ export const alphabet: AlphabetCharacter[] = [
   { letter: 'X', word: 'Xylophone', hint: 'xylophone' },
   { letter: 'Y', word: 'Yacht', hint: 'yacht' },
   { letter: 'Z', word: 'Zebra', hint: 'zebra' },
+];
+
+export const shapes: ShapeCharacter[] = [
+    { shape: 'Circle', hint: 'circle' },
+    { shape: 'Square', hint: 'square' },
+    { shape: 'Triangle', hint: 'triangle' },
+    { shape: 'Star', hint: 'star' },
+    { shape: 'Heart', hint: 'heart' },
+    { shape: 'Rectangle', hint: 'rectangle' },
+];
+
+export const readingWords: { word: string }[] = [
+    { word: 'CAT' },
+    { word: 'SUN' },
+    { word: 'DOG' },
+    { word: 'BALL' },
+    { word: 'TREE' },
+    { word: 'CAR' },
+    { word: 'BOOK' },
+    { word: 'STAR' },
 ];

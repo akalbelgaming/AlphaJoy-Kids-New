@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Eraser, Check, Loader2 } from 'lucide-react';
+import { Eraser, Check, Loader2, Paintbrush } from 'lucide-react';
 
 interface Point {
   x: number;
@@ -74,10 +74,9 @@ export function ColoringCanvas({
   };
 
   const handleComplete = () => {
-    if (paths.length > 0) {
-      onComplete();
-      setPaths([]);
-    }
+    // For free drawing, "Done" might just mean moving on
+    onComplete();
+    setPaths([]);
   };
 
   useEffect(() => {
@@ -86,10 +85,10 @@ export function ColoringCanvas({
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border touch-none overflow-hidden flex items-center justify-center">
+      <div className="relative w-full aspect-square max-w-lg bg-white rounded-xl shadow-lg border touch-none overflow-hidden flex items-center justify-center">
         {isLoading ? (
           <Loader2 className="w-16 h-16 text-primary animate-spin" />
-        ) : imageUrl ? (
+        ) : (
           <svg
             ref={svgRef}
             className="w-full h-full"
@@ -99,9 +98,16 @@ export function ColoringCanvas({
             onPointerLeave={handlePointerUp}
             viewBox="0 0 500 500"
           >
-            {/* Background coloring page */}
-            <image href={imageUrl} x="0" y="0" height="500" width="500" />
+            {/* Background Image (if provided) */}
+            {imageUrl && <image href={imageUrl} x="0" y="0" height="500" width="500" />}
             
+            {/* Blank Drawing Area Message */}
+            {!imageUrl && paths.length === 0 && (
+                <text x="50%" y="50%" dy="0.35em" textAnchor="middle" className="text-muted-foreground text-2xl font-semibold flex items-center justify-center">
+                    <tspan><Paintbrush className="inline-block mr-2" /> Start drawing!</tspan>
+                </text>
+            )}
+
             {/* User drawing */}
             {paths.map((path, index) => (
               <path
@@ -116,18 +122,16 @@ export function ColoringCanvas({
               />
             ))}
           </svg>
-        ) : (
-          <p className="text-muted-foreground">Coloring page not available.</p>
         )}
       </div>
       <div className="flex gap-4">
-        <Button variant="outline" size="lg" onClick={handleClear} className="w-32" disabled={isLoading || !imageUrl}>
+        <Button variant="outline" size="lg" onClick={handleClear} className="w-32" disabled={isLoading}>
           <Eraser className="mr-2 h-5 w-5" />
           Clear
         </Button>
-        <Button size="lg" onClick={handleComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading || !imageUrl || paths.length === 0}>
+        <Button size="lg" onClick={handleComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}>
           <Check className="mr-2 h-5 w-5" />
-          Done!
+          {imageUrl ? 'Done!' : 'Next'}
         </Button>
       </div>
     </div>

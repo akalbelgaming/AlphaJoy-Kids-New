@@ -14,14 +14,19 @@ import {
   Users,
   TrendingUp,
   BookCopy,
+  Shapes,
+  Calculator,
+  ScanEye,
+  PenSquare,
 } from "lucide-react";
-import { numbers, alphabet } from "@/lib/characters";
+import { numbers, alphabet, shapes, readingWords } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
-import { getAdaptiveDifficulty } from "@/app/actions";
-import { getStory } from "@/lib/story";
+import { getAdaptiveDifficulty, getStory, getImageForWord } from "@/app/actions";
+import { ColoringCanvas } from "@/components/coloring-canvas";
+import { CountingDisplay } from "@/components/counting-display";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,7 +42,7 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-type Mode = "numbers" | "alphabet" | "story";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -66,71 +71,115 @@ export default function GameClient() {
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
 
+  const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
+  const [isCountingLoading, setIsCountingLoading] = useState(false);
+
   const { toast } = useToast();
 
-  const characterSet = useMemo(
-    () => (mode === "numbers" ? numbers : alphabet),
-    [mode]
-  );
+  const characterSet = useMemo(() => {
+    switch (mode) {
+      case "numbers":
+      case "counting":
+        return numbers;
+      case "alphabet":
+        return alphabet;
+      case "story":
+        return alphabet;
+      case "shapes":
+        return shapes;
+      case "reading":
+        return readingWords;
+      default:
+        return [];
+    }
+  }, [mode]);
+  
   const currentCharacter = useMemo(
     () => characterSet[currentIndex],
     [characterSet, currentIndex]
   );
   
-  const letter = useMemo(() => typeof currentCharacter === 'string' ? currentCharacter : currentCharacter.letter, [currentCharacter]);
-  const word = useMemo(() => typeof currentCharacter === 'string' ? undefined : currentCharacter.word, [currentCharacter]);
+  const itemToTrace = useMemo(() => {
+      if (!currentCharacter) return '';
+      if (typeof currentCharacter === 'string') return currentCharacter;
+      if ('letter' in currentCharacter) return currentCharacter.letter;
+      if ('shape' in currentCharacter) return currentCharacter.shape;
+      if ('word' in currentCharacter) return currentCharacter.word;
+      return '';
+  }, [currentCharacter]);
+
+  const itemForStory = useMemo(() => {
+    if (!currentCharacter) return '';
+    if (typeof currentCharacter === 'object' && 'word' in currentCharacter) return currentCharacter.word;
+    return '';
+  }, [currentCharacter]);
+
+  const itemForCounting = useMemo(() => {
+    if (mode !== 'counting' || !currentCharacter) return 0;
+    return parseInt(currentCharacter as string, 10);
+  }, [mode, currentCharacter]);
 
   useEffect(() => {
-    setStartTime(Date.now());
-
-    if (mode === 'story') {
-      const fetchStory = async () => {
-        setIsStoryLoading(true);
-        setStory(null);
-        setAudioUrl(null);
-        
-        const storyWord = (typeof currentCharacter === 'object' && currentCharacter.word) ? currentCharacter.word : null;
-        
-        if (!storyWord) {
-            setIsStoryLoading(false);
-            return;
-        }
-
-        try {
-            const storyResponse = await getStory(storyWord);
-            if (storyResponse.success && storyResponse.data) {
-              setStory(storyResponse.data.story);
-              setAudioUrl(storyResponse.data.audioUrl);
-            } else {
-               toast({
-                variant: "destructive",
-                title: "Could not create a story",
-                description: storyResponse.error || "The AI storyteller is taking a break. Please try the next one!",
-              });
+    const fetchUIData = async () => {
+        setStartTime(Date.now());
+        if (mode === 'story') {
+            setIsStoryLoading(true);
+            setStory(null);
+            setAudioUrl(null);
+            if (!itemForStory) {
+                setIsStoryLoading(false);
+                return;
             }
-        } catch (e) {
-             toast({
-                variant: "destructive",
-                title: "Error fetching story",
-                description: "An unexpected error occurred.",
-            });
-        } finally {
-            setIsStoryLoading(false);
+            try {
+                const storyResponse = await getStory(itemForStory);
+                if (storyResponse.success && storyResponse.data) {
+                  setStory(storyResponse.data.story);
+                  setAudioUrl(storyResponse.data.audioUrl);
+                } else {
+                   toast({ variant: "destructive", title: "Could not create a story", description: storyResponse.error || "The AI storyteller is taking a break." });
+                }
+            } catch (e) {
+                 toast({ variant: "destructive", title: "Error fetching story", description: "An unexpected error occurred." });
+            } finally {
+                setIsStoryLoading(false);
+            }
+        } else if (mode === 'counting') {
+            setIsCountingLoading(true);
+            setCountingImageUrls([]);
+            const count = itemForCounting;
+            if (count > 0) {
+              try {
+                // Generate one image and duplicate it for simplicity and speed
+                const imageResponse = await getImageForWord('apple');
+                if (imageResponse.success && imageResponse.data) {
+                  setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
+                } else {
+                  toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
+                }
+              } catch (e) {
+                  toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
+              } finally {
+                setIsCountingLoading(false);
+              }
+            } else {
+              setIsCountingLoading(false);
+            }
         }
-      };
-      fetchStory();
-    }
-  }, [currentIndex, mode, characterSet, toast, currentCharacter]);
+    };
+    fetchUIData();
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast]);
 
 
   const handleNext = useCallback(() => {
-    setCurrentIndex((prev) => (prev + 1) % characterSet.length);
+    if (characterSet.length > 0) {
+      setCurrentIndex((prev) => (prev + 1) % characterSet.length);
+    }
   }, [characterSet.length]);
 
   const handlePrev = useCallback(() => {
-    setCurrentIndex(
-      (prev) => (prev - 1 + characterSet.length) % characterSet.length
-    );
+    if (characterSet.length > 0) {
+      setCurrentIndex((prev) => (prev - 1 + characterSet.length) % characterSet.length);
+    }
   }, [characterSet.length]);
 
   const handleCompletion = useCallback(() => {
@@ -158,48 +207,30 @@ export default function GameClient() {
   const handleModeChange = useCallback((newMode: Mode) => {
     setMode(newMode);
     setCurrentIndex(0);
+    setCompletions(0);
+    setClears(0);
+    setCompletionTimes([]);
   }, []);
 
   const handleUpdateDifficulty = useCallback(async () => {
     if (completions === 0) {
-      toast({
-        title: "Not enough data!",
-        description: "Complete a few tracings first to adapt difficulty.",
-      });
+      toast({ title: "Not enough data!", description: "Complete a few tracings first to adapt difficulty." });
       return;
     }
 
     const successRate = completions / (completions + clears);
-    const averageCompletionTime =
-      completionTimes.reduce((a, b) => a + b, 0) / (completionTimes.length || 1);
+    const averageCompletionTime = completionTimes.reduce((a, b) => a + b, 0) / (completionTimes.length || 1);
 
-    toast({
-      title: "Adapting difficulty...",
-      description: "Our AI is finding the perfect challenge for you.",
-    });
+    toast({ title: "Adapting difficulty...", description: "Our AI is finding the perfect challenge for you." });
 
-    const response = await getAdaptiveDifficulty({
-      successRate,
-      averageCompletionTime,
-      difficulty,
-    });
+    const response = await getAdaptiveDifficulty({ successRate, averageCompletionTime, difficulty });
 
     if (response.success && response.data) {
       const newDifficulty = response.data.recommendedDifficulty as Difficulty;
       setDifficulty(newDifficulty);
-      toast({
-        variant: "default",
-        title: `Difficulty set to ${
-          newDifficulty.charAt(0).toUpperCase() + newDifficulty.slice(1)
-        }!`,
-        description: response.data.reason,
-      });
+      toast({ variant: "default", title: `Difficulty set to ${newDifficulty.charAt(0).toUpperCase() + newDifficulty.slice(1)}!`, description: response.data.reason });
     } else {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: response.error,
-      });
+      toast({ variant: "destructive", title: "Uh oh! Something went wrong.", description: response.error });
     }
   }, [completions, clears, completionTimes, difficulty, toast]);
 
@@ -207,6 +238,63 @@ export default function GameClient() {
     setShowInterstitial(false);
     handleNext();
   }, [handleNext]);
+
+  const renderMainContent = () => {
+    switch (mode) {
+      case "alphabet":
+      case "numbers":
+      case "shapes":
+      case "reading":
+        return (
+          <TracingCanvas
+            key={`${mode}-${currentIndex}`}
+            character={itemToTrace}
+            onComplete={handleCompletion}
+            onClear={handleClear}
+            strokeColor={strokeColor}
+            strokeWidth={strokeWidth}
+            difficulty={difficulty}
+            fontFamily={fontFamily}
+          />
+        );
+      case "story":
+        return (
+          <StoryDisplay
+            key={`${mode}-${currentIndex}`}
+            word={itemForStory}
+            story={story}
+            audioUrl={audioUrl}
+            isLoading={isStoryLoading}
+            onComplete={handleCompletion}
+          />
+        );
+       case "counting":
+        return (
+          <CountingDisplay
+            key={`${mode}-${currentIndex}`}
+            count={itemForCounting}
+            imageUrls={countingImageUrls}
+            isLoading={isCountingLoading}
+            onComplete={handleCompletion}
+          />
+        );
+      case "drawing":
+        return (
+            <ColoringCanvas
+                key={`${mode}-${currentIndex}`}
+                imageUrl={null}
+                isLoading={false}
+                onComplete={handleCompletion}
+                onClear={handleClear}
+                strokeColor={strokeColor}
+                strokeWidth={strokeWidth}
+            />
+        );
+      default:
+        return null;
+    }
+  };
+
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground p-4 lg:p-6 flex flex-col lg:flex-row gap-6">
@@ -320,7 +408,7 @@ export default function GameClient() {
                 max={24}
                 step={2}
                 value={[strokeWidth]}
-                onValueChange={(v) => setStrokeWidth(v[0])}
+                onValuege={(v) => setStrokeWidth(v[0])}
               />
             </div>
           </CardContent>
@@ -333,60 +421,26 @@ export default function GameClient() {
           points={POINTS_PER_COMPLETION}
           trigger={animationTrigger}
         />
-        <div className="w-full flex justify-center items-center mb-4 gap-4">
-          <Button variant="ghost" size="icon" onClick={handlePrev}>
+        <div className="w-full flex justify-center items-center mb-4 gap-2 flex-wrap">
+          <Button variant="ghost" size="icon" onClick={handlePrev} disabled={characterSet.length === 0}>
             <ArrowLeft />
           </Button>
-          <div className="flex items-center gap-2">
-            <Button
-              onClick={() => handleModeChange("alphabet")}
-              variant={mode === "alphabet" ? "default" : "outline"}
-              className="w-32"
-            >
-              <BookOpen className="mr-2" /> Letters
-            </Button>
-            <Button
-              onClick={() => handleModeChange("numbers")}
-              variant={mode === "numbers" ? "default" : "outline"}
-              className="w-32"
-            >
-              <Hash className="mr-2" /> Numbers
-            </Button>
-            <Button
-              onClick={() => handleModeChange("story")}
-              variant={mode === "story" ? "default" : "outline"}
-              className="w-32"
-            >
-              <BookCopy className="mr-2" /> Story Time
-            </Button>
+          <div className="flex items-center gap-2 flex-wrap justify-center">
+             <Button onClick={() => handleModeChange("alphabet")} variant={mode === "alphabet" ? "default" : "outline"}><BookOpen className="mr-2" /> Letters</Button>
+             <Button onClick={() => handleModeChange("numbers")} variant={mode === "numbers" ? "default" : "outline"}><Hash className="mr-2" /> Numbers</Button>
+             <Button onClick={() => handleModeChange("shapes")} variant={mode === "shapes" ? "default" : "outline"}><Shapes className="mr-2" /> Shapes</Button>
+             <Button onClick={() => handleModeChange("counting")} variant={mode === "counting" ? "default" : "outline"}><Calculator className="mr-2" /> Counting</Button>
+             <Button onClick={() => handleModeChange("reading")} variant={mode === "reading" ? "default" : "outline"}><ScanEye className="mr-2" /> Reading</Button>
+             <Button onClick={() => handleModeChange("drawing")} variant={mode === "drawing" ? "default" : "outline"}><PenSquare className="mr-2" /> Drawing</Button>
+             <Button onClick={() => handleModeChange("story")} variant={mode === "story" ? "default" : "outline"}><BookCopy className="mr-2" /> Story Time</Button>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleNext}>
+          <Button variant="ghost" size="icon" onClick={handleNext} disabled={characterSet.length === 0}>
             <ArrowRight />
           </Button>
         </div>
 
         <div className="w-full flex-1 flex flex-col items-center justify-center">
-            {mode === 'story' ? (
-              <StoryDisplay
-                  key={`${mode}-${currentIndex}`}
-                  word={(typeof currentCharacter === 'object' && currentCharacter.word) ? currentCharacter.word : ''}
-                  story={story}
-                  audioUrl={audioUrl}
-                  isLoading={isStoryLoading}
-                  onComplete={handleCompletion}
-                />
-            ) : (
-              <TracingCanvas
-                key={`${mode}-${currentIndex}`}
-                character={letter}
-                onComplete={handleCompletion}
-                onClear={handleClear}
-                strokeColor={strokeColor}
-                strokeWidth={strokeWidth}
-                difficulty={difficulty}
-                fontFamily={fontFamily}
-              />
-            )}
+            {renderMainContent()}
         </div>
         
         <div className="w-full max-w-lg mt-4 self-center">
