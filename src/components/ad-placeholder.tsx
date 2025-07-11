@@ -34,7 +34,10 @@ export function AdBanner({ className }: { className?: string }) {
           </div>
           <p className="text-xs text-gray-600">Install this great new game now!</p>
         </div>
-        <button className="bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors">
+        <button 
+          suppressHydrationWarning
+          className="bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-md hover:bg-blue-600 transition-colors"
+        >
           Install
         </button>
       </div>
