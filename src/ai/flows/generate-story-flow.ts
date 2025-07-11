@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A Genkit flow for generating a short story with audio.
@@ -63,17 +64,14 @@ const generateStoryFlow = ai.defineFlow(
     // 1. Generate the story text
     const { text } = await ai.generate({
       model: googleAI.model('gemini-1.5-flash'),
-      prompt: `You are a master storyteller for young children (ages 3-5). 
-    Write a very short, simple, and happy story about a "${input.topic}".
-    The story should be only 2-3 sentences long.
-    Use simple words and a positive tone. Do not add any formatting.`,
+      prompt: `Write a very short, happy story for a toddler (ages 3-5) about a "${input.topic}". The story must be 2 simple sentences. Do not use complex words or formatting.`,
     });
     
     if (!text) {
       throw new Error('Failed to generate story text.');
     }
     
-    const storyText = text;
+    const storyText = text.trim();
     
     // 2. Generate the audio for the story
     const { media } = await ai.generate({
@@ -89,7 +87,7 @@ const generateStoryFlow = ai.defineFlow(
       prompt: storyText,
     });
 
-    if (!media) {
+    if (!media || !media.url) {
       throw new Error('Failed to generate audio from text.');
     }
 
@@ -98,6 +96,10 @@ const generateStoryFlow = ai.defineFlow(
       'base64'
     );
     const wavBase64 = await toWav(audioBuffer);
+
+    if (!wavBase64) {
+        throw new Error('Failed to convert audio to WAV format.');
+    }
 
     return { 
         story: storyText,
