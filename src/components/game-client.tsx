@@ -145,18 +145,20 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCount = 'apple'; // Let's always count apples for now
-            if (count > 0) {
+            const itemToCount = (alphabet.find(c => c.letter === 'A')?.word || 'apple'); 
+            
+            if (count > 0 && itemToCount) {
               try {
-                // Generate just one image and reuse it
-                const imageResponse = await getImageForWord(itemToCount); 
+                const imageResponse = await getImageForWord(itemToCount);
                 if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
                 } else {
                   toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
+                  setCountingImageUrls([]);
                 }
               } catch (e) {
                   toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
+                  setCountingImageUrls([]);
               } finally {
                 setIsCountingLoading(false);
               }

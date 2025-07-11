@@ -35,7 +35,7 @@ const generateImageFlow = ai.defineFlow(
   async (input) => {
     const {media} = await ai.generate({
       model: 'googleai/gemini-2.0-flash-preview-image-generation',
-      prompt: `A simple, cute, vibrant cartoon of a ${input.prompt}, on a clean white background, for a children's educational game. The object should be clear and easily recognizable.`,
+      prompt: `A single, simple, cute, vibrant cartoon of a ${input.prompt}, on a clean white background, for a children's educational game. The object should be clear, easily recognizable, and look like a sticker.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
       },
