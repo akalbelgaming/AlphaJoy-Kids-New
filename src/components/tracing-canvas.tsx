@@ -103,8 +103,19 @@ export function TracingCanvas({
     setPathLength(0);
   }, [character, fontFamily]);
   
-  // Adjust font size for words vs single characters
-  const fontSize = character.length > 1 ? 'text-[150px]' : 'text-[350px]';
+  // Adjust font size for words vs single characters/numbers.
+  const isNumeric = !isNaN(parseFloat(character)) && isFinite(character as any);
+  let fontSize = 'text-[350px]'; // Default large size for letters and numbers
+  if (character.length > 2 && !isNumeric) {
+      fontSize = 'text-[150px]'; // Smaller size for long words
+  } else if (character.length > 1 && !isNumeric) {
+      fontSize = 'text-[200px]'; // Medium size for short words
+  } else if (character.length === 2 && isNumeric) {
+      fontSize = 'text-[280px]'; // Large size for two-digit numbers
+  } else if (character.length > 2 && isNumeric) {
+      fontSize = 'text-[200px]'; // Medium size for three-digit numbers
+  }
+
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
