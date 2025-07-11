@@ -91,6 +91,8 @@ export default function GameClient({ mode }: GameClientProps) {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter; // numbers
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter; // alphabet, reading
+      const isNumeric = !isNaN(parseFloat(currentCharacter as string)) && isFinite(currentCharacter as any);
+      if (isNumeric) return currentCharacter as string;
       return ''; // Other modes don't trace a single character
   }, [mode, currentCharacter]);
 
@@ -143,10 +145,12 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
+            const itemToCount = 'apple'; // Let's always count apples for now
             if (count > 0) {
               try {
-                const imageResponse = await getImageForWord('apple');
-                if (imageResponse.success && imageResponse.data) {
+                // Generate just one image and reuse it
+                const imageResponse = await getImageForWord(itemToCount); 
+                if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
                 } else {
                   toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
