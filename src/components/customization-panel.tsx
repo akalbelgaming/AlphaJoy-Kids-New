@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -99,7 +100,7 @@ export function CustomizationPanel({
               onValueChange={(v) => onFontFamilyChange(v as FontFamily)}
               defaultValue={fontFamily}
             >
-              <SelectTrigger id="font-family">
+              <SelectTrigger id="font-family" suppressHydrationWarning>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -126,6 +127,7 @@ export function CustomizationPanel({
                         ? "border-primary ring-2 ring-offset-2 ring-primary"
                         : "border-transparent"
                     )}
+                    suppressHydrationWarning
                   >
                     <span className="sr-only">{color}</span>
                   </button>
@@ -147,6 +149,7 @@ export function CustomizationPanel({
               step={2}
               value={[strokeWidth]}
               onValueChange={(v) => onStrokeWidthChange(v[0])}
+              suppressHydrationWarning
             />
           </div>
         </CardContent>
@@ -164,7 +167,7 @@ export function CustomizationPanel({
                   <Users className="inline mr-2 h-4 w-4" />
                   Success Rate:
                 </span>{" "}
-                <span>
+                <span suppressHydrationWarning>
                   {completions + clears > 0
                     ? `${Math.round(
                         (completions / (completions + clears)) * 100
@@ -183,6 +186,7 @@ export function CustomizationPanel({
           <Button
             onClick={handleUpdateDifficulty}
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+            suppressHydrationWarning
           >
             <Sparkles className="mr-2 h-4 w-4" /> Adapt Difficulty
           </Button>
