@@ -74,26 +74,25 @@ const activities = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="p-6 bg-primary text-primary-foreground shadow-lg">
+      <header className="p-4 bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto flex items-center gap-4">
-           <ToyBrick className="h-10 w-10" />
-           <h1 className="text-3xl font-bold font-headline">Trace & Earn</h1>
+           <ToyBrick className="h-8 w-8" />
+           <h1 className="text-xl font-bold font-headline">Trace & Earn</h1>
         </div>
       </header>
       
       <main className="flex-1 container mx-auto p-4 md:p-6 mb-24">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {activities.map((activity) => (
             <Link href={activity.href} key={activity.href} className="group">
-              <Card className={`overflow-hidden transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-2xl group-hover:-translate-y-1 border-2 border-transparent group-hover:border-primary bg-white`}>
-                <CardHeader className="flex flex-col items-center justify-center p-6">
-                  <div className={`p-4 rounded-full ${activity.color} ${activity.bgColor}`}>
-                    {activity.icon}
+              <Card className="overflow-hidden transition-shadow duration-300 ease-in-out group-hover:shadow-lg bg-card border-none shadow-md">
+                <CardHeader className="flex flex-col items-center justify-center p-4">
+                  <div className={`p-4 rounded-full ${activity.bgColor}`}>
+                     {activity.icon}
                   </div>
                 </CardHeader>
-                <CardContent className="text-center p-4 pt-0">
-                  <CardTitle className="text-xl font-bold text-foreground">{activity.title}</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">{activity.description}</p>
+                <CardContent className="text-center p-2 pt-0">
+                  <CardTitle className="text-base font-medium text-foreground">{activity.title}</CardTitle>
                 </CardContent>
               </Card>
             </Link>
@@ -101,7 +100,7 @@ export default function Home() {
         </div>
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/80 backdrop-blur-sm border-t">
+      <div className="fixed bottom-0 left-0 right-0 p-2 bg-background/80 backdrop-blur-sm border-t">
         <AdBanner className="max-w-4xl mx-auto"/>
       </div>
     </div>

@@ -10,11 +10,11 @@ const adTriggerPaths = ['/letters', '/numbers', '/shapes', '/counting', '/readin
 export function InterstitialWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [showAd, setShowAd] = useState(false);
-  const previousPath = useRef<string | null>(null);
+  const previousPath = useRef<string | null>(pathname);
 
   useEffect(() => {
-    // Check if the navigation is to an ad-triggering path from a different path
-    if (adTriggerPaths.includes(pathname) && previousPath.current !== pathname && previousPath.current !== null) {
+    // Show ad when navigating from home ('/') to an activity page
+    if (adTriggerPaths.includes(pathname) && previousPath.current === '/') {
       setShowAd(true);
     }
     
