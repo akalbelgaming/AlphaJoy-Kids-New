@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import {
   ArrowRight,
   ArrowLeft
@@ -9,11 +9,12 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory, getImageForWord } from "@/app/actions";
+import { getStory, getImageForWord, getAudioForText } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
+import { numberToWords } from '@/lib/utils';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -44,7 +45,7 @@ export default function GameClient({ mode }: GameClientProps) {
   const [showInterstitial, setShowInterstitial] = useState(false);
 
   const [story, setStory] = useState<string | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [storyAudioUrl, setStoryAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
   
   const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
@@ -52,6 +53,9 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [drawingImageUrl, setDrawingImageUrl] = useState<string | null>(null);
   const [isDrawingImageLoading, setIsDrawingImageLoading] = useState(false);
+
+  const [characterAudioUrl, setCharacterAudioUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const { toast } = useToast();
 
@@ -112,10 +116,30 @@ export default function GameClient({ mode }: GameClientProps) {
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
+        setCharacterAudioUrl(null);
+
+        // Fetch character voice
+        if (mode === 'alphabet' || mode === 'reading' || mode === 'numbers') {
+            let textToSpeak = '';
+            if (mode === 'numbers') {
+                const num = parseInt(itemToTrace, 10);
+                textToSpeak = numberToWords(num) || itemToTrace;
+            } else {
+                textToSpeak = itemToTrace;
+            }
+
+            if (textToSpeak) {
+                 const audioResponse = await getAudioForText(textToSpeak);
+                 if (audioResponse.success && audioResponse.data) {
+                    setCharacterAudioUrl(audioResponse.data.audioUrl);
+                 }
+            }
+        }
+
         if (mode === 'story') {
             setIsStoryLoading(true);
             setStory(null);
-            setAudioUrl(null);
+            setStoryAudioUrl(null);
             if (!itemForStory) {
                 setIsStoryLoading(false);
                 return;
@@ -124,7 +148,7 @@ export default function GameClient({ mode }: GameClientProps) {
                 const storyResponse = await getStory(itemForStory);
                 if (storyResponse.success && storyResponse.data) {
                   setStory(storyResponse.data.story);
-                  setAudioUrl(storyResponse.data.audioUrl);
+                  setStoryAudioUrl(storyResponse.data.audioUrl);
                 } else {
                    toast({ variant: "destructive", title: "Could not create a story", description: storyResponse.error || "The AI storyteller is taking a break." });
                 }
@@ -137,10 +161,11 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCount = (characterSet.find(c => typeof c === 'object' && 'word' in c && c.letter === (numbers[currentIndex] as any)) as AlphabetCharacter | undefined)?.word || 'item';
+            const itemToCount = (alphabet.find(c => c.word.toLowerCase().includes('apple'))?.word) || 'item'; // Simplified
 
             if (count > 0 && itemToCount) {
               try {
+                // Generate one image and reuse it
                 const imageResponse = await getImageForWord(itemToCount);
                 if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
@@ -160,7 +185,13 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet]);
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet, itemToTrace]);
+  
+  useEffect(() => {
+    if (characterAudioUrl && audioRef.current) {
+        audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+    }
+  }, [characterAudioUrl]);
 
 
   const handleNext = useCallback(() => {
@@ -238,7 +269,7 @@ export default function GameClient({ mode }: GameClientProps) {
             key={`${mode}-${currentIndex}`}
             word={itemForStory}
             story={story}
-            audioUrl={audioUrl}
+            audioUrl={storyAudioUrl}
             isLoading={isStoryLoading}
             onComplete={handleCompletion}
           />
@@ -273,6 +304,7 @@ export default function GameClient({ mode }: GameClientProps) {
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
+      {characterAudioUrl && <audio ref={audioRef} src={characterAudioUrl} hidden />}
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">

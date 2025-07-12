@@ -41,7 +41,7 @@ export function StoryDisplay({
               <p className="text-lg text-center leading-relaxed p-4 bg-primary/5 rounded-lg">
                 {story}
               </p>
-              <audio controls src={audioUrl} className="w-full">
+              <audio controls src={audioUrl} className="w-full" autoPlay>
                 Your browser does not support the audio element.
               </audio>
             </>
