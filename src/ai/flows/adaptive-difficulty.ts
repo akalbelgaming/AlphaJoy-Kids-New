@@ -1,3 +1,4 @@
+
 // src/ai/flows/adaptive-difficulty.ts
 'use server';
 
@@ -47,14 +48,27 @@ const adaptiveDifficultyPrompt = ai.definePrompt({
   input: {schema: AdaptiveDifficultyInputSchema},
   output: {schema: AdaptiveDifficultyOutputSchema},
   prompt: `You are an AI that adaptively adjusts the difficulty of a tracing game for a child.
+Your goal is to recommend a new difficulty level from ['easy', 'medium', 'hard'] based on the user's performance.
 
-  Based on the user's success rate ({{successRate}}), completion time ({{averageCompletionTime}} seconds), and the current difficulty level ({{difficulty}}), recommend a new difficulty level from ['easy', 'medium', 'hard'].
+Current User Performance:
+- Success Rate: {{successRate}} (A value from 0.0 to 1.0)
+- Average Completion Time: {{averageCompletionTime}} seconds
+- Current Difficulty: {{difficulty}}
 
-  - If success rate is high (>0.9) and completion time is fast (<10 seconds for easy, <15 for medium, <20 for hard), recommend increasing the difficulty.
-  - If success rate is low (<0.6), recommend decreasing the difficulty.
-  - Otherwise, recommend keeping the difficulty the same.
+Follow these rules to make a recommendation:
+1.  **Increase Difficulty:** If the success rate is high (greater than 0.9) AND the completion time is fast, recommend the next level up.
+    - 'easy' is fast if time < 10 seconds.
+    - 'medium' is fast if time < 15 seconds.
+    - 'hard' is fast if time < 20 seconds.
+    - If already at 'hard', keep it 'hard'.
+2.  **Decrease Difficulty:** If the success rate is low (less than 0.6), recommend the next level down.
+    - If already at 'easy', keep it 'easy'.
+3.  **Maintain Difficulty:** In all other cases, keep the difficulty the same.
 
-  Your reason should be brief, positive, and encouraging. For example: "You're doing great! Let's try something a little trickier." or "Let's practice a bit more to get the hang of it!".
+Your 'reason' must be brief, positive, and encouraging for a child.
+- If increasing: "You're doing great! Let's try something a little trickier."
+- If decreasing: "Let's practice a bit more to get the hang of it!"
+- If maintaining: "You're doing a wonderful job! Let's keep practicing."
 `,
 });
 
@@ -67,7 +81,10 @@ const adaptiveDifficultyFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await adaptiveDifficultyPrompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('The AI failed to provide a difficulty recommendation.');
+    }
+    return output;
   }
 );
 
