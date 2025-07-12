@@ -24,6 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { getAdaptiveDifficulty } from "@/app/actions";
 import React from "react";
+import { Separator } from "./ui/separator";
 
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
@@ -82,23 +83,24 @@ export function CustomizationPanel({
 
   return (
     <>
-      <Card className="shadow-md">
+      <Card className="shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary font-headline">
             <Paintbrush /> Customize
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-4">
+        <CardContent className="flex flex-col gap-6">
           <div>
             <Label
               htmlFor="font-family"
-              className="flex items-center gap-2 mb-2"
+              className="flex items-center gap-2 mb-2 font-semibold"
             >
               <ToyBrick /> Font Style
             </Label>
             <Select
               onValueChange={(v) => onFontFamilyChange(v as FontFamily)}
               defaultValue={fontFamily}
+              suppressHydrationWarning
             >
               <SelectTrigger id="font-family" suppressHydrationWarning>
                 <SelectValue />
@@ -111,7 +113,7 @@ export function CustomizationPanel({
             </Select>
           </div>
           <div>
-            <Label className="flex items-center gap-2 mb-2">
+            <Label className="flex items-center gap-2 mb-2 font-semibold">
               <Palette /> Pencil Color
             </Label>
             <div className="flex gap-2">
@@ -122,9 +124,9 @@ export function CustomizationPanel({
                     onClick={() => onStrokeColorChange(color)}
                     style={{ backgroundColor: color }}
                     className={cn(
-                      "w-8 h-8 rounded-full border-2",
+                      "w-8 h-8 rounded-full border-2 transition-all",
                       strokeColor === color
-                        ? "border-primary ring-2 ring-offset-2 ring-primary"
+                        ? "border-primary ring-2 ring-offset-2 ring-primary scale-110"
                         : "border-transparent"
                     )}
                     suppressHydrationWarning
@@ -138,7 +140,7 @@ export function CustomizationPanel({
           <div>
             <Label
               htmlFor="stroke-width"
-              className="flex items-center gap-2 mb-2"
+              className="flex items-center gap-2 mb-2 font-semibold"
             >
               Pencil Size
             </Label>
@@ -154,20 +156,20 @@ export function CustomizationPanel({
           </div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-primary font-headline">
             <TrendingUp /> Difficulty
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-           <div className="text-sm space-y-2">
-              <div className="flex justify-between">
-                <span>
-                  <Users className="inline mr-2 h-4 w-4" />
+           <div className="text-sm space-y-2 text-muted-foreground">
+              <div className="flex justify-between items-center">
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" />
                   Success Rate:
                 </span>{" "}
-                <span suppressHydrationWarning>
+                <span className="font-bold text-foreground" suppressHydrationWarning>
                   {completions + clears > 0
                     ? `${Math.round(
                         (completions / (completions + clears)) * 100
@@ -175,12 +177,13 @@ export function CustomizationPanel({
                     : "N/A"}
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>
-                  <TrendingUp className="inline mr-2 h-4 w-4" />
+               <Separator />
+              <div className="flex justify-between items-center">
+                 <span className="flex items-center gap-1.5">
+                  <TrendingUp className="h-4 w-4" />
                   Current Level:
                 </span>{" "}
-                <span className="capitalize font-semibold">{difficulty}</span>
+                <span className="capitalize font-bold text-foreground">{difficulty}</span>
               </div>
             </div>
           <Button

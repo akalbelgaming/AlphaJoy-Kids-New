@@ -85,7 +85,7 @@ export function ColoringCanvas({
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <div className="relative w-full aspect-square max-w-lg bg-white rounded-xl shadow-lg border touch-none overflow-hidden flex items-center justify-center">
+      <div className="relative w-full aspect-square max-w-lg bg-white rounded-xl shadow-lg border-2 touch-none overflow-hidden flex items-center justify-center">
         {isLoading ? (
           <Loader2 className="w-16 h-16 text-primary animate-spin" />
         ) : (

@@ -23,7 +23,7 @@ export function CountingDisplay({
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <Card className="w-full max-w-lg shadow-lg">
+      <Card className="w-full max-w-lg shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary">
             <Calculator className="w-8 h-8"/>
@@ -33,14 +33,14 @@ export function CountingDisplay({
         <CardContent className="min-h-[250px] flex flex-col items-center justify-center gap-6 p-6">
           {isLoading ? (
             <div className="flex flex-wrap items-center justify-center gap-4">
-                {Array.from({length: count}).map((_, index) => (
+                {Array.from({length: Math.min(count, 12)}).map((_, index) => (
                     <Skeleton key={index} className="w-24 h-24 rounded-lg" />
                 ))}
             </div>
           ) : imageUrls.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-4">
-               {imageUrls.map((url, index) => (
-                    <div key={index} className="relative w-24 h-24">
+               {imageUrls.slice(0, 12).map((url, index) => ( // Only render up to 12 images to avoid clutter
+                    <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
                         <Image
                             src={url}
                             alt={`item ${index + 1}`}

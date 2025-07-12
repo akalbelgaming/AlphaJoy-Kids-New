@@ -15,14 +15,14 @@ interface ActivityPageProps {
 export default function ActivityPage({ mode, title }: ActivityPageProps) {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="p-4 bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
+      <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between gap-4">
            <div className="flex items-center gap-4">
             <ToyBrick className="h-8 w-8" />
             <h1 className="text-2xl font-bold font-headline">{title}</h1>
            </div>
            <Link href="/">
-             <Button variant="secondary" size="icon">
+             <Button variant="secondary" size="icon" className="rounded-full">
                 <Home className="h-5 w-5"/>
                 <span className="sr-only">Home</span>
              </Button>

@@ -121,7 +121,7 @@ export function ShapeColoringCanvas({
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
         <h2 className="text-4xl font-bold text-primary">{shapeName}</h2>
-      <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border touch-none overflow-hidden">
+      <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border-2 touch-none overflow-hidden">
         <svg
           ref={svgRef}
           className="w-full h-full"
@@ -139,7 +139,7 @@ export function ShapeColoringCanvas({
               stroke="hsl(var(--muted-foreground))"
               fill="transparent"
               strokeLinejoin="round"
-              className="opacity-50 pointer-events-none"
+              className="opacity-25 pointer-events-none"
             />
           
           {/* User drawing */}
@@ -156,7 +156,7 @@ export function ShapeColoringCanvas({
             />
           ))}
         </svg>
-        <div className="absolute bottom-2 right-2">
+        <div className="absolute bottom-2 right-2 bg-background/50 backdrop-blur-sm rounded-md px-2 py-0.5">
             <div className="text-xs text-muted-foreground">
                 Fill: {Math.round(fillRatio * 100)}%
             </div>

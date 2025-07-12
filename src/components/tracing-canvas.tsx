@@ -42,7 +42,7 @@ export function TracingCanvas({
   const difficultyStyles = {
     easy: 'opacity-40',
     medium: 'opacity-25',
-    hard: 'opacity-15',
+    hard: 'opacity-10',
   };
 
   const getPointInSVG = (e: React.PointerEvent<SVGSVGElement>): Point | null => {
@@ -103,23 +103,22 @@ export function TracingCanvas({
     setPathLength(0);
   }, [character, fontFamily]);
   
-  // Adjust font size for words vs single characters/numbers.
-  const isNumeric = !isNaN(parseFloat(character)) && isFinite(character as any);
-  let fontSize = 'text-[350px]'; // Default large size for letters and numbers
+  const isNumeric = /^\d+$/.test(character);
+  let fontSize = 'text-[350px]';
   if (character.length > 2 && !isNumeric) {
-      fontSize = 'text-[150px]'; // Smaller size for long words
+    fontSize = 'text-[150px]';
   } else if (character.length > 1 && !isNumeric) {
-      fontSize = 'text-[200px]'; // Medium size for short words
+    fontSize = 'text-[200px]';
   } else if (character.length === 2 && isNumeric) {
-      fontSize = 'text-[280px]'; // Large size for two-digit numbers
+    fontSize = 'text-[280px]';
   } else if (character.length > 2 && isNumeric) {
-      fontSize = 'text-[200px]'; // Medium size for three-digit numbers
+    fontSize = 'text-[200px]'
   }
 
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border touch-none overflow-hidden">
+      <div className="relative w-full aspect-square max-w-lg bg-card rounded-xl shadow-lg border-2 touch-none overflow-hidden">
         <svg
           ref={svgRef}
           className="w-full h-full"

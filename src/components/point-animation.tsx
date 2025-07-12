@@ -26,11 +26,11 @@ export function PointAnimation({ points, trigger }: PointAnimationProps) {
   if (!show) return null;
 
   return (
-    <div key={key} className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
-      <div className="animate-fade-in-out-up flex items-center justify-center gap-2 bg-primary/80 text-primary-foreground p-4 rounded-full shadow-lg border-2 border-primary-foreground/50 backdrop-blur-sm">
-        <Sparkles className="w-8 h-8 text-accent" />
-        <span className="text-3xl font-bold font-headline text-white drop-shadow-md">+{points} Points!</span>
-        <Sparkles className="w-8 h-8 text-accent" />
+    <div key={key} className="absolute inset-0 flex items-center justify-center pointer-events-none z-[100]">
+      <div className="animate-fade-in-out-up flex items-center justify-center gap-2 bg-accent/90 text-accent-foreground p-4 rounded-full shadow-lg border-2 border-accent-foreground/50 backdrop-blur-sm">
+        <Sparkles className="w-8 h-8 text-white" />
+        <span className="text-3xl font-bold font-headline text-accent-foreground drop-shadow-md">+{points} Points!</span>
+        <Sparkles className="w-8 h-8 text-white" />
       </div>
     </div>
   );

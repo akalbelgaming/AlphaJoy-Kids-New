@@ -25,7 +25,7 @@ const activities = [
     href: '/numbers',
     title: 'Numbers',
     icon: <Hash className="h-12 w-12" />,
-    description: 'Practice tracing numbers from 1 to 10.',
+    description: 'Practice tracing numbers from 1 to 100.',
     color: 'text-blue-500',
     bgColor: 'bg-blue-50',
   },
@@ -74,7 +74,7 @@ const activities = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="p-6 bg-primary text-primary-foreground shadow-md">
+      <header className="p-6 bg-primary text-primary-foreground shadow-lg">
         <div className="container mx-auto flex items-center gap-4">
            <ToyBrick className="h-10 w-10" />
            <h1 className="text-3xl font-bold font-headline">Trace & Earn</h1>
@@ -85,9 +85,9 @@ export default function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {activities.map((activity) => (
             <Link href={activity.href} key={activity.href} className="group">
-              <Card className={`overflow-hidden transition-transform duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-xl ${activity.bgColor}`}>
+              <Card className={`overflow-hidden transition-all duration-300 ease-in-out group-hover:scale-105 group-hover:shadow-2xl group-hover:-translate-y-1 border-2 border-transparent group-hover:border-primary bg-white`}>
                 <CardHeader className="flex flex-col items-center justify-center p-6">
-                  <div className={`p-4 rounded-full bg-white ${activity.color}`}>
+                  <div className={`p-4 rounded-full ${activity.color} ${activity.bgColor}`}>
                     {activity.icon}
                   </div>
                 </CardHeader>

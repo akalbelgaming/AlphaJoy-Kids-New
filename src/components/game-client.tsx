@@ -5,7 +5,6 @@ import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   ArrowRight,
   ArrowLeft,
-  ToyBrick,
   Award,
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
@@ -13,7 +12,7 @@ import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
 import { PointAnimation } from "@/components/point-animation";
-import { getAdaptiveDifficulty, getStory, getImageForWord } from "@/app/actions";
+import { getStory, getImageForWord } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -145,7 +144,7 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCount = (alphabet.find(c => c.letter === 'A')?.word || 'apple'); 
+            const itemToCount = (alphabet.find(c => c.letter === (currentCharacter as AlphabetCharacter)?.letter)?.word || 'apple'); 
             
             if (count > 0 && itemToCount) {
               try {
@@ -168,7 +167,7 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast]);
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast, currentCharacter]);
 
 
   const handleNext = useCallback(() => {
@@ -290,7 +289,7 @@ export default function GameClient({ mode }: GameClientProps) {
       />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
-        <Card className="shadow-md">
+        <Card className="shadow-lg border-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-primary font-headline">
               <Award /> Your Score

@@ -23,11 +23,11 @@ export function StoryDisplay({
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <Card className="w-full max-w-lg shadow-lg">
+      <Card className="w-full max-w-lg shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary">
             <BookOpen className="w-8 h-8"/>
-            <span className="text-2xl">Story about: {word}</span>
+            <span className="text-2xl">Story about: <span className="font-bold">{word}</span></span>
           </CardTitle>
         </CardHeader>
         <CardContent className="min-h-[250px] flex flex-col items-center justify-center gap-6 p-6">
