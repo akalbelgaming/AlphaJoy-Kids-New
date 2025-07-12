@@ -1,17 +1,14 @@
-
 "use client";
 
 import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   ArrowRight,
-  ArrowLeft,
-  Award,
+  ArrowLeft
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { PointAnimation } from "@/components/point-animation";
 import { getStory, getImageForWord } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
@@ -19,14 +16,12 @@ import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
-const POINTS_PER_COMPLETION = 10;
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
 interface GameClientProps {
@@ -35,7 +30,6 @@ interface GameClientProps {
 
 export default function GameClient({ mode }: GameClientProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [points, setPoints] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
 
   const [strokeColor, setStrokeColor] = useState("#4285F4");
@@ -48,7 +42,6 @@ export default function GameClient({ mode }: GameClientProps) {
   const [completionTimes, setCompletionTimes] = useState<number[]>([]);
 
   const [showInterstitial, setShowInterstitial] = useState(false);
-  const [animationTrigger, setAnimationTrigger] = useState(0);
 
   const [story, setStory] = useState<string | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -144,8 +137,8 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCount = (alphabet.find(c => c.letter === (currentCharacter as AlphabetCharacter)?.letter)?.word || 'apple'); 
-            
+            const itemToCount = (characterSet.find(c => typeof c === 'object' && 'word' in c && c.letter === (numbers[currentIndex] as any)) as AlphabetCharacter | undefined)?.word || 'item';
+
             if (count > 0 && itemToCount) {
               try {
                 const imageResponse = await getImageForWord(itemToCount);
@@ -167,7 +160,7 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, currentCharacter]);
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet]);
 
 
   const handleNext = useCallback(() => {
@@ -187,8 +180,6 @@ export default function GameClient({ mode }: GameClientProps) {
     if (startTime) {
       setCompletionTimes((prev) => [...prev, (endTime - startTime) / 1000]);
     }
-    setPoints((prev) => prev + POINTS_PER_COMPLETION);
-    setAnimationTrigger((prev) => prev + 1);
 
     const newCompletions = completions + 1;
     setCompletions(newCompletions);
@@ -283,26 +274,8 @@ export default function GameClient({ mode }: GameClientProps) {
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
-      <PointAnimation
-        points={POINTS_PER_COMPLETION}
-        trigger={animationTrigger}
-      />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
-        <Card className="shadow-lg border-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary font-headline">
-              <Award /> Your Score
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <div className="text-center bg-primary/10 p-4 rounded-lg">
-              <p className="text-sm text-primary font-semibold">TOTAL POINTS</p>
-              <p className="text-5xl font-bold text-primary">{points}</p>
-            </div>
-          </CardContent>
-        </Card>
-        
         <CustomizationPanel 
             fontFamily={fontFamily}
             onFontFamilyChange={setFontFamily}

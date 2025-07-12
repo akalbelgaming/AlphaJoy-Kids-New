@@ -5,8 +5,8 @@ import { InterstitialWrapper } from '@/components/interstitial-wrapper';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
-  title: 'Trace & Earn',
-  description: 'A fun tracing game for kids to learn numbers and alphabets and earn points!',
+  title: 'Trace & Learn',
+  description: 'A fun tracing game for kids to learn numbers and alphabets!',
 };
 
 export default function RootLayout({
@@ -30,3 +30,4 @@ export default function RootLayout({
       </body>
     </html>
   );
+}

@@ -77,15 +77,18 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-md">
         <div className="container mx-auto flex items-center gap-4">
            <ToyBrick className="h-8 w-8" />
-           <h1 className="text-xl font-bold font-headline">Trace & Earn</h1>
+           <h1 className="text-xl font-bold font-headline">Trace & Learn</h1>
         </div>
       </header>
       
       <main className="flex-1 container mx-auto p-4 md:p-6 mb-24">
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {activities.map((activity) => (
+          {activities.map((activity, index) => (
             <Link href={activity.href} key={activity.href} className="group">
-              <Card className="overflow-hidden transition-shadow duration-300 ease-in-out group-hover:shadow-lg bg-card border-none shadow-md">
+              <Card 
+                className="overflow-hidden transition-all duration-300 ease-in-out group-hover:shadow-lg group-hover:scale-105 bg-card border-none shadow-md animate-fade-in-zoom"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
                 <CardHeader className="flex flex-col items-center justify-center p-4">
                   <div className={`p-4 rounded-full ${activity.bgColor}`}>
                      {activity.icon}
