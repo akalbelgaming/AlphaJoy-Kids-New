@@ -126,20 +126,13 @@ export default function GameClient({ mode }: GameClientProps) {
     }
   }, [soundEnabled]);
 
-  const fetchCharacterAudio = useCallback(async (textToSpeak: string) => {
-    if (audioAbortControllerRef.current) {
-        audioAbortControllerRef.current.abort();
-    }
-
+  const fetchCharacterAudio = useCallback(async (textToSpeak: string, controller: AbortController) => {
     if (audioCache.current.has(textToSpeak)) {
-        playAudio(audioCache.current.get(textToSpeak)!);
-        return;
+      playAudio(audioCache.current.get(textToSpeak)!);
+      return;
     }
 
-    const controller = new AbortController();
-    audioAbortControllerRef.current = controller;
     setIsAudioLoading(true);
-
     try {
       const response = await getAudioForText(textToSpeak);
       if (controller.signal.aborted) return;
@@ -165,23 +158,43 @@ export default function GameClient({ mode }: GameClientProps) {
        }
     }
   }, [toast, playAudio]);
-
+  
   const handleReplaySound = useCallback(() => {
-    if (!soundEnabled || isAudioLoading) return;
     const textToSpeak = getTextToSpeak();
-    if (textToSpeak) {
-      fetchCharacterAudio(textToSpeak);
+    const cachedUrl = audioCache.current.get(textToSpeak);
+    if (cachedUrl && soundEnabled) {
+      playAudio(cachedUrl);
+    } else if (textToSpeak && soundEnabled && !isAudioLoading) {
+      // If not cached, fetch it now
+      const controller = new AbortController();
+      audioAbortControllerRef.current = controller;
+      fetchCharacterAudio(textToSpeak, controller);
     }
-  }, [soundEnabled, isAudioLoading, getTextToSpeak, fetchCharacterAudio]);
+  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio]);
+
 
   useEffect(() => {
     setStartTime(Date.now());
-
-    // Stop any ongoing audio requests when character changes
-    audioAbortControllerRef.current?.abort();
+    
+    // Abort any ongoing audio requests from previous character
+    if (audioAbortControllerRef.current) {
+        audioAbortControllerRef.current.abort();
+    }
     setIsAudioLoading(false);
 
+    // Create a new AbortController for the current character's requests
+    const controller = new AbortController();
+    audioAbortControllerRef.current = controller;
+
     const fetchUIData = async () => {
+        // Handle audio for traceable items
+        const textToSpeak = getTextToSpeak();
+        if (soundEnabled && textToSpeak && ['numbers', 'alphabet', 'reading'].includes(mode)) {
+          // Pass the controller to the fetch function
+          await fetchCharacterAudio(textToSpeak, controller);
+        }
+
+        // Handle story generation
         if (mode === 'story') {
             setIsStoryLoading(true);
             setStory(null);
@@ -192,6 +205,7 @@ export default function GameClient({ mode }: GameClientProps) {
             }
             try {
                 const storyResponse = await getStory(itemForStory);
+                if (controller.signal.aborted) return; // Check if aborted
                 if (storyResponse.success && storyResponse.data) {
                   setStory(storyResponse.data.story);
                   setStoryAudioUrl(storyResponse.data.audioUrl);
@@ -199,11 +213,15 @@ export default function GameClient({ mode }: GameClientProps) {
                    toast({ variant: "destructive", title: "Could not create a story", description: storyResponse.error || "The AI storyteller is taking a break." });
                 }
             } catch (e) {
+                 if (controller.signal.aborted) return; // Check if aborted
                  toast({ variant: "destructive", title: "Error fetching story", description: "An unexpected error occurred." });
             } finally {
-                setIsStoryLoading(false);
+                if (!controller.signal.aborted) setIsStoryLoading(false);
             }
-        } else if (mode === 'counting') {
+        } 
+        
+        // Handle counting item generation
+        else if (mode === 'counting') {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
@@ -211,6 +229,7 @@ export default function GameClient({ mode }: GameClientProps) {
             if (count > 0 && itemToCountWord) {
               try {
                 const imageResponse = await getImageForWord(itemToCountWord);
+                if (controller.signal.aborted) return; // Check if aborted
                 if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
                 } else {
@@ -218,18 +237,26 @@ export default function GameClient({ mode }: GameClientProps) {
                   setCountingImageUrls([]);
                 }
               } catch (e) {
+                  if (controller.signal.aborted) return; // Check if aborted
                   toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
                   setCountingImageUrls([]);
               } finally {
-                setIsCountingLoading(false);
+                if (!controller.signal.aborted) setIsCountingLoading(false);
               }
             } else {
               setIsCountingLoading(false);
             }
         }
     };
+
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet]);
+
+    // Cleanup function to abort on component unmount or dependency change
+    return () => {
+        controller.abort();
+    };
+
+  }, [currentIndex, mode, soundEnabled, getTextToSpeak, fetchCharacterAudio, itemForStory, itemForCounting, toast]);
   
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
