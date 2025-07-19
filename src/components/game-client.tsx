@@ -27,6 +27,7 @@ type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
+const DEBOUNCE_DELAY = 300; // ms
 
 interface GameClientProps {
     mode: Mode;
@@ -61,6 +62,8 @@ export default function GameClient({ mode }: GameClientProps) {
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const audioAbortControllerRef = useRef<AbortController | null>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { toast } = useToast();
 
@@ -116,41 +119,79 @@ export default function GameClient({ mode }: GameClientProps) {
     if (mode !== 'drawing' || !currentCharacter || typeof currentCharacter !== 'object' || !('word' in currentCharacter)) return null;
     return currentCharacter.word;
   }, [mode, currentCharacter]);
-
-  const fetchCharacterAudio = useCallback(async () => {
-    let textToSpeak = '';
-    if (mode === 'numbers') {
-        const num = parseInt(itemToTrace, 10);
-        textToSpeak = numberToWords(num) || itemToTrace;
-    } else if (mode === 'alphabet' || mode === 'reading') {
-        textToSpeak = itemToTrace;
-    }
-
-    if (textToSpeak) {
-        setIsAudioLoading(true);
+  
+  const fetchCharacterAudio = useCallback(async (textToSpeak: string, signal: AbortSignal) => {
+    setIsAudioLoading(true);
+    setCharacterAudioUrl(null);
+    try {
+      const audioResponse = await getAudioForText(textToSpeak);
+      if (signal.aborted) return;
+      if (audioResponse.success && audioResponse.data) {
+        setCharacterAudioUrl(audioResponse.data.audioUrl);
+      } else {
+        console.error("Failed to fetch audio:", audioResponse.error);
         setCharacterAudioUrl(null);
-        try {
-          const audioResponse = await getAudioForText(textToSpeak);
-          if (audioResponse.success && audioResponse.data) {
-              setCharacterAudioUrl(audioResponse.data.audioUrl);
-          } else {
-              console.error("Failed to fetch audio:", audioResponse.error);
-          }
-        } catch (e) {
-            console.error("Error fetching audio", e);
-        } finally {
-            setIsAudioLoading(false);
-        }
+      }
+    } catch (e) {
+      if (signal.aborted) return;
+      console.error("Error fetching audio", e);
+      setCharacterAudioUrl(null);
+    } finally {
+      if (!signal.aborted) {
+        setIsAudioLoading(false);
+      }
     }
-  }, [mode, itemToTrace]);
+  }, []);
+
+  const debouncedFetchAudio = useCallback((text: string) => {
+    // Cancel previous audio request
+    if (audioAbortControllerRef.current) {
+        audioAbortControllerRef.current.abort();
+    }
+    // Clear previous debounce timer
+    if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+    }
+    
+    // Create a new AbortController for the new request
+    const newController = new AbortController();
+    audioAbortControllerRef.current = newController;
+
+    setIsAudioLoading(true); // Set loading state immediately
+
+    debounceTimeoutRef.current = setTimeout(() => {
+        fetchCharacterAudio(text, newController.signal);
+    }, DEBOUNCE_DELAY);
+
+  }, [fetchCharacterAudio]);
 
 
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
         
-        // Fetch character voice
-        fetchCharacterAudio();
+        let textToSpeak = '';
+        if (mode === 'numbers') {
+            const num = parseInt(itemToTrace, 10);
+            textToSpeak = numberToWords(num) || itemToTrace;
+        } else if (mode === 'alphabet' || mode === 'reading') {
+            textToSpeak = itemToTrace;
+        }
+
+        if (textToSpeak) {
+            debouncedFetchAudio(textToSpeak);
+        } else {
+            // No text, so cancel any pending audio requests
+            if (audioAbortControllerRef.current) {
+                audioAbortControllerRef.current.abort();
+            }
+            if(debounceTimeoutRef.current) {
+                clearTimeout(debounceTimeoutRef.current);
+            }
+            setIsAudioLoading(false);
+            setCharacterAudioUrl(null);
+        }
+
 
         if (mode === 'story') {
             setIsStoryLoading(true);
@@ -177,11 +218,10 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCount = (alphabet.find(c => c.word.toLowerCase().includes('apple'))?.word) || 'item'; // Simplified
+            const itemToCount = (alphabet.find(c => c.letter === 'A')?.word) || 'item'; 
 
             if (count > 0 && itemToCount) {
               try {
-                // Generate one image and reuse it
                 const imageResponse = await getImageForWord(itemToCount);
                 if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
@@ -201,7 +241,7 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet, fetchCharacterAudio]);
+  }, [currentIndex, mode, itemForStory, itemToTrace, itemForCounting, toast, characterSet, debouncedFetchAudio]);
   
   useEffect(() => {
     if (characterAudioUrl && audioRef.current && userInteracted) {
@@ -211,7 +251,8 @@ export default function GameClient({ mode }: GameClientProps) {
 
   const playSound = () => {
     if (!userInteracted) setUserInteracted(true);
-    if (audioRef.current) {
+    if (audioRef.current && characterAudioUrl) {
+        audioRef.current.currentTime = 0;
         audioRef.current.play().catch(e => console.error("Audio play failed on click:", e));
     }
   };
