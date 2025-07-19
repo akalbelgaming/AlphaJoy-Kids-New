@@ -7,7 +7,9 @@ import {
   ToyBrick,
   Sparkles,
   TrendingUp,
-  Users
+  Users,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +27,7 @@ import { cn } from "@/lib/utils";
 import { getAdaptiveDifficulty } from "@/app/actions";
 import React from "react";
 import { Separator } from "./ui/separator";
+import { Switch } from "./ui/switch";
 
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
@@ -41,6 +44,8 @@ interface CustomizationPanelProps {
   completions: number;
   clears: number;
   completionTimes: number[];
+  soundEnabled: boolean;
+  onSoundEnabledChange: (enabled: boolean) => void;
 }
 
 export function CustomizationPanel({
@@ -55,6 +60,8 @@ export function CustomizationPanel({
   completions,
   clears,
   completionTimes,
+  soundEnabled,
+  onSoundEnabledChange,
 }: CustomizationPanelProps) {
 
   const { toast } = useToast();
@@ -90,6 +97,19 @@ export function CustomizationPanel({
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
+          <div className="flex items-center justify-between">
+             <Label
+                className="flex items-center gap-2 font-semibold"
+              >
+                {soundEnabled ? <Volume2 /> : <VolumeX />} Sound
+              </Label>
+              <Switch
+                checked={soundEnabled}
+                onCheckedChange={onSoundEnabledChange}
+                aria-label="Toggle sound"
+              />
+          </div>
+          <Separator />
           <div>
             <Label
               htmlFor="font-family"

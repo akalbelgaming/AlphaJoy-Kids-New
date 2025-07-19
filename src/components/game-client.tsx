@@ -54,10 +54,8 @@ export default function GameClient({ mode }: GameClientProps) {
   const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
   const [isCountingLoading, setIsCountingLoading] = useState(false);
   
-  const [drawingImageUrl, setDrawingImageUrl] = useState<string | null>(null);
-  const [isDrawingImageLoading, setIsDrawingImageLoading] = useState(false);
-
   const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioAbortControllerRef = useRef<AbortController | null>(null);
 
@@ -90,8 +88,6 @@ export default function GameClient({ mode }: GameClientProps) {
   const itemToTrace = useMemo(() => {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter; // numbers
-      const isNumeric = !isNaN(parseFloat(currentCharacter as string)) && isFinite(currentCharacter as any);
-      if (isNumeric) return currentCharacter as string;
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter; // alphabet, reading
       return ''; // Other modes don't trace a single character
   }, [mode, currentCharacter]);
@@ -110,15 +106,10 @@ export default function GameClient({ mode }: GameClientProps) {
     if (mode !== 'shapes' || !currentCharacter || typeof currentCharacter !== 'object' || !('path' in currentCharacter)) return null;
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
-  
-  const wordForDrawing = useMemo(() => {
-    if (mode !== 'drawing' || !currentCharacter || typeof currentCharacter !== 'object' || !('word' in currentCharacter)) return null;
-    return currentCharacter.word;
-  }, [mode, currentCharacter]);
 
-  const handleSoundRequest = useCallback(async () => {
+  const fetchCharacterAudio = useCallback(async () => {
     if (isAudioLoading) return;
-    
+
     let textToSpeak = '';
     if (mode === 'numbers') {
         const num = parseInt(itemToTrace, 10);
@@ -144,11 +135,13 @@ export default function GameClient({ mode }: GameClientProps) {
       if (response.success && response.data?.audioUrl) {
         if (audioRef.current) {
           audioRef.current.src = response.data.audioUrl;
-          audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+          if (soundEnabled) {
+             audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+          }
         }
       } else {
         console.error("Failed to fetch audio:", response.error);
-        toast({ variant: "destructive", title: "Could not play sound", description: "Please try again in a moment." });
+        toast({ variant: "destructive", title: "Could not play sound", description: "The AI is a bit busy. Please try again." });
       }
     } catch (error) {
        if (controller.signal.aborted) return;
@@ -159,12 +152,26 @@ export default function GameClient({ mode }: GameClientProps) {
         setIsAudioLoading(false);
        }
     }
-  }, [isAudioLoading, mode, itemToTrace, toast]);
-
+  }, [isAudioLoading, mode, itemToTrace, toast, soundEnabled]);
+  
+  const replaySound = useCallback(() => {
+    if (audioRef.current && audioRef.current.src) {
+        audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
+    } else {
+        // If there's no audio loaded, fetch it
+        fetchCharacterAudio();
+    }
+  }, [fetchCharacterAudio]);
 
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
+        const isSoundNeeded = ['numbers', 'alphabet', 'reading'].includes(mode);
+
+        // Fetch audio only if sound is enabled
+        if (soundEnabled && isSoundNeeded) {
+            fetchCharacterAudio();
+        }
 
         if (mode === 'story') {
             setIsStoryLoading(true);
@@ -191,7 +198,7 @@ export default function GameClient({ mode }: GameClientProps) {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
             const count = itemForCounting;
-            const itemToCountWord = (alphabet.find(a => a.letter === 'A')?.word) || "apple";
+            const itemToCountWord = "apple"; 
             if (count > 0 && itemToCountWord) {
               try {
                 const imageResponse = await getImageForWord(itemToCountWord);
@@ -213,6 +220,8 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
+  // We only want this to re-run when the character changes, not when sound setting changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet]);
   
   const handleNext = useCallback(() => {
@@ -342,6 +351,8 @@ export default function GameClient({ mode }: GameClientProps) {
             completions={completions}
             clears={clears}
             completionTimes={completionTimes}
+            soundEnabled={soundEnabled}
+            onSoundEnabledChange={setSoundEnabled}
         />
         <AdBanner />
       </aside>
@@ -352,16 +363,16 @@ export default function GameClient({ mode }: GameClientProps) {
             <ArrowLeft className="mr-2" /> Prev
           </Button>
           
-          {isSoundAvailable && (
+          {isSoundAvailable && soundEnabled && (
             <Button 
               variant="outline" 
               size="icon" 
-              onClick={handleSoundRequest} 
+              onClick={replaySound} 
               disabled={isAudioLoading} 
               className="rounded-full w-14 h-14"
             >
               <Volume2 className={cn("h-7 w-7", isAudioLoading && "animate-pulse")} />
-              <span className="sr-only">Play Sound</span>
+              <span className="sr-only">Replay Sound</span>
             </Button>
           )}
 
