@@ -1,9 +1,11 @@
+
 "use client";
 
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import {
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  Volume2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
@@ -18,6 +20,7 @@ import { numberToWords } from '@/lib/utils';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
 type Difficulty = "easy" | "medium" | "hard";
@@ -55,6 +58,8 @@ export default function GameClient({ mode }: GameClientProps) {
   const [isDrawingImageLoading, setIsDrawingImageLoading] = useState(false);
 
   const [characterAudioUrl, setCharacterAudioUrl] = useState<string | null>(null);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const { toast } = useToast();
@@ -112,29 +117,40 @@ export default function GameClient({ mode }: GameClientProps) {
     return currentCharacter.word;
   }, [mode, currentCharacter]);
 
+  const fetchCharacterAudio = useCallback(async () => {
+    let textToSpeak = '';
+    if (mode === 'numbers') {
+        const num = parseInt(itemToTrace, 10);
+        textToSpeak = numberToWords(num) || itemToTrace;
+    } else if (mode === 'alphabet' || mode === 'reading') {
+        textToSpeak = itemToTrace;
+    }
+
+    if (textToSpeak) {
+        setIsAudioLoading(true);
+        setCharacterAudioUrl(null);
+        try {
+          const audioResponse = await getAudioForText(textToSpeak);
+          if (audioResponse.success && audioResponse.data) {
+              setCharacterAudioUrl(audioResponse.data.audioUrl);
+          } else {
+              console.error("Failed to fetch audio:", audioResponse.error);
+          }
+        } catch (e) {
+            console.error("Error fetching audio", e);
+        } finally {
+            setIsAudioLoading(false);
+        }
+    }
+  }, [mode, itemToTrace]);
+
 
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
-        setCharacterAudioUrl(null);
-
+        
         // Fetch character voice
-        if (mode === 'alphabet' || mode === 'reading' || mode === 'numbers') {
-            let textToSpeak = '';
-            if (mode === 'numbers') {
-                const num = parseInt(itemToTrace, 10);
-                textToSpeak = numberToWords(num) || itemToTrace;
-            } else {
-                textToSpeak = itemToTrace;
-            }
-
-            if (textToSpeak) {
-                 const audioResponse = await getAudioForText(textToSpeak);
-                 if (audioResponse.success && audioResponse.data) {
-                    setCharacterAudioUrl(audioResponse.data.audioUrl);
-                 }
-            }
-        }
+        fetchCharacterAudio();
 
         if (mode === 'story') {
             setIsStoryLoading(true);
@@ -185,14 +201,20 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet, itemToTrace]);
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet, fetchCharacterAudio]);
   
   useEffect(() => {
-    if (characterAudioUrl && audioRef.current) {
+    if (characterAudioUrl && audioRef.current && userInteracted) {
         audioRef.current.play().catch(e => console.error("Audio play failed:", e));
     }
-  }, [characterAudioUrl]);
+  }, [characterAudioUrl, userInteracted]);
 
+  const playSound = () => {
+    if (!userInteracted) setUserInteracted(true);
+    if (audioRef.current) {
+        audioRef.current.play().catch(e => console.error("Audio play failed on click:", e));
+    }
+  };
 
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
@@ -304,7 +326,9 @@ export default function GameClient({ mode }: GameClientProps) {
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      {characterAudioUrl && <audio ref={audioRef} src={characterAudioUrl} hidden />}
+      {characterAudioUrl && <audio ref={audioRef} src={characterAudioUrl} hidden onCanPlayThrough={() => {
+        if(userInteracted) audioRef.current?.play().catch(e => console.error("Autoplay failed:", e));
+      }}/>}
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
@@ -330,9 +354,16 @@ export default function GameClient({ mode }: GameClientProps) {
             <ArrowLeft className="mr-2" /> Prev
           </Button>
           
-          <div className="flex-1 text-center">
-            {/* Can show current item here if needed, e.g., the letter or number */}
-          </div>
+          <Button 
+            variant="outline" 
+            size="icon" 
+            onClick={playSound} 
+            disabled={!characterAudioUrl || isAudioLoading} 
+            className="rounded-full w-14 h-14"
+            >
+            <Volume2 className={cn("h-7 w-7", isAudioLoading && "animate-pulse")} />
+            <span className="sr-only">Play Sound</span>
+          </Button>
 
           <Button variant="outline" size="lg" onClick={handleNext} disabled={characterSet.length === 0}>
             Next <ArrowRight className="ml-2" />
