@@ -56,6 +56,7 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [audioCache, setAudioCache] = useState<Map<string, string>>(new Map());
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioAbortControllerRef = useRef<AbortController | null>(null);
 
@@ -107,25 +108,23 @@ export default function GameClient({ mode }: GameClientProps) {
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
 
-  const fetchCharacterAudio = useCallback(async () => {
-    if (isAudioLoading) return;
-
-    let textToSpeak = '';
-    if (mode === 'numbers') {
-        const num = parseInt(itemToTrace, 10);
-        textToSpeak = numberToWords(num) || itemToTrace;
-    } else if (mode === 'alphabet' || mode === 'reading') {
-        textToSpeak = itemToTrace;
+  const fetchCharacterAudio = useCallback(async (textToSpeak: string) => {
+    if (isAudioLoading) {
+        audioAbortControllerRef.current?.abort();
     }
-    
-    if (!textToSpeak) return;
 
-    if (audioAbortControllerRef.current) {
-      audioAbortControllerRef.current.abort();
+    if (audioCache.has(textToSpeak)) {
+        if (audioRef.current) {
+            audioRef.current.src = audioCache.get(textToSpeak)!;
+            if (soundEnabled) {
+                audioRef.current.play().catch(e => console.error("Audio play failed from cache:", e));
+            }
+        }
+        return;
     }
+
     const controller = new AbortController();
     audioAbortControllerRef.current = controller;
-
     setIsAudioLoading(true);
 
     try {
@@ -133,6 +132,7 @@ export default function GameClient({ mode }: GameClientProps) {
       if (controller.signal.aborted) return;
 
       if (response.success && response.data?.audioUrl) {
+        setAudioCache(prev => new Map(prev).set(textToSpeak, response.data.audioUrl));
         if (audioRef.current) {
           audioRef.current.src = response.data.audioUrl;
           if (soundEnabled) {
@@ -152,25 +152,48 @@ export default function GameClient({ mode }: GameClientProps) {
         setIsAudioLoading(false);
        }
     }
-  }, [isAudioLoading, mode, itemToTrace, toast, soundEnabled]);
-  
+  }, [isAudioLoading, toast, soundEnabled, audioCache]);
+
   const replaySound = useCallback(() => {
-    if (audioRef.current && audioRef.current.src) {
-        audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
-    } else {
-        // If there's no audio loaded, fetch it
-        fetchCharacterAudio();
+    let textToSpeak = '';
+    if (mode === 'numbers') {
+        const num = parseInt(itemToTrace, 10);
+        textToSpeak = numberToWords(num) || itemToTrace;
+    } else if (mode === 'alphabet' || mode === 'reading') {
+        textToSpeak = itemToTrace;
     }
-  }, [fetchCharacterAudio]);
+    
+    if (!textToSpeak) return;
+
+    if (audioRef.current && audioRef.current.src && !audioRef.current.paused) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
+    } else if (audioCache.has(textToSpeak)) {
+        if (audioRef.current) {
+            audioRef.current.src = audioCache.get(textToSpeak)!;
+            audioRef.current.play().catch(e => console.error("Audio replay from cache failed:", e));
+        }
+    } else {
+        fetchCharacterAudio(textToSpeak);
+    }
+  }, [mode, itemToTrace, audioCache, fetchCharacterAudio]);
 
   useEffect(() => {
     const fetchUIData = async () => {
         setStartTime(Date.now());
         const isSoundNeeded = ['numbers', 'alphabet', 'reading'].includes(mode);
 
-        // Fetch audio only if sound is enabled
         if (soundEnabled && isSoundNeeded) {
-            fetchCharacterAudio();
+            let textToSpeak = '';
+            if (mode === 'numbers') {
+                const num = parseInt(itemToTrace, 10);
+                textToSpeak = numberToWords(num) || itemToTrace;
+            } else if (mode === 'alphabet' || mode === 'reading') {
+                textToSpeak = itemToTrace;
+            }
+            if (textToSpeak) {
+                fetchCharacterAudio(textToSpeak);
+            }
         }
 
         if (mode === 'story') {
@@ -220,9 +243,7 @@ export default function GameClient({ mode }: GameClientProps) {
         }
     };
     fetchUIData();
-  // We only want this to re-run when the character changes, not when sound setting changes.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet]);
+  }, [currentIndex, mode, itemForStory, itemForCounting, toast, characterSet, soundEnabled, fetchCharacterAudio, itemToTrace]);
   
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
@@ -363,7 +384,7 @@ export default function GameClient({ mode }: GameClientProps) {
             <ArrowLeft className="mr-2" /> Prev
           </Button>
           
-          {isSoundAvailable && soundEnabled && (
+          {isSoundAvailable && (
             <Button 
               variant="outline" 
               size="icon" 
