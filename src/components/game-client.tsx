@@ -29,6 +29,26 @@ type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
+// Simple Levenshtein distance function for fuzzy matching
+function levenshtein(s1: string, s2: string): number {
+    if (s1.length > s2.length) { [s1, s2] = [s2, s1]; }
+    const distances = Array.from({ length: s1.length + 1 }, (_, i) => i);
+    for (let j = 0; j < s2.length; j++) {
+        let prev = distances[0];
+        distances[0]++;
+        for (let i = 0; i < s1.length; i++) {
+            const temp = distances[i+1];
+            distances[i+1] = Math.min(
+                distances[i] + 1, 
+                distances[i+1] + 1,
+                prev + (s1[i] === s2[j] ? 0 : 1) 
+            );
+            prev = temp;
+        }
+    }
+    return distances[s1.length];
+}
+
 interface GameClientProps {
     mode: Mode;
 }
@@ -209,6 +229,7 @@ export default function GameClient({ mode }: GameClientProps) {
     setStartTime(Date.now());
     setIsCorrectAnswer(null);
     setLastTranscript(null);
+    setCountingImageUrls([]); // Clear images for the new number
     
     const controller = new AbortController();
 
@@ -310,14 +331,32 @@ export default function GameClient({ mode }: GameClientProps) {
       const currentCount = itemForCounting;
       const countAsWord = numberToWords(currentCount)?.toLowerCase();
       const countAsNumber = currentCount.toString();
+      
+      let isMatch = false;
+      const spokenWords = transcript.split(/\s+/);
+      
+      for (const spokenWord of spokenWords) {
+        if (spokenWord === countAsNumber) {
+            isMatch = true;
+            break;
+        }
+        if (countAsWord && levenshtein(spokenWord, countAsWord) <= 2) {
+            isMatch = true;
+            break;
+        }
+      }
 
-      // Flexible matching: check if transcript includes the word or number
-      if ((countAsWord && transcript.includes(countAsWord)) || transcript.includes(countAsNumber)) {
+      if (isMatch) {
         setIsCorrectAnswer(true);
         playSound("Correct!");
         
         const controller = new AbortController();
         fetchCountingImages(controller.signal);
+        
+        // Automatically go to next after a delay
+        setTimeout(() => {
+            handleCompletion();
+        }, 3000); 
 
       } else {
         setIsCorrectAnswer(false);
@@ -404,7 +443,6 @@ export default function GameClient({ mode }: GameClientProps) {
             lastTranscript={lastTranscript}
             isCorrect={isCorrectAnswer}
             onStartListening={handleStartListening}
-            onNext={handleCompletion}
           />
         );
       case "drawing":
