@@ -8,6 +8,7 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'Trace & Learn',
   description: 'A fun tracing game for kids to learn numbers and alphabets!',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
