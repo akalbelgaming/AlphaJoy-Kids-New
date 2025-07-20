@@ -1,3 +1,4 @@
+
 'use server';
 
 import { generateStory } from '@/ai/flows/generate-story-flow';
@@ -21,7 +22,17 @@ export async function getStory(word: string) {
     return { success: true, data: result };
   } catch (error) {
     console.error(`Error in getStory for "${word}":`, error);
-    const message = error instanceof Error ? error.message : 'An unknown error occurred.';
+    
+    let message = 'An unknown error occurred while creating the story.';
+    if (error instanceof Error) {
+      // Check for specific quota error message from the API
+      if (error.message.includes('429') || error.message.toLowerCase().includes('quota')) {
+        message = 'The storyteller is resting for today! Please try again tomorrow.';
+      } else {
+        message = "The storyteller seems to be busy. Please try again in a moment.";
+      }
+    }
+    
     return { success: false, error: message };
   }
 }
