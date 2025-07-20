@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>https://play-pad.vercel.app/</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/letters</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/numbers</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/hindi</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/shapes</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/counting</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/reading</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/drawing</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/story</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>https://play-pad.vercel.app/privacy</loc>
+  <lastmod>2024-06-12T00:00:00+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+</urlset>
