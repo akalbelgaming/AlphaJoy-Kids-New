@@ -169,7 +169,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       } else if (mode === 'reading') {
         textToSpeak = itemToTrace;
       } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
-        textToSpeak = `${currentCharacter.vowel}, ${currentCharacter.word}`;
+        textToSpeak = `${currentCharacter.vowel} से ${currentCharacter.word}`;
       }
 
       if (textToSpeak) {
@@ -192,7 +192,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       } else if (mode === 'reading') {
         textToSpeak = itemToTrace;
       } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
-        textToSpeak = `${currentCharacter.vowel}, ${currentCharacter.word}`;
+        textToSpeak = `${currentCharacter.vowel} से ${currentCharacter.word}`;
       }
 
       if (textToSpeak) {
