@@ -56,7 +56,7 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioCache = useRef<Map<string, string>>(new Map());
+  const audioCache = useRef<Map<string, string | null>>(new Map());
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioAbortControllerRef = useRef<AbortController | null>(null);
 
@@ -139,19 +139,23 @@ export default function GameClient({ mode }: GameClientProps) {
 
       const audioUrl = response.data?.audioUrl;
 
-      if (audioUrl) {
+      if (response.success && audioUrl) {
         audioCache.current.set(textToSpeak, audioUrl);
         playAudio(audioUrl);
       } else {
-        console.error("Failed to fetch audio:", response.error);
-        if (response.error?.includes('429')) {
+        // This is now an expected failure case, so we show a toast instead of a console error
+        if (response.error?.includes('daily sound limit')) {
              toast({
                 variant: "destructive",
                 title: "Daily Sound Limit Reached",
-                description: "You've used all free sounds for today. Please try again tomorrow!",
+                description: "You've used all the free sounds for today. Please try again tomorrow!",
                 duration: 8000
              });
+        } else {
+            // For other, unexpected errors, we can still log them.
+            console.error("Failed to fetch audio:", response.error);
         }
+        audioCache.current.set(textToSpeak, null); // Cache the failure to avoid retries
       }
     } catch (error) {
        if (controller.signal.aborted) return;
@@ -164,21 +168,27 @@ export default function GameClient({ mode }: GameClientProps) {
     }
   }, [toast, playAudio]);
   
-  const handleReplaySound = useCallback(() => {
+  const handleReplaySound = useCallback(async () => {
     const textToSpeak = getTextToSpeak();
-    if (!textToSpeak || !soundEnabled) return;
-    
-    const cachedUrl = audioCache.current.get(textToSpeak);
+    if (!textToSpeak || !soundEnabled || isAudioLoading) return;
 
-    if (cachedUrl) {
-        playAudio(cachedUrl);
-    } else if (!isAudioLoading) {
-      // If not cached, fetch it now on manual request
-      const controller = new AbortController();
-      audioAbortControllerRef.current = controller;
-      fetchCharacterAudio(textToSpeak, controller);
+    const cachedResult = audioCache.current.get(textToSpeak);
+
+    if (cachedResult) { // If it's a valid URL, play it
+        playAudio(cachedResult);
+    } else if (cachedResult === null) { // If it's a known failure (null)
+        toast({
+            variant: "destructive",
+            title: "Sound Not Available",
+            description: "You may have hit the daily free limit. Please try again tomorrow.",
+            duration: 8000,
+        });
+    } else { // Not in cache, try fetching
+        const controller = new AbortController();
+        audioAbortControllerRef.current = controller;
+        await fetchCharacterAudio(textToSpeak, controller);
     }
-  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio]);
+  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, toast]);
 
 
   useEffect(() => {
@@ -198,7 +208,8 @@ export default function GameClient({ mode }: GameClientProps) {
         // Handle audio for traceable items
         const textToSpeak = getTextToSpeak();
         if (soundEnabled && textToSpeak && ['numbers', 'alphabet', 'reading'].includes(mode)) {
-          await fetchCharacterAudio(textToSpeak, controller);
+          // Don't await here to let UI load faster. Audio will play when ready.
+          fetchCharacterAudio(textToSpeak, controller);
         }
 
         // Handle story generation
