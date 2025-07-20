@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,33 +17,29 @@ import {
  * A component that renders a real Google AdSense banner ad unit.
  */
 export function AdBanner({ className }: { className?: string }) {
-  const adRef = useRef<HTMLModElement>(null);
+  const pathname = usePathname();
 
   useEffect(() => {
-    // This effect runs when the adRef is attached to the <ins> element.
-    // This is a more reliable way to know the container is in the DOM.
-    if (adRef.current && adRef.current.children.length === 0) {
-      try {
-        // @ts-ignore
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (err) {
-        console.error("AdSense error:", err);
-      }
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (err) {
+      console.error("AdSense error:", err);
     }
-  }, []); // The dependency array is empty to run once on mount. The check inside handles the logic.
+  }, [pathname]);
 
   return (
     <div
+      key={pathname}
       className={cn(
         "flex w-full items-center justify-center bg-gray-100 text-black min-h-[50px]",
         className
       )}
     >
       <ins
-        ref={adRef}
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-3781633352100587" // This is your publisher ID
+        data-ad-client="ca-pub-3781633352100587"
         data-ad-slot="YOUR_AD_SLOT_ID" // TODO: Replace with your Ad Unit ID
         data-ad-format="auto"
         data-full-width-responsive="true"
