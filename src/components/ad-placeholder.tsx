@@ -1,3 +1,4 @@
+
 "use client";
 
 import { cn } from "@/lib/utils";
@@ -18,8 +19,14 @@ import {
  */
 export function AdBanner({ className }: { className?: string }) {
   const pathname = usePathname();
+  const adRef = useRef<HTMLModElement>(null);
 
   useEffect(() => {
+    const adElement = adRef.current;
+    if (!adElement) {
+      return;
+    }
+
     try {
       // @ts-ignore
       (window.adsbygoogle = window.adsbygoogle || []).push({});
@@ -30,13 +37,14 @@ export function AdBanner({ className }: { className?: string }) {
 
   return (
     <div
-      key={pathname}
+      key={pathname} // Force re-render on path change
       className={cn(
         "flex w-full items-center justify-center bg-gray-100 text-black min-h-[50px]",
         className
       )}
     >
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client="ca-pub-3781633352100587"
@@ -47,6 +55,7 @@ export function AdBanner({ className }: { className?: string }) {
     </div>
   );
 }
+
 
 /**
  * A component that shows an interstitial ad.
