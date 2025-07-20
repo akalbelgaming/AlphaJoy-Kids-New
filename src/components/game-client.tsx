@@ -13,7 +13,7 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory, getImageForWord, getColoringPage } from "@/app/actions";
+import { getStory, getColoringPage } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -79,9 +79,6 @@ export default function GameClient({ mode }: GameClientProps) {
   const [story, setStory] = useState<string | null>(null);
   const [storyAudioUrl, setStoryAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
-  
-  const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
-  const [isCountingLoading, setIsCountingLoading] = useState(false);
   
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
@@ -203,39 +200,11 @@ export default function GameClient({ mode }: GameClientProps) {
     utterance.rate = 0.8;
     speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, femaleVoice]);
-
-  const fetchCountingImages = useCallback(async (signal: AbortSignal) => {
-      setIsCountingLoading(true);
-      const count = itemForCounting;
-      // Using a simple, consistent word for image generation
-      const itemToCountWord = "apple"; 
-      if (count > 0 && itemToCountWord) {
-        try {
-          const imageResponse = await getImageForWord(itemToCountWord);
-          if (signal.aborted) return;
-          if (imageResponse.success && imageResponse.data?.imageUrl) {
-            setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
-          } else {
-            toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
-            setCountingImageUrls([]);
-          }
-        } catch (e) {
-            if (signal.aborted) return;
-            toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
-            setCountingImageUrls([]);
-        } finally {
-            if (!signal.aborted) setIsCountingLoading(false);
-        }
-      } else {
-          setIsCountingLoading(false);
-      }
-  }, [itemForCounting, toast]);
   
 
   useEffect(() => {
     setStartTime(Date.now());
     setIsCorrectAnswer(null);
-    setCountingImageUrls([]);
     
     const controller = new AbortController();
 
@@ -333,8 +302,6 @@ export default function GameClient({ mode }: GameClientProps) {
       // Forgiving logic: Any speech result is considered a success.
       setIsCorrectAnswer(true);
       playSound("Great job!");
-      const controller = new AbortController();
-      fetchCountingImages(controller.signal);
       setIsListening(false);
     };
 
@@ -348,8 +315,6 @@ export default function GameClient({ mode }: GameClientProps) {
       } else {
          // Even on error (like no-speech), we'll treat it as an attempt and show the answer.
         setIsCorrectAnswer(true);
-        const controller = new AbortController();
-        fetchCountingImages(controller.signal);
       }
       setIsListening(false);
     };
@@ -411,8 +376,6 @@ export default function GameClient({ mode }: GameClientProps) {
           <CountingDisplay
             key={`${mode}-${currentIndex}`}
             count={itemForCounting}
-            imageUrls={countingImageUrls}
-            isLoading={isCountingLoading}
             isListening={isListening}
             isCorrect={isCorrectAnswer}
             onStartListening={handleStartListening}
