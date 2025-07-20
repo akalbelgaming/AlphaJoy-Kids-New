@@ -89,7 +89,6 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [lastTranscript, setLastTranscript] = useState<string | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState<boolean | null>(null);
 
   const { toast } = useToast();
@@ -236,7 +235,6 @@ export default function GameClient({ mode }: GameClientProps) {
   useEffect(() => {
     setStartTime(Date.now());
     setIsCorrectAnswer(null);
-    setLastTranscript(null);
     setCountingImageUrls([]);
     
     const controller = new AbortController();
@@ -330,39 +328,13 @@ export default function GameClient({ mode }: GameClientProps) {
 
     setIsListening(true);
     setIsCorrectAnswer(null);
-    setLastTranscript(null);
 
     speechRecognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript.toLowerCase().trim();
-      setLastTranscript(transcript);
-
-      const currentCount = itemForCounting;
-      const countAsWord = numberToWords(currentCount)?.toLowerCase();
-      const countAsNumber = currentCount.toString();
-      
-      let isMatch = false;
-      const spokenWords = transcript.split(/\s+/);
-      
-      for (const spokenWord of spokenWords) {
-        if (spokenWord === countAsNumber || spokenWord === countAsWord) {
-            isMatch = true;
-            break;
-        }
-        if (countAsWord && levenshtein(spokenWord, countAsWord) <= 2) {
-            isMatch = true;
-            break;
-        }
-      }
-
-      if (isMatch) {
-        setIsCorrectAnswer(true);
-        playSound("Correct!");
-        const controller = new AbortController();
-        fetchCountingImages(controller.signal);
-      } else {
-        setIsCorrectAnswer(false);
-        playSound("Try again.");
-      }
+      // Forgiving logic: Any speech result is considered a success.
+      setIsCorrectAnswer(true);
+      playSound("Great job!");
+      const controller = new AbortController();
+      fetchCountingImages(controller.signal);
       setIsListening(false);
     };
 
@@ -374,11 +346,10 @@ export default function GameClient({ mode }: GameClientProps) {
           description: "Please allow microphone access in your browser settings to use this feature.",
         });
       } else {
-        toast({ 
-          variant: "destructive", 
-          title: "Could not hear you", 
-          description: "Please try speaking again."
-        });
+         // Even on error (like no-speech), we'll treat it as an attempt and show the answer.
+        setIsCorrectAnswer(true);
+        const controller = new AbortController();
+        fetchCountingImages(controller.signal);
       }
       setIsListening(false);
     };

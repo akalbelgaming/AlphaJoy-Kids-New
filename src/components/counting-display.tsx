@@ -5,8 +5,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Check, X, ArrowRight, Loader2 } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Mic, ArrowRight, Loader2 } from 'lucide-react';
 
 interface CountingDisplayProps {
   count: number;
@@ -29,20 +28,6 @@ export function CountingDisplay({
 }: CountingDisplayProps) {
   
   const showImages = isCorrect === true;
-
-  const getFeedbackMessage = () => {
-    if (isListening) return "Listening...";
-    if (isCorrect === false) return "That's not it. Try again!";
-    if (isCorrect === true) return "Great job!";
-    return "Press the mic and say the number!";
-  };
-
-  const getFeedbackIcon = () => {
-    if (isListening) return <Mic className="w-6 h-6 text-primary animate-pulse" />;
-    if (isCorrect === false) return <X className="w-6 h-6 text-destructive" />;
-    if (isCorrect === true) return <Check className="w-6 h-6 text-green-500" />;
-    return <Mic className="w-6 h-6" />;
-  };
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
@@ -67,11 +52,7 @@ export function CountingDisplay({
                         </div>
                     ))}
                 </div>
-            ) : (
-                <div className="w-full h-full min-h-[250px] bg-muted/30 rounded-lg flex items-center justify-center">
-                    <p className="text-muted-foreground italic">Say the number below!</p>
-                </div>
-            )}
+            ) : null}
         </CardContent>
         <CardHeader className="pt-2">
             <CardTitle className="text-center">
@@ -102,8 +83,7 @@ export function CountingDisplay({
         )}
 
         <div className="flex items-center gap-2 text-muted-foreground font-semibold text-lg h-8">
-            {getFeedbackIcon()}
-            <span>{getFeedbackMessage()}</span>
+            {!isCorrect && (isListening ? "Listening..." : "Press the mic and say the number!")}
         </div>
       </div>
     </div>
