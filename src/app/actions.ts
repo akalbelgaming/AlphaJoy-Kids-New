@@ -1,60 +1,65 @@
 'use server';
 
-import { adaptiveDifficulty, type AdaptiveDifficultyInput } from '@/ai/flows/adaptive-difficulty';
-import { generateImage } from '@/ai/flows/generate-image-flow';
-import { generateStory } from '@/ai/flows/generate-story-flow';
-import { generateColoringPage } from '@/ai/flows/generate-coloring-page-flow';
+import {
+  adaptiveDifficulty,
+  type AdaptiveDifficultyInput,
+} from '@/ai/flows/adaptive-difficulty';
+import {generateImage} from '@/ai/flows/generate-image-flow';
+import {generateStory} from '@/ai/flows/generate-story-flow';
+import {generateColoringPage} from '@/ai/flows/generate-coloring-page-flow';
 
 export async function getAdaptiveDifficulty(input: AdaptiveDifficultyInput) {
   try {
     const result = await adaptiveDifficulty(input);
-    return { success: true, data: result };
+    return {success: true, data: result};
   } catch (error) {
     console.error('Error in getAdaptiveDifficulty:', error);
-    return { success: false, error: 'Failed to get new difficulty from AI.' };
+    return {success: false, error: 'Failed to get new difficulty from AI.'};
   }
 }
 
 export async function getImageForWord(word: string) {
   try {
-    const result = await generateImage({ prompt: word });
-    return { success: true, data: result };
+    const result = await generateImage({prompt: word});
+    return {success: true, data: result};
   } catch (error) {
     console.error(`Error in getImageForWord for "${word}":`, error);
-    return { success: false, error: 'Failed to generate image.' };
+    return {success: false, error: 'Failed to generate image.'};
   }
 }
 
 export async function getStory(word: string) {
   if (!word) {
-    return { success: false, error: 'A word must be provided.' };
+    return {success: false, error: 'A word must be provided.'};
   }
   try {
-    const result = await generateStory({ topic: word });
+    const result = await generateStory({topic: word});
     if (!result || !result.story || !result.audioUrl) {
-      return { success: false, error: 'The AI failed to return a story.' };
+      return {success: false, error: 'The AI failed to return a story.'};
     }
-    return { success: true, data: result };
-  } catch (error)
+    return {success: true, data: result};
+  } catch (error) {
     console.error(`Error in getStory for "${word}":`, error);
-    const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, error: message };
+    const message =
+      error instanceof Error ? error.message : 'An unknown error occurred.';
+    return {success: false, error: message};
   }
 }
 
 export async function getColoringPage(word: string) {
   if (!word) {
-    return { success: false, error: 'A word must be provided.' };
+    return {success: false, error: 'A word must be provided.'};
   }
   try {
-    const result = await generateColoringPage({ prompt: word });
+    const result = await generateColoringPage({prompt: word});
     if (!result || !result.imageUrl) {
-      return { success: false, error: 'The AI failed to return an image.' };
+      return {success: false, error: 'The AI failed to return an image.'};
     }
-    return { success: true, data: result };
+    return {success: true, data: result};
   } catch (error) {
     console.error(`Error in getColoringPage for "${word}":`, error);
-    const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-    return { success: false, error: message };
+    const message =
+      error instanceof Error ? error.message : 'An unknown error occurred.';
+    return {success: false, error: message};
   }
 }
