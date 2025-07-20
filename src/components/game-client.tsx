@@ -338,7 +338,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
-      <audio ref={audioRef} src={audioUrl || ''} className="hidden" />
+      <audio ref={audioRef} src={audioUrl ?? undefined} className="hidden" />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
         <CustomizationPanel 
