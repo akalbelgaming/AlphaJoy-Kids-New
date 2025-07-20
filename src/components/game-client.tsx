@@ -56,7 +56,7 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioCache = useRef<Map<string, string | null>>(new Map());
+  const audioCache = useRef<Map<string, string>>(new Map());
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioAbortControllerRef = useRef<AbortController | null>(null);
 
@@ -137,22 +137,18 @@ export default function GameClient({ mode }: GameClientProps) {
       const response = await getAudioForText(textToSpeak);
       if (controller.signal.aborted) return;
 
-      // The AI flow now returns { audioUrl: null } on failure.
       const audioUrl = response.data?.audioUrl;
 
-      // Cache the result, whether it's a valid URL or null.
-      audioCache.current.set(textToSpeak, audioUrl || null);
-
       if (audioUrl) {
+        audioCache.current.set(textToSpeak, audioUrl);
         playAudio(audioUrl);
       } else {
-        // Silently fail if audioUrl is null.
-        console.warn(`Audio generation failed for "${textToSpeak}", but the app will continue.`);
+        console.error("Failed to fetch audio:", response.error);
         if (response.error?.includes('429')) {
              toast({
                 variant: "destructive",
                 title: "Daily Sound Limit Reached",
-                description: "You've used all free sounds for today. Previously played sounds will still work. Please try again tomorrow!",
+                description: "You've used all free sounds for today. Please try again tomorrow!",
                 duration: 8000
              });
         }
@@ -174,19 +170,15 @@ export default function GameClient({ mode }: GameClientProps) {
     
     const cachedUrl = audioCache.current.get(textToSpeak);
 
-    if (audioCache.current.has(textToSpeak)) {
-        if (cachedUrl) { // Check if the cached value is a valid URL
-            playAudio(cachedUrl);
-        } else {
-             toast({ title: "Sound Not Available", description: "The sound for this item could not be loaded." });
-        }
+    if (cachedUrl) {
+        playAudio(cachedUrl);
     } else if (!isAudioLoading) {
       // If not cached, fetch it now on manual request
       const controller = new AbortController();
       audioAbortControllerRef.current = controller;
       fetchCharacterAudio(textToSpeak, controller);
     }
-  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, toast]);
+  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio]);
 
 
   useEffect(() => {
@@ -206,7 +198,6 @@ export default function GameClient({ mode }: GameClientProps) {
         // Handle audio for traceable items
         const textToSpeak = getTextToSpeak();
         if (soundEnabled && textToSpeak && ['numbers', 'alphabet', 'reading'].includes(mode)) {
-          // Pass the controller to the fetch function
           await fetchCharacterAudio(textToSpeak, controller);
         }
 
@@ -438,3 +429,5 @@ export default function GameClient({ mode }: GameClientProps) {
     </div>
   );
 }
+
+    
