@@ -142,11 +142,20 @@ export default function GameClient({ mode }: GameClientProps) {
         playAudio(response.data.audioUrl);
       } else {
         console.error("Failed to fetch audio:", response.error);
-        toast({
-          variant: "destructive",
-          title: "Could Not Play Sound",
-          description: "The AI might be busy or the daily limit was reached. Please try again later.",
-        });
+        if (response.error?.includes('429')) {
+             toast({
+                variant: "destructive",
+                title: "Daily Sound Limit Reached",
+                description: "You've used all free sounds for today. Previously played sounds will still work. Please try again tomorrow!",
+                duration: 8000
+             });
+        } else {
+            toast({
+              variant: "destructive",
+              title: "Could Not Play Sound",
+              description: response.error || "The AI might be busy. Please try again.",
+            });
+        }
       }
     } catch (error) {
        if (controller.signal.aborted) return;
@@ -161,11 +170,13 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const handleReplaySound = useCallback(() => {
     const textToSpeak = getTextToSpeak();
+    if (!textToSpeak || !soundEnabled) return;
+    
     const cachedUrl = audioCache.current.get(textToSpeak);
-    if (cachedUrl && soundEnabled) {
+    if (cachedUrl) {
       playAudio(cachedUrl);
-    } else if (textToSpeak && soundEnabled && !isAudioLoading) {
-      // If not cached, fetch it now
+    } else if (!isAudioLoading) {
+      // If not cached, fetch it now on manual request
       const controller = new AbortController();
       audioAbortControllerRef.current = controller;
       fetchCharacterAudio(textToSpeak, controller);
@@ -256,7 +267,7 @@ export default function GameClient({ mode }: GameClientProps) {
         controller.abort();
     };
 
-  }, [currentIndex, mode, soundEnabled, getTextToSpeak, fetchCharacterAudio, itemForStory, itemForCounting, toast]);
+  }, [currentIndex, mode, soundEnabled, toast, itemForStory, itemForCounting, getTextToSpeak, fetchCharacterAudio]);
   
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
