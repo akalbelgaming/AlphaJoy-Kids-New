@@ -6,8 +6,8 @@ import { Analytics } from '@vercel/analytics/react';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-  title: 'Trace & Learn',
-  description: 'A fun tracing game for kids to learn numbers and alphabets!',
+  title: 'Play Pad: ABC, Stories & Art',
+  description: 'A fun game for kids to trace letters, count numbers, draw, and listen to stories!',
   manifest: '/manifest.json',
 };
 

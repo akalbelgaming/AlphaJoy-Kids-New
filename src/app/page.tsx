@@ -25,44 +25,44 @@ const activities = [
     href: '/numbers',
     title: 'Numbers',
     icon: <div className="text-3xl font-bold">123</div>,
-    color: 'from-blue-400 to-blue-600 text-white',
+    "color": 'from-blue-400 to-blue-600 text-white',
   },
   {
-    href: '/hindi',
-    title: 'Hindi',
-    icon: <div className="text-4xl font-bold">अ</div>,
-    color: 'from-orange-400 to-orange-600 text-white',
+    "href": '/hindi',
+    "title": 'Hindi',
+    "icon": <div className="text-4xl font-bold">अ</div>,
+    "color": 'from-orange-400 to-orange-600 text-white',
   },
   {
-    href: '/shapes',
-    title: 'Shapes',
-    icon: <div className="text-4xl">△</div>,
-    color: 'from-yellow-400 to-yellow-600 text-white',
+    "href": '/shapes',
+    "title": 'Shapes',
+    "icon": <div className="text-4xl">△</div>,
+    "color": 'from-yellow-400 to-yellow-600 text-white',
   },
   {
-    href: '/counting',
-    title: 'Counting',
-    icon: <div className="text-xl font-bold">1,2,3</div>,
-    color: 'from-green-400 to-green-600 text-white',
+    "href": '/counting',
+    "title": 'Counting',
+    "icon": <div className="text-xl font-bold">1,2,3</div>,
+    "color": 'from-green-400 to-green-600 text-white',
   },
   {
-    href: '/reading',
-    title: 'Reading',
-    icon: <div className="text-4xl font-bold">Aa</div>,
-    color: 'from-purple-400 to-purple-600 text-white',
+    "href": '/reading',
+    "title": 'Reading',
+    "icon": <div className="text-4xl font-bold">Aa</div>,
+    "color": 'from-purple-400 to-purple-600 text-white',
   },
   {
-    href: '/drawing',
-    title: 'Drawing',
-    icon: <div className="text-4xl">✎</div>,
-    color: 'from-indigo-400 to-indigo-600 text-white',
+    "href": '/drawing',
+    "title": 'Drawing',
+    "icon": <div className="text-4xl">✎</div>,
+    "color": 'from-indigo-400 to-indigo-600 text-white',
   },
   {
-    href: '/story',
-    title: 'Story Time',
-    icon: <div className="text-4xl">📖</div>,
-    color: 'from-pink-400 to-pink-600 text-white',
-  },
+    "href": '/story',
+    "title": 'Story Time',
+    "icon": <div className="text-4xl">📖</div>,
+    "color": 'from-pink-400 to-pink-600 text-white',
+  }
 ];
 
 export default function Home() {
@@ -71,7 +71,7 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center gap-4">
            <ToyBrick className="h-8 w-8" />
-           <h1 className="text-2xl font-bold font-headline">Trace & Learn</h1>
+           <h1 className="text-2xl font-bold font-headline">Play Pad: ABC, Stories &amp; Art</h1>
         </div>
       </header>
       
