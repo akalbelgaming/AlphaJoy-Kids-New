@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Fingerprint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-
 const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
         <path d="M18.84,10.29C18.85,10.29,18.86,10.29,18.86,10.29C19.6,10.23,20.3,10.28,21,10.56C20.9,11.53,20.5,12.5,19.9,13.27C19.3,14.07,18.5,14.65,17.65,14.73C16.71,14.83,15.82,14.4,15.1,13.78C15.1,13.78,15.1,13.77,15.1,13.77C14.35,13.1,13.9,12.18,14,11.23C14.08,10.25,14.75,9.5,15.65,9.4C16.63,9.31,17.5,9.73,18.15,10.39C18.16,10.4,18.16,10.4,18.17,10.41C18.38,10.23,18.6,10.21,18.84,10.29M17.34,2C15.82,2,14.83,3.31,14.83,4.83C14.83,6.35,15.79,7.67,17.3,7.67C17.31,7.67,17.32,7.67,17.34,7.67C18.86,7.67,19.83,6.36,19.83,4.84C19.83,3.32,18.87,2,17.35,2H17.34Z" fill="#68a22d"/>
@@ -30,7 +29,7 @@ export function CountingDisplay({
 }: CountingDisplayProps) {
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-end pb-8">
+    <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <div className="w-full max-w-2xl flex items-center justify-center" style={{minHeight: '420px'}}>
         {showReward ? (
           <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
@@ -57,7 +56,7 @@ export function CountingDisplay({
         )}
       </div>
       
-      <div className="flex flex-col items-center gap-4 mt-8 h-24">
+      <div className="flex flex-col items-center gap-4 h-24">
         {showReward ? (
           <Button 
               size="lg" 
