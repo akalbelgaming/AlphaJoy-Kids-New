@@ -3,22 +3,24 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, BookOpen, Check } from 'lucide-react';
+import { Loader2, BookOpen, Check, Volume2 } from 'lucide-react';
 
 interface StoryDisplayProps {
   word: string;
   story: string | null;
-  audioUrl: string | null;
   isLoading: boolean;
   onComplete: () => void;
+  onReplayAudio: () => void;
+  isAudioAvailable: boolean;
 }
 
 export function StoryDisplay({
   word,
   story,
-  audioUrl,
   isLoading,
   onComplete,
+  onReplayAudio,
+  isAudioAvailable,
 }: StoryDisplayProps) {
 
   return (
@@ -36,14 +38,17 @@ export function StoryDisplay({
               <Loader2 className="w-16 h-16 text-primary animate-spin" />
               <p>Our storyteller is thinking...</p>
             </div>
-          ) : story && audioUrl ? (
+          ) : story ? (
             <>
               <p className="text-lg text-center leading-relaxed p-4 bg-primary/5 rounded-lg">
                 {story}
               </p>
-              <audio controls src={audioUrl} className="w-full" autoPlay>
-                Your browser does not support the audio element.
-              </audio>
+              {isAudioAvailable && (
+                 <Button variant="outline" onClick={onReplayAudio}>
+                    <Volume2 className="mr-2 h-5 w-5"/>
+                    Listen Again
+                 </Button>
+              )}
             </>
           ) : (
             <p className="text-muted-foreground">Could not create a story for this.</p>

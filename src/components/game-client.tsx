@@ -13,7 +13,7 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory, getColoringPage } from "@/app/actions";
+import { getColoringPage } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -45,7 +45,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [showInterstitial, setShowInterstitial] = useState(false);
 
   const [story, setStory] = useState<string | null>(null);
-  const [storyAudioUrl, setStoryAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
   
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -114,8 +113,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [mode, currentCharacter]);
 
   const itemForStory = useMemo(() => {
-    if (!currentCharacter || typeof currentCharacter !== 'object' || !('word' in currentCharacter)) return '';
-    return currentCharacter.word;
+    if (!currentCharacter || typeof currentCharacter !== 'object' || !('word' in currentCharacter)) return null;
+    return currentCharacter as AlphabetCharacter;
   }, [currentCharacter]);
   
   const itemForCounting = useMemo(() => {
@@ -141,8 +140,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (mode === 'reading') {
       return itemToTrace;
     }
+    if (mode === 'story' && itemForStory) {
+        return itemForStory.story;
+    }
     return '';
-  }, [mode, itemToTrace, currentCharacter]);
+  }, [mode, itemToTrace, currentCharacter, itemForStory]);
 
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !speechSynthesis || !text) return;
@@ -151,7 +153,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (femaleVoice) {
       utterance.voice = femaleVoice;
     }
-    utterance.rate = 0.8;
+    utterance.rate = 0.9;
     speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, femaleVoice]);
   
@@ -161,49 +163,25 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (mode === 'counting') {
         setShowReward(false);
     }
+
+    const textToSpeak = getTextToSpeak();
+    if (textToSpeak) {
+        playSound(textToSpeak);
+    }
     
-    const controller = new AbortController();
-
-    const fetchUIData = async () => {
-        const textToSpeak = getTextToSpeak();
-        if (textToSpeak) {
-           playSound(textToSpeak);
-        }
-
-        if (mode === 'story') {
-            setIsStoryLoading(true);
+    if (mode === 'story') {
+        if (itemForStory) {
+            setStory(itemForStory.story);
+        } else {
             setStory(null);
-            setStoryAudioUrl(null);
-            if (!itemForStory) {
-                setIsStoryLoading(false);
-                return;
-            }
-            try {
-                const storyResponse = await getStory(itemForStory);
-                if (controller.signal.aborted) return;
-                if (storyResponse.success && storyResponse.data) {
-                  setStory(storyResponse.data.story);
-                  setStoryAudioUrl(storyResponse.data.audioUrl);
-                } else {
-                   toast({ variant: "destructive", title: "Could not create a story", description: storyResponse.error || "The AI storyteller is taking a break." });
-                }
-            } catch (e) {
-                 if (controller.signal.aborted) return;
-                 toast({ variant: "destructive", title: "Error fetching story", description: "An unexpected error occurred." });
-            } finally {
-                if (!controller.signal.aborted) setIsStoryLoading(false);
-            }
         }
-    };
-
-    fetchUIData();
+    }
 
     return () => {
         if (speechSynthesis) speechSynthesis.cancel();
-        controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis]);
+  }, [currentIndex, mode, itemForStory, getTextToSpeak, playSound, speechSynthesis]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -289,11 +267,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return (
           <StoryDisplay
             key={`${mode}-${currentIndex}`}
-            word={itemForStory}
+            word={itemForStory?.word || ''}
             story={story}
-            audioUrl={storyAudioUrl}
             isLoading={isStoryLoading}
             onComplete={handleCompletion}
+            onReplayAudio={handleReplaySound}
+            isAudioAvailable={soundEnabled && !!speechSynthesis}
           />
         );
        case "counting":
@@ -323,7 +302,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story'].includes(mode);
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
