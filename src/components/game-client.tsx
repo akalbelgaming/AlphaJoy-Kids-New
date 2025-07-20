@@ -13,16 +13,15 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory, getImageForWord } from "@/app/actions";
+import { getStory, getImageForWord, getColoringPage } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
-import { numberToWords } from '@/lib/utils';
+import { numberToWords, cn } from '@/lib/utils';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
 type Difficulty = "easy" | "medium" | "hard";
@@ -338,7 +337,19 @@ export default function GameClient({ mode }: GameClientProps) {
 
     speechRecognition.onerror = (event) => {
       console.error("Speech recognition error", event.error);
-      toast({ variant: "destructive", title: "Could not hear you", description: "Please try speaking again."});
+      if (event.error === 'not-allowed') {
+        toast({
+          variant: "destructive",
+          title: "Microphone Access Denied",
+          description: "Please allow microphone access in your browser settings to use this feature.",
+        });
+      } else {
+        toast({ 
+          variant: "destructive", 
+          title: "Could not hear you", 
+          description: "Please try speaking again."
+        });
+      }
       setIsListening(false);
     };
 
