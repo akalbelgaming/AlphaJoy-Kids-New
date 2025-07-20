@@ -5,13 +5,8 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Fingerprint } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-interface CountingDisplayProps {
-  count: number;
-  showReward: boolean;
-  onCount: () => void;
-  onNext: () => void;
-}
 
 const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>
@@ -20,21 +15,31 @@ const AppleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
+interface CountingDisplayProps {
+  count: number;
+  showReward: boolean;
+  onCount: () => void;
+  onNext: () => void;
+}
+
 export function CountingDisplay({
   count,
   showReward,
   onCount,
   onNext,
 }: CountingDisplayProps) {
+
   return (
-    <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
+    <div className="w-full h-full flex flex-col items-center justify-end pb-8">
       <div className="w-full max-w-2xl flex items-center justify-center" style={{minHeight: '420px'}}>
         {showReward ? (
           <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
             <CardContent className="min-h-[400px] flex flex-col items-center justify-center gap-4 p-4">
-              <div className="flex flex-wrap items-center justify-center gap-4 p-4">
-                {Array.from({ length: Math.min(count, 12) }).map((_, index) => (
-                  <div key={index} className="relative w-24 h-24 p-1">
+              <div className={cn("grid gap-2 items-center justify-center",
+                count > 5 ? 'grid-cols-5' : `grid-cols-${count}`
+              )}>
+                {Array.from({ length: Math.min(count, 100) }).map((_, index) => (
+                  <div key={index} className="relative w-16 h-16 sm:w-20 sm:h-20 p-1">
                     <AppleIcon className="w-full h-full drop-shadow-md" />
                   </div>
                 ))}
@@ -52,7 +57,7 @@ export function CountingDisplay({
         )}
       </div>
       
-      <div className="flex flex-col items-center gap-4 mt-4 h-24">
+      <div className="flex flex-col items-center gap-4 mt-8 h-24">
         {showReward ? (
           <Button 
               size="lg" 
