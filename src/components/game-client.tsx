@@ -29,38 +29,6 @@ type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
-// Simple Levenshtein distance function for fuzzy matching
-function levenshtein(s1: string, s2: string): number {
-    s1 = s1.toLowerCase();
-    s2 = s2.toLowerCase();
-    const costs = [];
-    for (let i = 0; i <= s1.length; i++) {
-        let lastValue = i;
-        for (let j = 0; j <= s2.length; j++) {
-            if (i === 0) {
-                costs[j] = j;
-            } else {
-                if (j > 0) {
-                    let newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
-                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
-                    }
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                }
-            }
-        }
-        if (i > 0) {
-            costs[s2.length] = lastValue;
-        }
-    }
-    return costs[s2.length];
-}
-
-interface GameClientProps {
-    mode: Mode;
-}
-
 export default function GameClient({ mode }: GameClientProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
@@ -86,7 +54,7 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
-  const [isCorrectAnswer, setIsCorrectAnswer] = useState<boolean | null>(null);
+  const [showReward, setShowReward] = useState(false);
 
   const { toast } = useToast();
   
@@ -204,7 +172,9 @@ export default function GameClient({ mode }: GameClientProps) {
 
   useEffect(() => {
     setStartTime(Date.now());
-    setIsCorrectAnswer(null);
+    if (mode === 'counting') {
+        setShowReward(false);
+    }
     
     const controller = new AbortController();
 
@@ -296,11 +266,10 @@ export default function GameClient({ mode }: GameClientProps) {
     if (!speechRecognition || isListening) return;
 
     setIsListening(true);
-    setIsCorrectAnswer(null);
-
+    
     speechRecognition.onresult = (event) => {
       // Forgiving logic: Any speech result is considered a success.
-      setIsCorrectAnswer(true);
+      setShowReward(true);
       playSound("Great job!");
       setIsListening(false);
     };
@@ -313,8 +282,8 @@ export default function GameClient({ mode }: GameClientProps) {
           description: "Please allow microphone access in your browser settings to use this feature.",
         });
       } else {
-         // Even on error (like no-speech), we'll treat it as an attempt and show the answer.
-        setIsCorrectAnswer(true);
+        // Even on error (like no-speech), we'll treat it as an attempt and show the reward.
+        setShowReward(true);
       }
       setIsListening(false);
     };
@@ -322,6 +291,10 @@ export default function GameClient({ mode }: GameClientProps) {
     speechRecognition.onend = () => {
       if (isListening) {
         setIsListening(false);
+        // If recognition ends without a result (e.g., timeout), still show the reward.
+        if (!showReward) {
+          setShowReward(true);
+        }
       }
     };
 
@@ -377,7 +350,7 @@ export default function GameClient({ mode }: GameClientProps) {
             key={`${mode}-${currentIndex}`}
             count={itemForCounting}
             isListening={isListening}
-            isCorrect={isCorrectAnswer}
+            showReward={showReward}
             onStartListening={handleStartListening}
             onNext={handleCompletion}
           />

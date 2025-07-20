@@ -9,7 +9,7 @@ import { Mic, ArrowRight, Loader2 } from 'lucide-react';
 interface CountingDisplayProps {
   count: number;
   isListening: boolean;
-  isCorrect: boolean | null;
+  showReward: boolean;
   onStartListening: () => void;
   onNext: () => void;
 }
@@ -29,17 +29,15 @@ function AppleIcon(props: React.SVGProps<SVGSVGElement>) {
 export function CountingDisplay({
   count,
   isListening,
-  isCorrect,
+  showReward,
   onStartListening,
   onNext,
 }: CountingDisplayProps) {
-  
-  const showImages = isCorrect === true;
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <div className="w-full max-w-2xl min-h-[420px] flex items-center justify-center">
-        {showImages ? (
+        {showReward ? (
             <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
                 <CardContent className="min-h-[400px] flex flex-col items-center justify-center gap-4 p-4">
                     <div className="flex flex-wrap items-center justify-center gap-4 p-4">
@@ -63,7 +61,7 @@ export function CountingDisplay({
       </div>
       
       <div className="flex flex-col items-center gap-4 mt-4 h-24">
-        {isCorrect ? (
+        {showReward ? (
           <Button 
               size="lg" 
               onClick={onNext} 
@@ -84,7 +82,7 @@ export function CountingDisplay({
         )}
 
         <div className="flex items-center gap-2 text-muted-foreground font-semibold text-lg h-8">
-            {!isCorrect && (isListening ? "Listening..." : "Press the mic and say the number!")}
+            {!showReward && (isListening ? "Listening..." : "Press the mic and say the number!")}
         </div>
       </div>
     </div>
