@@ -13,13 +13,9 @@ export function InterstitialWrapper({ children }: { children: React.ReactNode })
   const previousPath = useRef<string | null>(pathname);
 
   useEffect(() => {
-    // TEMPORARILY DISABLED FOR ADSENSE VERIFICATION
-    // The interstitial ad can block the crawler. We will re-enable this after approval.
-    /*
     if (adTriggerPaths.includes(pathname) && previousPath.current === '/') {
       setShowAd(true);
     }
-    */
     
     // Update previous path *after* checking
     previousPath.current = pathname;
