@@ -29,8 +29,8 @@ export function CountingDisplay({
 }: CountingDisplayProps) {
 
   return (
-    <div className="w-full h-full flex flex-1 flex-col gap-4 items-center justify-center">
-      <div className="w-full max-w-2xl flex items-center justify-center flex-1">
+    <div className="w-full flex-1 flex flex-col items-center justify-center gap-6">
+      <div className="w-full max-w-2xl flex-1 flex flex-col items-center justify-center">
         {showReward ? (
           <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
             <CardContent className="flex flex-col items-center justify-center gap-4 p-4 min-h-[300px]">
@@ -56,7 +56,7 @@ export function CountingDisplay({
         )}
       </div>
       
-      <div className="flex flex-col items-center gap-4 h-24">
+      <div className="flex flex-col items-center gap-4 py-4">
         {showReward ? (
           <Button 
               size="lg" 
