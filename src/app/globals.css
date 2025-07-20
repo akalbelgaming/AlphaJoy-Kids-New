@@ -8,17 +8,17 @@ body {
 
 @layer base {
   :root {
-    --background: 210 20% 98%; /* Material Grey 50 */
+    --background: 210 30% 98%; /* Lighter, slightly bluer grey */
     --foreground: 222.2 84% 4.9%;
 
     --card: 255 100% 100%; /* White cards */
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 207 90% 95%;
+    --popover: 255 100% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 217 89% 61%; /* Cheerful Blue #4285F4 */
-    --primary-foreground: 210 40% 98%;
+    --primary: 345 85% 55%; /* Playful Pink/Red */
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -26,16 +26,16 @@ body {
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 55 100% 61%; /* Sunny Yellow #FFEB3B */
-    --accent-foreground: 55 100% 15%; /* Dark text for yellow */
+    --accent: 45 95% 60%; /* Sunny Orange */
+    --accent-foreground: 24 9.8% 10%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 217 89% 61%;
-    --radius: 0.5rem; /* Less bubbly corners for Material feel */
+    --ring: 345 85% 55%;
+    --radius: 0.75rem; /* Slightly more rounded corners */
   }
 
   .dark {
@@ -45,20 +45,20 @@ body {
     --card-foreground: 210 40% 98%;
     --popover: 222 70% 12%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 89% 70%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 345 85% 65%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 55 100% 61%;
-    --accent-foreground: 55 100% 15%;
+    --accent: 45 95% 60%;
+    --accent-foreground: 24 9.8% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 217 89% 70%;
-    --radius: 0.5rem;
+    --ring: 345 85% 65%;
+    --radius: 0.75rem;
   }
 }
 
