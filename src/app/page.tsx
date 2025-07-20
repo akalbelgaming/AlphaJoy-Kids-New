@@ -39,6 +39,14 @@ const activities = [
     bgColor: 'bg-orange-50',
   },
   {
+    href: '/hindi-consonants',
+    title: 'Hindi Consonants',
+    icon: <Languages className="h-12 w-12" />,
+    description: 'Learn Hindi consonants (vyanjan).',
+    color: 'text-teal-500',
+    bgColor: 'bg-teal-50',
+  },
+  {
     href: '/shapes',
     title: 'Shapes',
     icon: <Shapes className="h-12 w-12" />,
