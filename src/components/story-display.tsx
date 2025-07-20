@@ -42,7 +42,7 @@ export function StoryDisplay({
             </div>
           ) : story ? (
             <>
-              <p className="text-lg text-center leading-relaxed p-4 bg-primary/5 rounded-lg">
+              <p className="text-lg text-center leading-relaxed p-4 bg-primary/5 rounded-lg whitespace-pre-wrap">
                 {story}
               </p>
               {isAudioAvailable && (

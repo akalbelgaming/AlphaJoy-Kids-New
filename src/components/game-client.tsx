@@ -13,7 +13,6 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -139,51 +138,23 @@ export default function GameClient({ mode }: {mode: Mode}) {
     utterance.rate = 0.9;
     speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, femaleVoice]);
-  
-
-  const fetchAndPlayStory = useCallback(async (word: string) => {
-    setIsStoryLoading(true);
-    setStory(null);
-    setAudioUrl(null);
-    
-    const response = await getStory(word);
-    
-    if (response.success && response.data) {
-      setStory(response.data.story);
-      setAudioUrl(response.data.audioUrl);
-    } else {
-      setStory("Oops! I couldn't think of a story right now. Let's try the next one!");
-      setAudioUrl(null);
-      toast({
-        variant: "destructive",
-        title: "Story time failed",
-        description: response.error,
-      });
-    }
-    setIsStoryLoading(false);
-  }, [toast]);
-
-  useEffect(() => {
-    if (audioUrl && soundEnabled && audioRef.current) {
-        audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
-    }
-  }, [audioUrl, soundEnabled]);
-
 
   useEffect(() => {
     setStartTime(Date.now());
     if (mode === 'counting') {
         setShowReward(false);
     }
-
-    if (mode !== 'story' && speechSynthesis) {
+    if (speechSynthesis) {
         speechSynthesis.cancel();
     }
     
-    if (mode === 'story') {
-        if (itemForStory?.word) {
-            fetchAndPlayStory(itemForStory.word);
-        }
+    // This logic handles what to say or do when the character changes
+    const storyCharacter = itemForStory;
+    if (mode === 'story' && storyCharacter?.story) {
+      setStory(storyCharacter.story);
+      playSound(storyCharacter.story);
+    } else if (mode === 'story') {
+      setStory("No story found for this item.");
     } else {
       const textToSpeak = (mode === 'numbers')
         ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
@@ -196,15 +167,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
       }
     }
 
-  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, fetchAndPlayStory, currentCharacter, speechSynthesis]);
-  
+  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, currentCharacter, speechSynthesis]);
   
   const handleReplaySound = () => {
-    if (mode === 'story') {
-        if(audioRef.current) {
-            audioRef.current.currentTime = 0;
-            audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
-        }
+    const storyCharacter = itemForStory;
+    if (mode === 'story' && storyCharacter?.story) {
+        playSound(storyCharacter.story);
     } else {
        const textToSpeak = (mode === 'numbers')
         ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
@@ -299,11 +267,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
             key={`${mode}-${currentIndex}`}
             word={itemForStory?.word || ''}
             story={story}
-            audioUrl={audioUrl}
-            isLoading={isStoryLoading}
+            audioUrl={null} // AI Audio is removed
+            isLoading={false} // No loading needed
             onComplete={handleCompletion}
             onReplayAudio={handleReplaySound}
-            isAudioAvailable={!!audioUrl && soundEnabled}
+            isAudioAvailable={soundEnabled && !!speechSynthesis}
           />
         );
        case "counting":
@@ -370,7 +338,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={!soundEnabled || (mode === 'story' && (!audioUrl || isStoryLoading))}
+              disabled={!soundEnabled}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
