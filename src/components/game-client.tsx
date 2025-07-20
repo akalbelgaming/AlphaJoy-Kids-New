@@ -206,6 +206,7 @@ export default function GameClient({ mode }: GameClientProps) {
   }, [soundEnabled, speechSynthesis, femaleVoice]);
 
   const fetchCountingImages = useCallback(async (signal: AbortSignal) => {
+      setIsCountingLoading(true);
       const count = itemForCounting;
       const itemToCountWord = "apple"; 
       if (count > 0 && itemToCountWord) {
@@ -222,7 +223,11 @@ export default function GameClient({ mode }: GameClientProps) {
             if (signal.aborted) return;
             toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
             setCountingImageUrls([]);
+        } finally {
+            if (!signal.aborted) setIsCountingLoading(false);
         }
+      } else {
+          setIsCountingLoading(false);
       }
   }, [itemForCounting, toast]);
   
@@ -265,14 +270,6 @@ export default function GameClient({ mode }: GameClientProps) {
                 if (!controller.signal.aborted) setIsStoryLoading(false);
             }
         }
-        
-        if (mode === 'counting') {
-            setIsCountingLoading(true);
-            await fetchCountingImages(controller.signal);
-            if (!controller.signal.aborted) {
-                setIsCountingLoading(false);
-            }
-        }
     };
 
     fetchUIData();
@@ -283,7 +280,7 @@ export default function GameClient({ mode }: GameClientProps) {
         controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, fetchCountingImages, speechSynthesis, speechRecognition]);
+  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -345,19 +342,12 @@ export default function GameClient({ mode }: GameClientProps) {
       let isMatch = false;
       const spokenWords = transcript.split(/\s+/);
       
-      // More forgiving check
       for (const spokenWord of spokenWords) {
         if (spokenWord === countAsNumber || spokenWord === countAsWord) {
             isMatch = true;
             break;
         }
-        // Allow Levenshtein distance of 1 for small words
-        if (countAsWord && countAsWord.length <= 4 && levenshtein(spokenWord, countAsWord) <= 1) {
-            isMatch = true;
-            break;
-        }
-        // Allow Levenshtein distance of 2 for longer words
-        if (countAsWord && countAsWord.length > 4 && levenshtein(spokenWord, countAsWord) <= 2) {
+        if (countAsWord && levenshtein(spokenWord, countAsWord) <= 2) {
             isMatch = true;
             break;
         }
@@ -366,6 +356,9 @@ export default function GameClient({ mode }: GameClientProps) {
       if (isMatch) {
         setIsCorrectAnswer(true);
         playSound("Correct!");
+        // Fetch images after correct answer
+        const controller = new AbortController();
+        fetchCountingImages(controller.signal);
       } else {
         setIsCorrectAnswer(false);
         playSound("Try again.");
@@ -391,7 +384,9 @@ export default function GameClient({ mode }: GameClientProps) {
     };
 
     speechRecognition.onend = () => {
-      setIsListening(false);
+      if (isListening) {
+        setIsListening(false);
+      }
     };
 
     speechRecognition.start();

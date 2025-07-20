@@ -48,7 +48,7 @@ export function CountingDisplay({
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <Card className="w-full max-w-2xl shadow-lg border-2">
         <CardContent className="min-h-[300px] flex flex-col items-center justify-center gap-4 p-4">
-            {isLoading ? (
+            {isLoading && !showImages ? (
                 <div className="w-full h-full min-h-[250px] bg-muted/30 rounded-lg flex items-center justify-center">
                     <Skeleton className="w-48 h-12" />
                 </div>
@@ -81,7 +81,15 @@ export function CountingDisplay({
       </Card>
       
       <div className="flex flex-col items-center gap-4 mt-4 h-24">
-        {!isCorrect ? (
+        {isCorrect ? (
+          <Button 
+              size="lg" 
+              onClick={onNext} 
+              className="w-32"
+          >
+              Next <ArrowRight className="ml-2 h-5 w-5" />
+          </Button>
+        ) : (
           <Button 
               size="lg" 
               onClick={onStartListening} 
@@ -90,14 +98,6 @@ export function CountingDisplay({
           >
               {isListening ? <Mic className="mr-2 h-5 w-5 animate-pulse" /> : <Mic className="mr-2 h-5 w-5" />}
               Speak
-          </Button>
-        ) : (
-          <Button 
-              size="lg" 
-              onClick={onNext} 
-              className="w-32"
-          >
-              Next <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         )}
 
