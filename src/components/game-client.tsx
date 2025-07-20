@@ -5,7 +5,8 @@ import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import {
   ArrowRight,
   ArrowLeft,
-  Volume2
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
@@ -118,6 +119,8 @@ export default function GameClient({ mode }: GameClientProps) {
     }
     return '';
   }, [mode, itemToTrace]);
+  
+  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null | undefined>(undefined);
 
   const playAudio = useCallback((url: string | null) => {
     if (url && audioRef.current && soundEnabled) {
@@ -128,11 +131,14 @@ export default function GameClient({ mode }: GameClientProps) {
 
   const fetchCharacterAudio = useCallback(async (textToSpeak: string, controller: AbortController) => {
     if (audioCache.current.has(textToSpeak)) {
-      playAudio(audioCache.current.get(textToSpeak)!);
+      const cachedUrl = audioCache.current.get(textToSpeak)!;
+      setCurrentAudioUrl(cachedUrl);
+      playAudio(cachedUrl);
       return;
     }
 
     setIsAudioLoading(true);
+    setCurrentAudioUrl(undefined); // Reset while loading
     try {
       const response = await getAudioForText(textToSpeak);
       if (controller.signal.aborted) return;
@@ -141,9 +147,11 @@ export default function GameClient({ mode }: GameClientProps) {
 
       if (response.success && audioUrl) {
         audioCache.current.set(textToSpeak, audioUrl);
+        setCurrentAudioUrl(audioUrl);
         playAudio(audioUrl);
       } else {
-        // This is now an expected failure case, so we show a toast instead of a console error
+        audioCache.current.set(textToSpeak, null); // Cache the failure
+        setCurrentAudioUrl(null);
         if (response.error?.includes('daily sound limit')) {
              toast({
                 variant: "destructive",
@@ -151,11 +159,7 @@ export default function GameClient({ mode }: GameClientProps) {
                 description: "You've used all the free sounds for today. Please try again tomorrow!",
                 duration: 8000
              });
-        } else {
-            // For other, unexpected errors, we can still log them.
-            console.error("Failed to fetch audio:", response.error);
         }
-        audioCache.current.set(textToSpeak, null); // Cache the failure to avoid retries
       }
     } catch (error) {
        if (controller.signal.aborted) return;
@@ -172,23 +176,15 @@ export default function GameClient({ mode }: GameClientProps) {
     const textToSpeak = getTextToSpeak();
     if (!textToSpeak || !soundEnabled || isAudioLoading) return;
 
-    const cachedResult = audioCache.current.get(textToSpeak);
-
-    if (cachedResult) { // If it's a valid URL, play it
-        playAudio(cachedResult);
-    } else if (cachedResult === null) { // If it's a known failure (null)
-        toast({
-            variant: "destructive",
-            title: "Sound Not Available",
-            description: "You may have hit the daily free limit. Please try again tomorrow.",
-            duration: 8000,
-        });
-    } else { // Not in cache, try fetching
-        const controller = new AbortController();
-        audioAbortControllerRef.current = controller;
-        await fetchCharacterAudio(textToSpeak, controller);
+    // Always try to fetch if the current URL is null (failed before)
+    if (currentAudioUrl === null) {
+      const controller = new AbortController();
+      audioAbortControllerRef.current = controller;
+      await fetchCharacterAudio(textToSpeak, controller);
+    } else if (currentAudioUrl) {
+      playAudio(currentAudioUrl);
     }
-  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, toast]);
+  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, currentAudioUrl]);
 
 
   useEffect(() => {
@@ -208,8 +204,9 @@ export default function GameClient({ mode }: GameClientProps) {
         // Handle audio for traceable items
         const textToSpeak = getTextToSpeak();
         if (soundEnabled && textToSpeak && ['numbers', 'alphabet', 'reading'].includes(mode)) {
-          // Don't await here to let UI load faster. Audio will play when ready.
           fetchCharacterAudio(textToSpeak, controller);
+        } else {
+          setCurrentAudioUrl(undefined); // Not an audio mode
         }
 
         // Handle story generation
@@ -383,7 +380,8 @@ export default function GameClient({ mode }: GameClientProps) {
     }
   };
 
-  const isSoundAvailable = ['numbers', 'alphabet', 'reading'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading'].includes(mode);
+  const isSoundButtonDisabled = !soundEnabled || isAudioLoading || currentAudioUrl === null;
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
@@ -415,16 +413,20 @@ export default function GameClient({ mode }: GameClientProps) {
             <ArrowLeft className="mr-2" /> Prev
           </Button>
           
-          {isSoundAvailable && (
+          {isSoundAvailableForMode && (
             <Button 
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={isAudioLoading || !soundEnabled}
+              disabled={isSoundButtonDisabled}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
-              <Volume2 className={cn("h-7 w-7", isAudioLoading && "animate-pulse")} />
+              {currentAudioUrl === null ? (
+                <VolumeX className={cn("h-7 w-7")} />
+              ) : (
+                <Volume2 className={cn("h-7 w-7", isAudioLoading && "animate-pulse")} />
+              )}
             </Button>
           )}
 
@@ -440,5 +442,3 @@ export default function GameClient({ mode }: GameClientProps) {
     </div>
   );
 }
-
-    
