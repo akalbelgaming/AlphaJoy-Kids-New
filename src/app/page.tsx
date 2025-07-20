@@ -31,20 +31,12 @@ const activities = [
     bgColor: 'bg-blue-50',
   },
   {
-    href: '/hindi-vowels',
-    title: 'Hindi Vowels',
+    href: '/hindi',
+    title: 'Hindi',
     icon: <Languages className="h-12 w-12" />,
-    description: 'Learn Hindi vowels (swar).',
+    description: 'Learn Hindi vowels and consonants.',
     color: 'text-orange-500',
     bgColor: 'bg-orange-50',
-  },
-  {
-    href: '/hindi-consonants',
-    title: 'Hindi Consonants',
-    icon: <Languages className="h-12 w-12" />,
-    description: 'Learn Hindi consonants (vyanjan).',
-    color: 'text-teal-500',
-    bgColor: 'bg-teal-50',
   },
   {
     href: '/shapes',

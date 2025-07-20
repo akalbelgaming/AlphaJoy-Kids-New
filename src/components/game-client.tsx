@@ -10,7 +10,7 @@ import {
   Loader2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
-import { hindiVowels, hindiConsonants, type HindiCharacter, type HindiConsonant } from "@/lib/hindi-characters";
+import { hindiCharacters, type HindiCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -24,7 +24,7 @@ import { getStory } from "@/lib/story";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi-vowels" | "hindi-consonants";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -71,7 +71,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
                          voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
                          voices.find(v => v.lang.startsWith('en'));
           const hiVoice = voices.find(v => v.lang.startsWith('hi'));
-          setVoice(mode.startsWith('hindi-') ? (hiVoice || enVoice) : enVoice);
+          setVoice(mode === 'hindi' ? (hiVoice || enVoice) : enVoice);
         }
       };
 
@@ -99,10 +99,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return shapes;
       case "drawing":
         return alphabet;
-      case "hindi-vowels":
-        return hindiVowels;
-      case "hindi-consonants":
-        return hindiConsonants;
+      case "hindi":
+        return hindiCharacters;
       default:
         return [];
     }
@@ -117,8 +115,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
-      if ('vowel' in currentCharacter) return currentCharacter.vowel;
-      if ('consonant' in currentCharacter) return currentCharacter.consonant;
+      if ('character' in currentCharacter) return currentCharacter.character;
       return '';
   }, [mode, currentCharacter]);
 
@@ -196,10 +193,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
         textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
       } else if (mode === 'reading') {
         textToSpeak = itemToTrace;
-      } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
-        textToSpeak = `${currentCharacter.vowel} से ${currentCharacter.word}`;
-      } else if (mode === 'hindi-consonants' && typeof currentCharacter === 'object' && 'consonant' in currentCharacter) {
-        textToSpeak = `${currentCharacter.consonant} से ${currentCharacter.word}`;
+      } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
+        textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
       }
 
       if (textToSpeak) {
@@ -228,10 +223,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
     } else if (mode === 'reading') {
       textToSpeak = itemToTrace;
-    } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
-      textToSpeak = `${currentCharacter.vowel} से ${currentCharacter.word}`;
-    } else if (mode === 'hindi-consonants' && typeof currentCharacter === 'object' && 'consonant' in currentCharacter) {
-      textToSpeak = `${currentCharacter.consonant} से ${currentCharacter.word}`;
+    } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
+      textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
     }
 
     if (textToSpeak) {
@@ -287,8 +280,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "alphabet":
       case "numbers":
       case "reading":
-      case "hindi-vowels":
-      case "hindi-consonants":
+      case "hindi":
         return (
           <TracingCanvas
             key={`${mode}-${currentIndex}`}
@@ -356,7 +348,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi-vowels', 'hindi-consonants'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi'].includes(mode);
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">

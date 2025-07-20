@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { InterstitialAd } from '@/components/ad-placeholder';
 
 // List of paths that trigger the interstitial ad
-const adTriggerPaths = ['/letters', '/numbers', '/shapes', '/counting', '/reading', '/drawing', '/story'];
+const adTriggerPaths = ['/letters', '/numbers', '/shapes', '/counting', '/reading', '/drawing', '/story', '/hindi'];
 
 export function InterstitialWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
