@@ -1,8 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React from "react";
-import { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -17,29 +16,20 @@ import {
  * A component that renders a real Google AdSense banner ad unit.
  */
 export function AdBanner({ className }: { className?: string }) {
+  const adRef = useRef<HTMLModElement>(null);
+
   useEffect(() => {
-    const pushAd = () => {
+    // This effect runs when the adRef is attached to the <ins> element.
+    // This is a more reliable way to know the container is in the DOM.
+    if (adRef.current && adRef.current.children.length === 0) {
       try {
         // @ts-ignore
         (window.adsbygoogle = window.adsbygoogle || []).push({});
       } catch (err) {
         console.error("AdSense error:", err);
       }
-    };
-
-    // Wait until the document is fully loaded before trying to push the ad.
-    if (document.readyState === "complete") {
-      pushAd();
-    } else {
-      const listener = () => {
-        pushAd();
-        window.removeEventListener("load", listener);
-      };
-      window.addEventListener("load", listener);
-      // Cleanup listener on component unmount
-      return () => window.removeEventListener("load", listener);
     }
-  }, []);
+  }, []); // The dependency array is empty to run once on mount. The check inside handles the logic.
 
   return (
     <div
@@ -49,6 +39,7 @@ export function AdBanner({ className }: { className?: string }) {
       )}
     >
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client="ca-pub-3781633352100587" // This is your publisher ID
