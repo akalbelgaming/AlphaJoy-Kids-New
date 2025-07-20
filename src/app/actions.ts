@@ -66,12 +66,23 @@ export async function getAudioForText(text: string) {
     }
     try {
         const result = await generateAudio({ text });
-        // The flow now returns { audioUrl: null } on failure, so we just pass it along.
-        return { success: true, data: result };
+        if (result && result.audioUrl) {
+            return { success: true, data: result };
+        } else {
+             // Check for 429 error specifically for a better message
+             const isRateLimitError = result && (result as any).error?.message?.includes('429');
+             const errorMessage = isRateLimitError
+               ? 'You have exceeded the daily sound limit. Please try again tomorrow. (429)'
+               : 'The AI failed to generate sound.';
+             return { success: false, error: errorMessage };
+        }
     } catch (error) {
-        // This catch block might be less likely to be hit now, but good for safety.
         console.error(`Error in getAudioForText for "${text}":`, error);
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-        return { success: false, error: message };
+        // Check for 429 in the catch block as well for safety
+        const finalMessage = message.includes('429')
+            ? 'You have exceeded the daily sound limit. Please try again tomorrow. (429)'
+            : message;
+        return { success: false, error: finalMessage };
     }
 }
