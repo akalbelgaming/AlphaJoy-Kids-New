@@ -75,8 +75,8 @@ export default function Home() {
         </div>
       </header>
       
-      <main className="flex-1 p-4 md:p-6 mb-24">
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      <main className="flex-1 p-6 md:p-8 mb-24">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           {activities.map((activity, index) => (
             <Link href={activity.href} key={activity.href} className="group">
               <Card 
@@ -87,10 +87,10 @@ export default function Home() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardContent className="flex flex-col items-center justify-center p-2 sm:p-4 gap-2 text-center">
-                  <div className="h-8 w-8 sm:h-10 sm:w-10 flex items-center justify-center">
+                  <div className="h-10 w-10 flex items-center justify-center">
                     {activity.icon}
                   </div>
-                  <CardTitle className="text-base sm:text-lg font-bold text-shadow-sm">{activity.title}</CardTitle>
+                  <CardTitle className="text-lg font-bold text-shadow-sm">{activity.title}</CardTitle>
                 </CardContent>
               </Card>
             </Link>
