@@ -18,49 +18,49 @@ const activities = [
   {
     href: '/letters',
     title: 'Letters',
-    icon: <BookOpen className="h-10 w-10" />,
+    icon: <div className="text-4xl font-bold">A</div>,
     color: 'from-red-400 to-red-600 text-white',
   },
   {
     href: '/numbers',
     title: 'Numbers',
-    icon: <Hash className="h-10 w-10" />,
+    icon: <div className="text-3xl font-bold">123</div>,
     color: 'from-blue-400 to-blue-600 text-white',
   },
   {
     href: '/hindi',
     title: 'Hindi',
-    icon: <Languages className="h-10 w-10" />,
+    icon: <div className="text-4xl font-bold">अ</div>,
     color: 'from-orange-400 to-orange-600 text-white',
   },
   {
     href: '/shapes',
     title: 'Shapes',
-    icon: <Shapes className="h-10 w-10" />,
+    icon: <div className="text-4xl">△</div>,
     color: 'from-yellow-400 to-yellow-600 text-white',
   },
   {
     href: '/counting',
     title: 'Counting',
-    icon: <Calculator className="h-10 w-10" />,
+    icon: <div className="text-xl font-bold">1,2,3</div>,
     color: 'from-green-400 to-green-600 text-white',
   },
   {
     href: '/reading',
     title: 'Reading',
-    icon: <ScanEye className="h-10 w-10" />,
+    icon: <div className="text-4xl font-bold">Aa</div>,
     color: 'from-purple-400 to-purple-600 text-white',
   },
   {
     href: '/drawing',
     title: 'Drawing',
-    icon: <PenSquare className="h-10 w-10" />,
+    icon: <div className="text-4xl">✎</div>,
     color: 'from-indigo-400 to-indigo-600 text-white',
   },
   {
     href: '/story',
     title: 'Story Time',
-    icon: <BookCopy className="h-10 w-10" />,
+    icon: <div className="text-4xl">📖</div>,
     color: 'from-pink-400 to-pink-600 text-white',
   },
 ];
@@ -87,7 +87,9 @@ export default function Home() {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <CardContent className="flex flex-col items-center justify-center p-4 gap-3 text-center">
-                  {activity.icon}
+                  <div className="h-10 w-10 flex items-center justify-center">
+                    {activity.icon}
+                  </div>
                   <CardTitle className="text-lg font-bold text-shadow-sm">{activity.title}</CardTitle>
                 </CardContent>
               </Card>
