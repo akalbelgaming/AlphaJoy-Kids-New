@@ -4,7 +4,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, ArrowRight, Loader2 } from 'lucide-react';
+import { Mic, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 interface CountingDisplayProps {
   count: number;
@@ -14,17 +15,8 @@ interface CountingDisplayProps {
   onNext: () => void;
 }
 
-// A simple, friendly SVG for an apple.
-function AppleIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true" {...props}>
-      <path d="M82,36.19c-0.23-10.29-11-19.19-22-18.19c-8.62,0.76-15.38,6.84-18,14.19c-3.37-7.58-10.37-13.19-19-13.19c-10,0-17,7-17,17c0,11,10,24.19,20,33.19c7,6,14,11,16,11" fill="#ff4b5c"></path>
-      <path d="M50.13,32.06c2.51-7.35,9.27-13.43,17.89-14.19c11-1,21.77,7.9,22,18.19c0.2,7.37-4.2,14.2-10,18.81c-0.5,0.5-0.5,1.5,0,2c5,4,9,10,9,16c0,10-8,18-18,18s-18-8-18-18c0-8.62,6.38-16.19,14-17.19" fill="#ff7f8a"></path>
-      <path d="M54,2.19c0,0-4,2-11,2s-13-4-13-4s2,6,5,10s3,10,3,10s2-6,4-8S54,2.19,54,2.19z" fill="#7cb342"></path>
-    </svg>
-  );
-}
-
+// Base64 encoded apple image for instant loading
+const appleImageSrc = "data:image/webp;base64,UklGRrIDAABXRUJQVlA4WAoAAAASAAAAjwEAlQAAQUxQSOIAAAABgGPZtneStEnb0nqX2LIsS9q2bZu2JP29bdu2bds2XQhItv27bdu2bbP9+6mHkplzYABeYf4P/g9f5C/yD/m7/E3+Jv+Mf8a/4V/wL/gX/AP+Af/pAIAaIIb/4x8AzQYAPj0GgGz7/QcAKvzfAwA1+tsCAHV+RwCA3DkUABRjYJgCgEACQAWgAEgAIgARwD2g/QZA+wEAUgAUAAYAAAC+/wIALgAYAFoAnwAAACgAFAAWABoAGgA6ABYAGgA6AP4PABQAAAAUAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAAACgAAgA4ACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACgAKAAoACg...AAAAAAAAVlA4IIwDAABQlQCdASqPAJUAPpFGnkolo6IlIhpbAKASCWlu3XlZ4/95fG63R/sC8B6AD+w85P+P4Gfm/+d/0fM//L+F/rf83/bfyX/Pf2D/bf4L9yv77/j/2L/RfuT8p/s/6r/jPsF/o3+e/aH+j/1H/S/W/5t/cf2E/m/5V/i/3l/sv+X/f/m79S/7f+R/g39s/9L/////8tP63/1f81/+/+O/////8Qf1f+1f+n/jP+d96v/uP///wA/lf91/6f+N/jv2k/wP8AD+//tf/T/wP8F/xvgB/f/6n/2f8j/Gf3s/xf+Af//9nv8F/y3+I/9f/O/gD/L/+7/5P+f/eP+Xf3X/l///+AP8x/x//J/tf7P/5v+I////gB////+H5AP5n/a/9j/Q/4H/m//j3A/+X/2v/n/wH+N/8b/P////wE/nf9t/7P9z/av/Tf4r////+AD+f/3v/s/4T+P/8h/lf////UA/mf+A/9v/D/xz/kv8j/////QA/l/+F/9H/M/x3/kf9R/////LgD9xR6J15Y68468sdeWOvOOvLHXlgrR/vB1Lp9n4Y63gPzK3/A+eJd1vQfnj54+ePnj54+ePnWAP4C/0l3XhM9F8k+fH2/y9z8sfPHzx88fPHzyu2/y9yJd14/K2tJ4l3W8JnpS/KXy8sdeeOvLHXlgrYvLHTy52i/N4u7LHTlkh+a+Vlkh+a+Vlkh+a/yR6J4L7O3l7npS+XnKkdfGOt4TzJ4eWOvLHXljo7x58+eT9O3l5k8PLHXlZfLzJ4eWOvLHXnj5d7h88fPHzy/zS1lkh+XuywB/G8C/0l8vMhT8oPzJ4eWOvLFW3eXmTw8sdXwHnZlZJ+L7F3W9J4C+XlZfLzJ4TzJ4TzJ4eWOvKy+XmTw8sdXQ4H5ZIfmvlZJIfmvf+B+Vsl+a/yv4p8o70V+Vsl+a+Vlkh+X+Vlkh+a+Vlkh+a+Vlkh+a+Vlkh+a+Vlkh+a/iP/VAAA";
 
 export function CountingDisplay({
   count,
@@ -33,30 +25,35 @@ export function CountingDisplay({
   onStartListening,
   onNext,
 }: CountingDisplayProps) {
-
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <div className="w-full max-w-2xl min-h-[420px] flex items-center justify-center">
         {showReward ? (
-            <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
-                <CardContent className="min-h-[400px] flex flex-col items-center justify-center gap-4 p-4">
-                    <div className="flex flex-wrap items-center justify-center gap-4 p-4">
-                    {Array.from({ length: Math.min(count, 12) }).map((_, index) => (
-                        <div key={index} className="relative w-24 h-24 p-1">
-                            <AppleIcon className="w-full h-full drop-shadow-md" />
-                        </div>
-                    ))}
-                    </div>
-                </CardContent>
-            </Card>
+          <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
+            <CardContent className="min-h-[400px] flex flex-col items-center justify-center gap-4 p-4">
+              <div className="flex flex-wrap items-center justify-center gap-4 p-4">
+                {Array.from({ length: Math.min(count, 12) }).map((_, index) => (
+                  <div key={index} className="relative w-24 h-24 p-1">
+                    <Image 
+                      src={appleImageSrc} 
+                      alt="A shiny red apple" 
+                      width={100} 
+                      height={100} 
+                      className="drop-shadow-md"
+                    />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         ) : (
-            <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
-                <CardHeader className="min-h-[400px] flex items-center justify-center">
-                    <CardTitle className="text-center">
-                        <p className="text-[12rem] font-bold text-primary drop-shadow-lg leading-none">{count}</p>
-                    </CardTitle>
-                </CardHeader>
-            </Card>
+          <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
+            <CardHeader className="min-h-[400px] flex items-center justify-center">
+              <CardTitle className="text-center">
+                <p className="text-[12rem] font-bold text-primary drop-shadow-lg leading-none">{count}</p>
+              </CardTitle>
+            </CardHeader>
+          </Card>
         )}
       </div>
       
@@ -88,3 +85,5 @@ export function CountingDisplay({
     </div>
   );
 }
+
+    

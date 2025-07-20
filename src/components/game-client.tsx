@@ -29,7 +29,7 @@ type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
-export default function GameClient({ mode }: GameClientProps) {
+export default function GameClient({ mode }: {mode: Mode}) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
 
@@ -226,12 +226,14 @@ export default function GameClient({ mode }: GameClientProps) {
   };
   
   const handleNext = useCallback(() => {
+    setShowReward(false);
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev + 1) % characterSet.length);
     }
   }, [characterSet.length]);
 
   const handlePrev = useCallback(() => {
+    setShowReward(false);
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev - 1 + characterSet.length) % characterSet.length);
     }
@@ -432,3 +434,5 @@ export default function GameClient({ mode }: GameClientProps) {
     </div>
   );
 }
+
+    
