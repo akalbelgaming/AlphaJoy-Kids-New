@@ -71,7 +71,7 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center gap-4">
            <ToyBrick className="h-8 w-8" />
-           <h1 className="text-2xl font-bold font-headline">Play Pad: ABC, Stories &amp; Art</h1>
+           <h1 className="text-xl sm:text-2xl font-bold font-headline">Play Pad: ABC, Stories &amp; Art</h1>
         </div>
       </header>
       
