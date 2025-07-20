@@ -53,45 +53,32 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
   
   // States for counting game
-  const [isListening, setIsListening] = useState(false);
   const [showReward, setShowReward] = useState(false);
-  const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
 
   const { toast } = useToast();
   
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if ('speechSynthesis' in window) {
-        const synth = window.speechSynthesis;
-        setSpeechSynthesis(synth);
-        
-        const loadVoices = () => {
-          const voices = synth.getVoices();
-          if (voices.length > 0) {
-            const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
-                           voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
-                           voices.find(v => v.lang.startsWith('en'));
-            setFemaleVoice(female || null);
-          }
-        };
-
-        if (synth.getVoices().length > 0) {
-          loadVoices();
-        } else {
-          synth.onvoiceschanged = loadVoices;
-        }
-      } else {
-          console.warn("Speech Synthesis not supported in this browser.");
-      }
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const synth = window.speechSynthesis;
+      setSpeechSynthesis(synth);
       
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-          const recognition = new SpeechRecognition();
-          recognition.continuous = false;
-          recognition.lang = 'en-US';
-          recognition.interimResults = false;
-          speechRecognitionRef.current = recognition;
+      const loadVoices = () => {
+        const voices = synth.getVoices();
+        if (voices.length > 0) {
+          const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
+                         voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
+                         voices.find(v => v.lang.startsWith('en'));
+          setFemaleVoice(female || null);
+        }
+      };
+
+      if (synth.getVoices().length > 0) {
+        loadVoices();
+      } else {
+        synth.onvoiceschanged = loadVoices;
       }
+    } else {
+        console.warn("Speech Synthesis not supported in this browser.");
     }
   }, []);
 
@@ -213,7 +200,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
     return () => {
         if (speechSynthesis) speechSynthesis.cancel();
-        if (speechRecognitionRef.current) speechRecognitionRef.current.abort();
         controller.abort();
     };
 
@@ -225,14 +211,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
   };
   
   const handleNext = useCallback(() => {
-    setShowReward(false);
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev + 1) % characterSet.length);
     }
   }, [characterSet.length]);
 
   const handlePrev = useCallback(() => {
-    setShowReward(false);
     if (characterSet.length > 0) {
       setCurrentIndex((prev) => (prev - 1 + characterSet.length) % characterSet.length);
     }
@@ -263,51 +247,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
     handleNext();
   }, [handleNext]);
   
-  const handleSpeakButtonClick = () => {
-    const speechRecognition = speechRecognitionRef.current;
-    if (!speechRecognition) {
-      toast({ variant: "destructive", title: "Voice recognition not supported", description: "Please use a different browser like Chrome or Safari."});
-      return;
-    }
-
-    setIsListening(true);
-    
-    speechRecognition.onresult = (event) => {
-      // If we get any result, we consider it a success.
-      // This is to encourage children to speak without pressure.
-      const spokenText = event.results[0][0].transcript;
-      if(spokenText) {
-          playSound("Great job!");
-          setShowReward(true);
-      }
-      setIsListening(false);
-    };
-
-    speechRecognition.onerror = (event) => {
-      if (event.error === 'not-allowed') {
-        toast({
-          variant: "destructive",
-          title: "Microphone Access Denied",
-          description: "Please allow microphone access in your browser settings to use this feature.",
-          duration: 5000,
-        });
-      } else if (event.error === 'no-speech') {
-        toast({ variant: "destructive", title: "Didn't hear anything", description: "Please try speaking a bit louder."});
-      } else {
-        toast({ variant: "destructive", title: "Could not hear you", description: "Please try speaking again."});
-      }
-      setIsListening(false);
-    };
-
-    speechRecognition.onend = () => {
-        // This can be called even if there's no result, so we check isListening.
-        // It helps to turn off the spinner if recognition ends without a result or error.
-        if (isListening) {
-            setIsListening(false);
-        }
-    };
-
-    speechRecognition.start();
+  const handleCountTap = () => {
+    setShowReward(true);
+    playSound(numberToWords(itemForCounting) || itemForCounting.toString());
   };
 
 
@@ -359,9 +301,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
           <CountingDisplay
             key={`${mode}-${currentIndex}`}
             count={itemForCounting}
-            isListening={isListening}
             showReward={showReward}
-            onSpeak={handleSpeakButtonClick}
+            onCount={handleCountTap}
             onNext={handleCompletion}
           />
         );
