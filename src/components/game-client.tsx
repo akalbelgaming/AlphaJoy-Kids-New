@@ -13,7 +13,7 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetC
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getColoringPage } from "@/app/actions";
+import { getStory } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -45,7 +45,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [showInterstitial, setShowInterstitial] = useState(false);
 
   const [story, setStory] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
   
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
@@ -127,25 +129,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
   
-  const getTextToSpeak = useCallback(() => {
-    if (mode === 'numbers') {
-      const num = parseInt(itemToTrace, 10);
-      return numberToWords(num) || itemToTrace;
-    }
-    if (mode === 'alphabet') {
-      if(typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
-        return `${currentCharacter.letter}, for ${currentCharacter.word}`;
-      }
-    }
-    if (mode === 'reading') {
-      return itemToTrace;
-    }
-    if (mode === 'story' && itemForStory) {
-        return itemForStory.story;
-    }
-    return '';
-  }, [mode, itemToTrace, currentCharacter, itemForStory]);
-
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !speechSynthesis || !text) return;
     speechSynthesis.cancel();
@@ -158,34 +141,81 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [soundEnabled, speechSynthesis, femaleVoice]);
   
 
+  const fetchAndPlayStory = useCallback(async (word: string) => {
+    setIsStoryLoading(true);
+    setStory(null);
+    setAudioUrl(null);
+    
+    const response = await getStory(word);
+    
+    if (response.success && response.data) {
+      setStory(response.data.story);
+      setAudioUrl(response.data.audioUrl);
+    } else {
+      setStory("Oops! I couldn't think of a story right now. Let's try the next one!");
+      setAudioUrl(null);
+      toast({
+        variant: "destructive",
+        title: "Story time failed",
+        description: response.error,
+      });
+    }
+    setIsStoryLoading(false);
+  }, [toast]);
+
+  useEffect(() => {
+    if (audioUrl && soundEnabled && audioRef.current) {
+        audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
+    }
+  }, [audioUrl, soundEnabled]);
+
+
   useEffect(() => {
     setStartTime(Date.now());
     if (mode === 'counting') {
         setShowReward(false);
     }
 
-    const textToSpeak = getTextToSpeak();
-    if (textToSpeak) {
-        playSound(textToSpeak);
+    if (mode !== 'story' && speechSynthesis) {
+        speechSynthesis.cancel();
     }
     
     if (mode === 'story') {
-        if (itemForStory) {
-            setStory(itemForStory.story);
-        } else {
-            setStory(null);
+        if (itemForStory?.word) {
+            fetchAndPlayStory(itemForStory.word);
         }
+    } else {
+      const textToSpeak = (mode === 'numbers')
+        ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
+        : (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter)
+        ? `${currentCharacter.letter}, for ${currentCharacter.word}`
+        : (mode === 'reading') ? itemToTrace : '';
+
+      if (textToSpeak) {
+        playSound(textToSpeak);
+      }
     }
 
-    return () => {
-        if (speechSynthesis) speechSynthesis.cancel();
-    };
-
-  }, [currentIndex, mode, itemForStory, getTextToSpeak, playSound, speechSynthesis]);
+  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, fetchAndPlayStory, currentCharacter, speechSynthesis]);
+  
   
   const handleReplaySound = () => {
-    const text = getTextToSpeak();
-    playSound(text);
+    if (mode === 'story') {
+        if(audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
+        }
+    } else {
+       const textToSpeak = (mode === 'numbers')
+        ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
+        : (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter)
+        ? `${currentCharacter.letter}, for ${currentCharacter.word}`
+        : (mode === 'reading') ? itemToTrace : '';
+
+      if (textToSpeak) {
+        playSound(textToSpeak);
+      }
+    }
   };
   
   const handleNext = useCallback(() => {
@@ -269,10 +299,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
             key={`${mode}-${currentIndex}`}
             word={itemForStory?.word || ''}
             story={story}
+            audioUrl={audioUrl}
             isLoading={isStoryLoading}
             onComplete={handleCompletion}
             onReplayAudio={handleReplaySound}
-            isAudioAvailable={soundEnabled && !!speechSynthesis}
+            isAudioAvailable={!!audioUrl && soundEnabled}
           />
         );
        case "counting":
@@ -307,6 +338,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
+      <audio ref={audioRef} src={audioUrl || ''} className="hidden" />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
         <CustomizationPanel 
@@ -338,7 +370,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={!soundEnabled}
+              disabled={!soundEnabled || (mode === 'story' && (!audioUrl || isStoryLoading))}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >

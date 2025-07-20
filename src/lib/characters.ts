@@ -2,7 +2,6 @@ export interface AlphabetCharacter {
   letter: string;
   word: string;
   hint: string;
-  story: string;
 }
 
 export interface ShapeCharacter {
@@ -14,32 +13,32 @@ export interface ShapeCharacter {
 export const numbers: string[] = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
 export const alphabet: AlphabetCharacter[] = [
-  { letter: 'A', word: 'Apple', hint: 'red apple', story: 'A little apple rolled down the hill.' },
-  { letter: 'B', word: 'Ball', hint: 'bouncy ball', story: 'The bouncy ball went up, up, up!' },
-  { letter: 'C', word: 'Cat', hint: 'cute cat', story: 'The cute cat took a long, cozy nap.' },
-  { letter: 'D', word: 'Dog', hint: 'friendly dog', story: 'A friendly dog wagged its happy tail.' },
-  { letter: 'E', word: 'Egg', hint: 'white egg', story: 'A small bird hatched from the little egg.' },
-  { letter: 'F', word: 'Fish', hint: 'swimming fish', story: 'The shiny fish swam in the clear water.' },
-  { letter: 'G', word: 'Goat', hint: 'farm goat', story: 'The silly goat ate grass on the farm.' },
-  { letter: 'H', word: 'Hat', hint: 'sun hat', story: 'My new hat keeps the bright sun away.' },
-  { letter: 'I', word: 'Igloo', hint: 'snow igloo', story: 'The igloo was made of blocks of snow.' },
-  { letter: 'J', word: 'Jar', hint: 'jam jar', story: 'The jar was full of sweet, red jam.' },
-  { letter: 'K', word: 'Kite', hint: 'flying kite', story: 'The colorful kite flew high in the sky.' },
-  { letter: 'L', word: 'Lion', hint: 'roaring lion', story: 'The big lion let out a mighty roar.' },
-  { letter: 'M', word: 'Monkey', hint: 'swinging monkey', story: 'A funny monkey swung from a tree.' },
-  { letter: 'N', word: 'Nest', hint: 'bird nest', story: 'The mama bird built a cozy nest.' },
-  { letter: 'O', word: 'Orange', hint: 'orange fruit', story: 'The juicy orange was sweet and tasty.' },
-  { letter: 'P', word: 'Pencil', hint: 'yellow pencil', story: 'The yellow pencil drew a happy sun.' },
-  { letter: 'Q', word: 'Queen', hint: 'royal queen', story: 'The kind queen wore a shiny crown.' },
-  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit', story: 'A white rabbit hopped through the grass.' },
-  { letter: 'S', word: 'Sun', hint: 'bright sun', story: 'The bright sun made everything warm.' },
-  { letter: 'T', word: 'Tiger', hint: 'striped tiger', story: 'The striped tiger walked in the jungle.' },
-  { letter: 'U', word: 'Urn', hint: 'clay urn', story: 'The clay urn held beautiful, tall flowers.' },
-  { letter: 'V', word: 'Violin', hint: 'musical violin', story: 'The musician played a sweet song on the violin.' },
-  { letter: 'W', word: 'Watch', hint: 'wrist watch', story: 'My new watch helps me tell the time.' },
-  { letter: 'X', word: 'X-ray', hint: 'bone x-ray', story: 'The x-ray showed the bones inside my hand.' },
-  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht', story: 'The white yacht sailed across the blue sea.' },
-  { letter: 'Z', word: 'Zebra', hint: 'striped zebra', story: 'The zebra had black and white stripes.' },
+  { letter: 'A', word: 'Apple', hint: 'red apple' },
+  { letter: 'B', word: 'Ball', hint: 'bouncy ball' },
+  { letter: 'C', word: 'Cat', hint: 'cute cat' },
+  { letter: 'D', word: 'Dog', hint: 'friendly dog' },
+  { letter: 'E', word: 'Egg', hint: 'white egg' },
+  { letter: 'F', word: 'Fish', hint: 'swimming fish' },
+  { letter: 'G', word: 'Goat', hint: 'farm goat' },
+  { letter: 'H', word: 'Hat', hint: 'sun hat' },
+  { letter: 'I', word: 'Igloo', hint: 'snow igloo' },
+  { letter: 'J', word: 'Jar', hint: 'jam jar' },
+  { letter: 'K', word: 'Kite', hint: 'flying kite' },
+  { letter: 'L', word: 'Lion', hint: 'roaring lion' },
+  { letter: 'M', word: 'Monkey', hint: 'swinging monkey' },
+  { letter: 'N', word: 'Nest', hint: 'bird nest' },
+  { letter: 'O', word: 'Orange', hint: 'orange fruit' },
+  { letter: 'P', word: 'Pencil', hint: 'yellow pencil' },
+  { letter: 'Q', word: 'Queen', hint: 'royal queen' },
+  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit' },
+  { letter: 'S', word: 'Sun', hint: 'bright sun' },
+  { letter: 'T', word: 'Tiger', hint: 'striped tiger' },
+  { letter: 'U', word: 'Urn', hint: 'clay urn' },
+  { letter: 'V', word: 'Violin', hint: 'musical violin' },
+  { letter: 'W', word: 'Watch', hint: 'wrist watch' },
+  { letter: 'X', word: 'X-ray', hint: 'bone x-ray' },
+  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht' },
+  { letter: 'Z', word: 'Zebra', hint: 'striped zebra' },
 ];
 
 export const shapes: ShapeCharacter[] = [

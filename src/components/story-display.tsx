@@ -8,6 +8,7 @@ import { Loader2, BookOpen, Check, Volume2 } from 'lucide-react';
 interface StoryDisplayProps {
   word: string;
   story: string | null;
+  audioUrl: string | null;
   isLoading: boolean;
   onComplete: () => void;
   onReplayAudio: () => void;
@@ -17,6 +18,7 @@ interface StoryDisplayProps {
 export function StoryDisplay({
   word,
   story,
+  audioUrl,
   isLoading,
   onComplete,
   onReplayAudio,
