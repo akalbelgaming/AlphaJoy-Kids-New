@@ -23,15 +23,17 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3781633352100587" crossOrigin="anonymous"></script>
         {/* Tag for child-directed treatment */}
-        <script>
-          {`
-            (adsbygoogle = window.adsbygoogle || []).push({
-              google_ad_client: "ca-pub-3781633352100587",
-              enable_page_level_ads: true,
-              tag_for_child_directed_treatment: 1
-            });
-          `}
-        </script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (adsbygoogle = window.adsbygoogle || []).push({
+                google_ad_client: "ca-pub-3781633352100587",
+                enable_page_level_ads: true,
+                tag_for_child_directed_treatment: 1
+              });
+            `,
+          }}
+        />
       </head>
       <body className="font-body antialiased" suppressHydrationWarning={true}>
         <InterstitialWrapper>
