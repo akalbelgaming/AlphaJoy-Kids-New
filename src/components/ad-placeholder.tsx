@@ -2,8 +2,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import React from "react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -18,33 +17,18 @@ import {
  * A component that renders a real Google AdSense banner ad unit.
  */
 export function AdBanner({ className }: { className?: string }) {
-  const pathname = usePathname();
-  const adRef = useRef<HTMLModElement>(null);
-
-  useEffect(() => {
-    const adElement = adRef.current;
-    if (!adElement) {
-      return;
-    }
-
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense error:", err);
-    }
-  }, [pathname]);
-
+  // This component now simply renders the ad slot.
+  // The main AdSense script loaded in layout.tsx will automatically
+  // find and fill this slot. This avoids the race condition
+  // that was causing the "availableWidth=0" error.
   return (
     <div
-      key={pathname} // Force re-render on path change
       className={cn(
-        "flex w-full items-center justify-center bg-gray-100 text-black min-h-[50px]",
+        "flex w-full items-center justify-center text-black min-h-[50px] bg-transparent",
         className
       )}
     >
       <ins
-        ref={adRef}
         className="adsbygoogle"
         style={{ display: "block" }}
         data-ad-client="ca-pub-3781633352100587"
@@ -68,17 +52,6 @@ export function InterstitialAd({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  useEffect(() => {
-    if (isOpen) {
-      try {
-        // @ts-ignore
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-      } catch (e) {
-        console.error("Interstitial ad error", e);
-      }
-    }
-  }, [isOpen]);
-
   if (!isOpen) return null;
 
   return (
