@@ -327,7 +327,6 @@ export default function GameClient({ mode }: GameClientProps) {
     };
 
     speechRecognition.onerror = (event) => {
-      console.error("Speech recognition error", event.error);
       if (event.error === 'not-allowed') {
         toast({
           variant: "destructive",
