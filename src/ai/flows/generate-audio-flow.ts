@@ -20,7 +20,8 @@ export type GenerateAudioInput = z.infer<typeof GenerateAudioInputSchema>;
 const GenerateAudioOutputSchema = z.object({
   audioUrl: z
     .string()
-    .describe("The generated audio as a data URI in WAV format."),
+    .nullable()
+    .describe("The generated audio as a data URI in WAV format, or null if generation fails."),
 });
 export type GenerateAudioOutput = z.infer<typeof GenerateAudioOutputSchema>;
 
@@ -59,36 +60,43 @@ const generateAudioFlow = ai.defineFlow(
     outputSchema: GenerateAudioOutputSchema,
   },
   async (input) => {
-    const { media } = await ai.generate({
-      model: googleAI.model('gemini-2.5-flash-preview-tts'),
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: 'Algenib' },
+    try {
+        const { media } = await ai.generate({
+          model: googleAI.model('gemini-2.5-flash-preview-tts'),
+          config: {
+            responseModalities: ['AUDIO'],
+            speechConfig: {
+              voiceConfig: {
+                prebuiltVoiceConfig: { voiceName: 'Algenib' },
+              },
+            },
           },
-        },
-      },
-      prompt: input.text,
-    });
+          prompt: input.text,
+        });
 
-    if (!media || !media.url) {
-      throw new Error('Failed to generate audio from text.');
+        if (!media || !media.url) {
+          console.error('Audio generation returned no media.');
+          return { audioUrl: null };
+        }
+
+        const audioBuffer = Buffer.from(
+          media.url.substring(media.url.indexOf(',') + 1),
+          'base64'
+        );
+        const wavBase64 = await toWav(audioBuffer);
+
+        if (!wavBase64) {
+            console.error('Failed to convert audio to WAV format.');
+            return { audioUrl: null };
+        }
+
+        return { 
+            audioUrl: 'data:audio/wav;base64,' + wavBase64
+        };
+    } catch (error) {
+        console.error('An error occurred during audio generation:', error);
+        return { audioUrl: null };
     }
-
-    const audioBuffer = Buffer.from(
-      media.url.substring(media.url.indexOf(',') + 1),
-      'base64'
-    );
-    const wavBase64 = await toWav(audioBuffer);
-
-    if (!wavBase64) {
-        throw new Error('Failed to convert audio to WAV format.');
-    }
-
-    return { 
-        audioUrl: 'data:audio/wav;base64,' + wavBase64
-    };
   }
 );
 

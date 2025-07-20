@@ -66,11 +66,10 @@ export async function getAudioForText(text: string) {
     }
     try {
         const result = await generateAudio({ text });
-        if (!result || !result.audioUrl) {
-            return { success: false, error: 'The AI failed to return audio.' };
-        }
+        // The flow now returns { audioUrl: null } on failure, so we just pass it along.
         return { success: true, data: result };
     } catch (error) {
+        // This catch block might be less likely to be hit now, but good for safety.
         console.error(`Error in getAudioForText for "${text}":`, error);
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
         return { success: false, error: message };

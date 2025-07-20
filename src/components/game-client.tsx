@@ -56,7 +56,7 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioCache = useRef<Map<string, string>>(new Map());
+  const audioCache = useRef<Map<string, string | null>>(new Map());
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioAbortControllerRef = useRef<AbortController | null>(null);
 
@@ -119,8 +119,8 @@ export default function GameClient({ mode }: GameClientProps) {
     return '';
   }, [mode, itemToTrace]);
 
-  const playAudio = useCallback((url: string) => {
-    if (audioRef.current && soundEnabled) {
+  const playAudio = useCallback((url: string | null) => {
+    if (url && audioRef.current && soundEnabled) {
       audioRef.current.src = url;
       audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
     }
@@ -137,11 +137,17 @@ export default function GameClient({ mode }: GameClientProps) {
       const response = await getAudioForText(textToSpeak);
       if (controller.signal.aborted) return;
 
-      if (response.success && response.data?.audioUrl) {
-        audioCache.current.set(textToSpeak, response.data.audioUrl);
-        playAudio(response.data.audioUrl);
+      // The AI flow now returns { audioUrl: null } on failure.
+      const audioUrl = response.data?.audioUrl;
+
+      // Cache the result, whether it's a valid URL or null.
+      audioCache.current.set(textToSpeak, audioUrl || null);
+
+      if (audioUrl) {
+        playAudio(audioUrl);
       } else {
-        console.error("Failed to fetch audio:", response.error);
+        // Silently fail if audioUrl is null.
+        console.warn(`Audio generation failed for "${textToSpeak}", but the app will continue.`);
         if (response.error?.includes('429')) {
              toast({
                 variant: "destructive",
@@ -149,17 +155,11 @@ export default function GameClient({ mode }: GameClientProps) {
                 description: "You've used all free sounds for today. Previously played sounds will still work. Please try again tomorrow!",
                 duration: 8000
              });
-        } else {
-            toast({
-              variant: "destructive",
-              title: "Could Not Play Sound",
-              description: response.error || "The AI might be busy. Please try again.",
-            });
         }
       }
     } catch (error) {
        if (controller.signal.aborted) return;
-       console.error("Error fetching audio:", error);
+       console.error("An unexpected error occurred while fetching audio:", error);
        toast({ variant: "destructive", title: "Audio Error", description: "An unexpected error occurred." });
     } finally {
        if (!controller.signal.aborted) {
@@ -173,15 +173,20 @@ export default function GameClient({ mode }: GameClientProps) {
     if (!textToSpeak || !soundEnabled) return;
     
     const cachedUrl = audioCache.current.get(textToSpeak);
-    if (cachedUrl) {
-      playAudio(cachedUrl);
+
+    if (audioCache.current.has(textToSpeak)) {
+        if (cachedUrl) { // Check if the cached value is a valid URL
+            playAudio(cachedUrl);
+        } else {
+             toast({ title: "Sound Not Available", description: "The sound for this item could not be loaded." });
+        }
     } else if (!isAudioLoading) {
       // If not cached, fetch it now on manual request
       const controller = new AbortController();
       audioAbortControllerRef.current = controller;
       fetchCharacterAudio(textToSpeak, controller);
     }
-  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio]);
+  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, toast]);
 
 
   useEffect(() => {
