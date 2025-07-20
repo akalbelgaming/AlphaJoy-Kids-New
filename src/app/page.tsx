@@ -8,6 +8,7 @@ import {
   PenSquare,
   BookCopy,
   ToyBrick,
+  Languages,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdBanner } from '@/components/ad-placeholder';
@@ -28,6 +29,14 @@ const activities = [
     description: 'Practice tracing numbers from 1 to 100.',
     color: 'text-blue-500',
     bgColor: 'bg-blue-50',
+  },
+  {
+    href: '/hindi-vowels',
+    title: 'Hindi Vowels',
+    icon: <Languages className="h-12 w-12" />,
+    description: 'Learn Hindi vowels (swar).',
+    color: 'text-orange-500',
+    bgColor: 'bg-orange-50',
   },
   {
     href: '/shapes',

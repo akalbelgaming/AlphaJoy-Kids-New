@@ -5,7 +5,7 @@ import GameClient from '@/components/game-client';
 import { AdBanner } from '@/components/ad-placeholder';
 import { Button } from '@/components/ui/button';
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi-vowels";
 
 interface ActivityPageProps {
   mode: Mode;

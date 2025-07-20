@@ -9,7 +9,8 @@ import {
   VolumeX,
   Loader2
 } from "lucide-react";
-import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
+import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
+import { hindiVowels, type HindiCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -22,7 +23,7 @@ import { numberToWords, cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi-vowels";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -50,7 +51,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
-  const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
   
   // States for counting game
   const [showReward, setShowReward] = useState(false);
@@ -65,10 +66,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
       const loadVoices = () => {
         const voices = synth.getVoices();
         if (voices.length > 0) {
-          const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
+          const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
                          voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
                          voices.find(v => v.lang.startsWith('en'));
-          setFemaleVoice(female || null);
+          const hiVoice = voices.find(v => v.lang.startsWith('hi'));
+          setVoice(mode === 'hindi-vowels' ? (hiVoice || enVoice) : enVoice);
         }
       };
 
@@ -80,7 +82,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else {
         console.warn("Speech Synthesis not supported in this browser.");
     }
-  }, []);
+  }, [mode]);
 
 
   const characterSet = useMemo(() => {
@@ -95,13 +97,15 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "shapes":
         return shapes;
       case "drawing":
-        return alphabet; 
+        return alphabet;
+      case "hindi-vowels":
+        return hindiVowels;
       default:
         return [];
     }
   }, [mode]);
   
-  const currentCharacter: string | AlphabetCharacter | ShapeCharacter | undefined = useMemo(
+  const currentCharacter: string | AlphabetCharacter | ShapeCharacter | HindiCharacter | undefined = useMemo(
     () => characterSet[currentIndex],
     [characterSet, currentIndex]
   );
@@ -110,6 +114,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
+      if ('vowel' in currentCharacter) return currentCharacter.vowel;
       return '';
   }, [mode, currentCharacter]);
 
@@ -132,12 +137,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (!soundEnabled || !speechSynthesis || !text) return;
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
-    if (femaleVoice) {
-      utterance.voice = femaleVoice;
+    if (voice) {
+      utterance.voice = voice;
     }
     utterance.rate = 0.9;
     speechSynthesis.speak(utterance);
-  }, [soundEnabled, speechSynthesis, femaleVoice]);
+  }, [soundEnabled, speechSynthesis, voice]);
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -156,11 +161,16 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'story') {
       setStory("No story found for this item.");
     } else {
-      const textToSpeak = (mode === 'numbers')
-        ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
-        : (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter)
-        ? `${currentCharacter.letter}, for ${currentCharacter.word}`
-        : (mode === 'reading') ? itemToTrace : '';
+      let textToSpeak = '';
+      if (mode === 'numbers') {
+        textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
+      } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
+        textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
+      } else if (mode === 'reading') {
+        textToSpeak = itemToTrace;
+      } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
+        textToSpeak = `${currentCharacter.vowel}, ${currentCharacter.word}`;
+      }
 
       if (textToSpeak) {
         playSound(textToSpeak);
@@ -174,11 +184,16 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (mode === 'story' && storyCharacter?.story) {
         playSound(storyCharacter.story);
     } else {
-       const textToSpeak = (mode === 'numbers')
-        ? numberToWords(parseInt(itemToTrace, 10)) || itemToTrace
-        : (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter)
-        ? `${currentCharacter.letter}, for ${currentCharacter.word}`
-        : (mode === 'reading') ? itemToTrace : '';
+       let textToSpeak = '';
+       if (mode === 'numbers') {
+        textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
+      } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
+        textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
+      } else if (mode === 'reading') {
+        textToSpeak = itemToTrace;
+      } else if (mode === 'hindi-vowels' && typeof currentCharacter === 'object' && 'vowel' in currentCharacter) {
+        textToSpeak = `${currentCharacter.vowel}, ${currentCharacter.word}`;
+      }
 
       if (textToSpeak) {
         playSound(textToSpeak);
@@ -234,6 +249,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "alphabet":
       case "numbers":
       case "reading":
+      case "hindi-vowels":
         return (
           <TracingCanvas
             key={`${mode}-${currentIndex}`}
@@ -301,7 +317,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi-vowels'].includes(mode);
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
