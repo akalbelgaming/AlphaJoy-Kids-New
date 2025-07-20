@@ -4,7 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Check, Mic, MicOff, X } from 'lucide-react';
+import { Mic, Check, X, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CountingDisplayProps {
@@ -15,7 +15,7 @@ interface CountingDisplayProps {
   lastTranscript: string | null;
   isCorrect: boolean | null;
   onStartListening: () => void;
-  onComplete: () => void; // This will now be used for when the answer is correct
+  onNext: () => void;
 }
 
 export function CountingDisplay({
@@ -26,8 +26,9 @@ export function CountingDisplay({
   lastTranscript,
   isCorrect,
   onStartListening,
-  onComplete,
+  onNext,
 }: CountingDisplayProps) {
+  
   const getFeedbackMessage = () => {
     if (isListening) {
       return "Listening...";
@@ -36,7 +37,7 @@ export function CountingDisplay({
       return `You said "${lastTranscript}". Try again!`;
     }
     if (isCorrect === true) {
-        return `Correct! It's ${count}!`;
+        return `That's right! This is ${count}!`;
     }
     return "Press the mic and say the number!";
   };
@@ -59,49 +60,61 @@ export function CountingDisplay({
       <Card className="w-full max-w-lg shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary">
-            <span className="text-3xl font-bold">Count the items!</span>
+            <span className="text-3xl font-bold">{isCorrect ? 'Look! There are...' : 'What number is this?'}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="min-h-[250px] flex flex-col items-center justify-center gap-6 p-6">
-          {isLoading ? (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-                {Array.from({length: Math.min(count, 12)}).map((_, index) => (
-                    <Skeleton key={index} className="w-24 h-24 rounded-lg" />
-                ))}
-            </div>
-          ) : imageUrls.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-center gap-4">
-               {imageUrls.slice(0, 12).map((url, index) => (
-                    <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
-                        <Image
-                            src={url}
-                            alt={`item ${index + 1}`}
-                            fill
-                            className="object-contain"
-                            sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 5vw"
-                            unoptimized
-                        />
-                    </div>
-                ))}
-            </div>
+          {isCorrect ? (
+             isLoading ? (
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                    {Array.from({length: Math.min(count, 12)}).map((_, index) => (
+                        <Skeleton key={index} className="w-24 h-24 rounded-lg" />
+                    ))}
+                </div>
+              ) : imageUrls.length > 0 ? (
+                <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-zoom">
+                   {imageUrls.slice(0, 12).map((url, index) => (
+                        <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
+                            <Image
+                                src={url}
+                                alt={`item ${index + 1}`}
+                                fill
+                                className="object-contain"
+                                sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 5vw"
+                                unoptimized
+                            />
+                        </div>
+                    ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground">Could not load items.</p>
+              )
           ) : (
-            <p className="text-muted-foreground">Could not load items to count.</p>
+             <p className="text-[15rem] font-bold text-primary drop-shadow-lg">{count}</p>
           )}
         </CardContent>
       </Card>
       
-      <p className="text-9xl font-bold text-primary drop-shadow-lg">{count}</p>
-
-      <div className="flex flex-col items-center gap-4 mt-4">
-        <Button 
-            size="lg" 
-            onClick={onStartListening} 
-            className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" 
-            disabled={isLoading || isListening}
-        >
-          {isListening ? <Mic className="mr-2 h-5 w-5 animate-pulse" /> : <Mic className="mr-2 h-5 w-5" />}
-          Speak
-        </Button>
+      <div className="flex flex-col items-center gap-4 mt-4 h-24">
+        {isCorrect ? (
+             <Button 
+                size="lg" 
+                onClick={onNext} 
+                className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
+                Next <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+        ) : (
+            <Button 
+                size="lg" 
+                onClick={onStartListening} 
+                className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" 
+                disabled={isLoading || isListening}
+            >
+              {isListening ? <Mic className="mr-2 h-5 w-5 animate-pulse" /> : <Mic className="mr-2 h-5 w-5" />}
+              Speak
+            </Button>
+        )}
         <div className="flex items-center gap-2 text-muted-foreground font-semibold text-lg h-8">
             {getFeedbackIcon()}
             <span>{getFeedbackMessage()}</span>

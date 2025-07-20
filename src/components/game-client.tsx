@@ -55,25 +55,19 @@ export default function GameClient({ mode }: GameClientProps) {
   const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
   const [isCountingLoading, setIsCountingLoading] = useState(false);
   
-  // States for speech synthesis (text-to-speech)
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
   const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
-  const [isSoundReady, setIsSoundReady] = useState(false);
   
-  // States for speech recognition (speech-to-text)
   const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
   const [isListening, setIsListening] = useState(false);
   const [lastTranscript, setLastTranscript] = useState<string | null>(null);
   const [isCorrectAnswer, setIsCorrectAnswer] = useState<boolean | null>(null);
 
-  const audioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
   
-  // Effect to initialize Speech Synthesis and Speech Recognition
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // --- Speech Synthesis Setup ---
       if ('speechSynthesis' in window) {
         const synth = window.speechSynthesis;
         setSpeechSynthesis(synth);
@@ -85,7 +79,6 @@ export default function GameClient({ mode }: GameClientProps) {
                            voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
                            voices.find(v => v.lang.startsWith('en'));
             setFemaleVoice(female || null);
-            setIsSoundReady(true);
           }
         };
 
@@ -95,11 +88,9 @@ export default function GameClient({ mode }: GameClientProps) {
           synth.onvoiceschanged = loadVoices;
         }
       } else {
-          setIsSoundReady(false);
           console.warn("Speech Synthesis not supported in this browser.");
       }
       
-      // --- Speech Recognition Setup ---
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
           const recognition = new SpeechRecognition();
@@ -176,17 +167,43 @@ export default function GameClient({ mode }: GameClientProps) {
   }, [mode, itemToTrace, currentCharacter]);
 
   const playSound = useCallback((text: string) => {
-    if (!soundEnabled || !speechSynthesis || !isSoundReady || !text) return;
-    
+    if (!soundEnabled || !speechSynthesis || !text) return;
     speechSynthesis.cancel();
-    
     const utterance = new SpeechSynthesisUtterance(text);
     if (femaleVoice) {
       utterance.voice = femaleVoice;
     }
     utterance.rate = 0.8;
     speechSynthesis.speak(utterance);
-  }, [soundEnabled, speechSynthesis, isSoundReady, femaleVoice]);
+  }, [soundEnabled, speechSynthesis, femaleVoice]);
+
+  const fetchCountingImages = useCallback(async (signal: AbortSignal) => {
+      setIsCountingLoading(true);
+      setCountingImageUrls([]);
+      const count = itemForCounting;
+      const itemToCountWord = "apple"; 
+      if (count > 0 && itemToCountWord) {
+        try {
+          const imageResponse = await getImageForWord(itemToCountWord);
+          if (signal.aborted) return;
+          if (imageResponse.success && imageResponse.data?.imageUrl) {
+            setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
+          } else {
+            toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
+            setCountingImageUrls([]);
+          }
+        } catch (e) {
+            if (signal.aborted) return;
+            toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
+            setCountingImageUrls([]);
+        } finally {
+          if (!signal.aborted) setIsCountingLoading(false);
+        }
+      } else {
+        setIsCountingLoading(false);
+      }
+  }, [itemForCounting, toast]);
+  
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -224,33 +241,6 @@ export default function GameClient({ mode }: GameClientProps) {
             } finally {
                 if (!controller.signal.aborted) setIsStoryLoading(false);
             }
-        } 
-        
-        else if (mode === 'counting') {
-            setIsCountingLoading(true);
-            setCountingImageUrls([]);
-            const count = itemForCounting;
-            const itemToCountWord = "apple"; 
-            if (count > 0 && itemToCountWord) {
-              try {
-                const imageResponse = await getImageForWord(itemToCountWord);
-                if (controller.signal.aborted) return;
-                if (imageResponse.success && imageResponse.data?.imageUrl) {
-                  setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
-                } else {
-                  toast({ variant: "destructive", title: "Could not get images", description: imageResponse.error });
-                  setCountingImageUrls([]);
-                }
-              } catch (e) {
-                  if (controller.signal.aborted) return;
-                  toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
-                  setCountingImageUrls([]);
-              } finally {
-                if (!controller.signal.aborted) setIsCountingLoading(false);
-              }
-            } else {
-              setIsCountingLoading(false);
-            }
         }
     };
 
@@ -262,7 +252,7 @@ export default function GameClient({ mode }: GameClientProps) {
         controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, itemForCounting, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
+  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -306,7 +296,6 @@ export default function GameClient({ mode }: GameClientProps) {
     handleNext();
   }, [handleNext]);
 
-  // --- Speech Recognition Logic ---
   const handleStartListening = () => {
     if (!speechRecognition || isListening) return;
 
@@ -319,15 +308,17 @@ export default function GameClient({ mode }: GameClientProps) {
       setLastTranscript(transcript);
 
       const currentCount = itemForCounting;
-      const countAsWord = numberToWords(currentCount);
+      const countAsWord = numberToWords(currentCount)?.toLowerCase();
       const countAsNumber = currentCount.toString();
 
-      if (transcript === countAsWord || transcript === countAsNumber) {
+      // Flexible matching: check if transcript includes the word or number
+      if ((countAsWord && transcript.includes(countAsWord)) || transcript.includes(countAsNumber)) {
         setIsCorrectAnswer(true);
         playSound("Correct!");
-        setTimeout(() => {
-          handleCompletion();
-        }, 1500);
+        
+        const controller = new AbortController();
+        fetchCountingImages(controller.signal);
+
       } else {
         setIsCorrectAnswer(false);
         playSound("Try again.");
@@ -414,7 +405,7 @@ export default function GameClient({ mode }: GameClientProps) {
             lastTranscript={lastTranscript}
             isCorrect={isCorrectAnswer}
             onStartListening={handleStartListening}
-            onComplete={handleCompletion}
+            onNext={handleCompletion}
           />
         );
       case "drawing":
@@ -435,11 +426,9 @@ export default function GameClient({ mode }: GameClientProps) {
   };
 
   const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading'].includes(mode);
-  const isSoundButtonDisabled = !soundEnabled || !isSoundReady;
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      <audio ref={audioRef} hidden />
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
@@ -472,13 +461,11 @@ export default function GameClient({ mode }: GameClientProps) {
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={isSoundButtonDisabled}
+              disabled={!soundEnabled}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
-              {!isSoundReady && soundEnabled ? (
-                <Loader2 className="h-7 w-7 animate-spin" />
-              ) : soundEnabled ? (
+              {soundEnabled ? (
                 <Volume2 className={cn("h-7 w-7")} />
               ) : (
                 <VolumeX className={cn("h-7 w-7")} />
