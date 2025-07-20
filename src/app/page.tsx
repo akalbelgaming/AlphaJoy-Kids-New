@@ -76,7 +76,7 @@ export default function Home() {
       </header>
       
       <main className="flex-1 p-4 md:p-6 mb-24">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
           {activities.map((activity, index) => (
             <Link href={activity.href} key={activity.href} className="group">
               <Card 
