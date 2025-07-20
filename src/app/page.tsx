@@ -66,6 +66,23 @@ const activities = [
   }
 ];
 
+// Girl Icon SVG Component
+const GirlIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg {...props} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C9.24 2 7 4.24 7 7c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5zm0 10c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z" fill="#FFC0CB"/>
+    <path d="M12,13c-2.67,0-8,1.34-8,4v3h16v-3C20,14.34,14.67,13,12,13z M12,12c2.76,0,5-2.24,5-5s-2.24-5-5-5 S7,4.24,7,7S9.24,12,12,12z" fill="none"/>
+  </svg>
+);
+
+// Boy Icon SVG Component
+const BoyIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg {...props} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 2C9.24 2 7 4.24 7 7c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5zm0 10c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z" fill="#89CFF0"/>
+    <path d="M12,13c-2.67,0-8,1.34-8,4v3h16v-3C20,14.34,14.67,13,12,13z M12,12c2.76,0,5-2.24,5-5s-2.24-5-5-5 S7,4.24,7,7S9.24,12,12,12z" fill="none"/>
+  </svg>
+);
+
+
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
