@@ -32,28 +32,32 @@ export function CountingDisplay({
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <Card className="w-full max-w-2xl shadow-lg border-2">
-        <CardContent className="min-h-[300px] flex flex-col items-center justify-center gap-4 p-4">
-            {isLoading && showImages ? (
-                <div className="w-full h-full min-h-[250px] bg-muted/30 rounded-lg flex items-center justify-center">
-                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
-                </div>
-            ) : showImages ? (
-                <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-zoom p-4">
-                   {imageUrls.slice(0, 12).map((url, index) => (
-                        <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
-                            <Image
-                                src={url}
-                                alt={`item ${index + 1}`}
-                                fill
-                                className="object-contain"
-                                sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 5vw"
-                                unoptimized
-                            />
-                        </div>
-                    ))}
-                </div>
-            ) : null}
-        </CardContent>
+        {showImages ? (
+            <CardContent className="min-h-[300px] flex flex-col items-center justify-center gap-4 p-4">
+                {isLoading ? (
+                    <div className="w-full h-full min-h-[250px] bg-muted/30 rounded-lg flex items-center justify-center">
+                        <Loader2 className="w-16 h-16 text-primary animate-spin" />
+                    </div>
+                ) : (
+                    <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-zoom p-4">
+                       {imageUrls.slice(0, 12).map((url, index) => (
+                            <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
+                                <Image
+                                    src={url}
+                                    alt={`item ${index + 1}`}
+                                    fill
+                                    className="object-contain"
+                                    sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 5vw"
+                                    unoptimized
+                                />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
+        ) : (
+           <div className="min-h-[300px]"></div>
+        )}
         <CardHeader className="pt-2">
             <CardTitle className="text-center">
                 <p className="text-[10rem] font-bold text-primary drop-shadow-lg leading-none">{count}</p>
