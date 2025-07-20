@@ -4,29 +4,61 @@ import React from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Check, Calculator } from 'lucide-react';
+import { Loader2, Check, Mic, MicOff, X } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CountingDisplayProps {
   count: number;
   imageUrls: string[];
   isLoading: boolean;
-  onComplete: () => void;
+  isListening: boolean;
+  lastTranscript: string | null;
+  isCorrect: boolean | null;
+  onStartListening: () => void;
+  onComplete: () => void; // This will now be used for when the answer is correct
 }
 
 export function CountingDisplay({
   count,
   imageUrls,
   isLoading,
+  isListening,
+  lastTranscript,
+  isCorrect,
+  onStartListening,
   onComplete,
 }: CountingDisplayProps) {
+  const getFeedbackMessage = () => {
+    if (isListening) {
+      return "Listening...";
+    }
+    if (isCorrect === false && lastTranscript) {
+      return `You said "${lastTranscript}". Try again!`;
+    }
+    if (isCorrect === true) {
+        return `Correct! It's ${count}!`;
+    }
+    return "Press the mic and say the number!";
+  };
+
+  const getFeedbackIcon = () => {
+    if (isListening) {
+      return <Mic className="w-6 h-6 text-primary animate-pulse" />;
+    }
+    if (isCorrect === false) {
+      return <X className="w-6 h-6 text-destructive" />;
+    }
+    if (isCorrect === true) {
+      return <Check className="w-6 h-6 text-green-500" />;
+    }
+    return <Mic className="w-6 h-6" />;
+  };
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <Card className="w-full max-w-lg shadow-lg border-2">
         <CardHeader>
           <CardTitle className="flex items-center gap-3 text-primary">
-            <Calculator className="w-8 h-8"/>
             <span className="text-3xl font-bold">Count the items!</span>
           </CardTitle>
         </CardHeader>
@@ -39,7 +71,7 @@ export function CountingDisplay({
             </div>
           ) : imageUrls.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-4">
-               {imageUrls.slice(0, 12).map((url, index) => ( // Only render up to 12 images to avoid clutter
+               {imageUrls.slice(0, 12).map((url, index) => (
                     <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
                         <Image
                             src={url}
@@ -57,12 +89,23 @@ export function CountingDisplay({
           )}
         </CardContent>
       </Card>
-       <p className="text-9xl font-bold text-primary drop-shadow-lg">{count}</p>
-      <div className="flex gap-4 mt-4">
-        <Button size="lg" onClick={onComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}>
-          <Check className="mr-2 h-5 w-5" />
-          Next
+      
+      <p className="text-9xl font-bold text-primary drop-shadow-lg">{count}</p>
+
+      <div className="flex flex-col items-center gap-4 mt-4">
+        <Button 
+            size="lg" 
+            onClick={onStartListening} 
+            className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" 
+            disabled={isLoading || isListening}
+        >
+          {isListening ? <Mic className="mr-2 h-5 w-5 animate-pulse" /> : <Mic className="mr-2 h-5 w-5" />}
+          Speak
         </Button>
+        <div className="flex items-center gap-2 text-muted-foreground font-semibold text-lg h-8">
+            {getFeedbackIcon()}
+            <span>{getFeedbackMessage()}</span>
+        </div>
       </div>
     </div>
   );

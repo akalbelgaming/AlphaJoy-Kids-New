@@ -56,43 +56,64 @@ export default function GameClient({ mode }: GameClientProps) {
   const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
   const [isCountingLoading, setIsCountingLoading] = useState(false);
   
+  // States for speech synthesis (text-to-speech)
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
   const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [isSoundReady, setIsSoundReady] = useState(false);
   
-  const audioRef = useRef<HTMLAudioElement>(null);
+  // States for speech recognition (speech-to-text)
+  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const [lastTranscript, setLastTranscript] = useState<string | null>(null);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState<boolean | null>(null);
 
+  const audioRef = useRef<HTMLAudioElement>(null);
   const { toast } = useToast();
   
-  // Effect to initialize speech synthesis
+  // Effect to initialize Speech Synthesis and Speech Recognition
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const synth = window.speechSynthesis;
-      setSpeechSynthesis(synth);
-      
-      const loadVoices = () => {
-        const voices = synth.getVoices();
-        if (voices.length > 0) {
-          // Find a female voice, preferring local ones
-          const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
-                         voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
-                         voices.find(v => v.lang.startsWith('en'));
-          setFemaleVoice(female || null);
-          setIsSoundReady(true);
-        }
-      };
+    if (typeof window !== 'undefined') {
+      // --- Speech Synthesis Setup ---
+      if ('speechSynthesis' in window) {
+        const synth = window.speechSynthesis;
+        setSpeechSynthesis(synth);
+        
+        const loadVoices = () => {
+          const voices = synth.getVoices();
+          if (voices.length > 0) {
+            const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
+                           voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
+                           voices.find(v => v.lang.startsWith('en'));
+            setFemaleVoice(female || null);
+            setIsSoundReady(true);
+          }
+        };
 
-      // Voices load asynchronously
-      if (synth.getVoices().length > 0) {
-        loadVoices();
+        if (synth.getVoices().length > 0) {
+          loadVoices();
+        } else {
+          synth.onvoiceschanged = loadVoices;
+        }
       } else {
-        synth.onvoiceschanged = loadVoices;
+          setIsSoundReady(false);
+          console.warn("Speech Synthesis not supported in this browser.");
       }
-    } else {
-        setIsSoundReady(false);
+      
+      // --- Speech Recognition Setup ---
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = false;
+          recognition.lang = 'en-US';
+          recognition.interimResults = false;
+          setSpeechRecognition(recognition);
+      } else {
+          console.warn("Speech Recognition not supported in this browser.");
+      }
     }
   }, []);
+
 
   const characterSet = useMemo(() => {
     switch (mode) {
@@ -101,12 +122,11 @@ export default function GameClient({ mode }: GameClientProps) {
         return numbers;
       case "alphabet":
       case "story":
-      case "reading": // Reading uses alphabet words now
+      case "reading": 
         return alphabet; 
       case "shapes":
         return shapes;
       case "drawing":
-        // For drawing, the set can be based on something simple like letters to get a word prompt
         return alphabet; 
       default:
         return [];
@@ -120,9 +140,9 @@ export default function GameClient({ mode }: GameClientProps) {
   
   const itemToTrace = useMemo(() => {
       if (!currentCharacter) return '';
-      if (typeof currentCharacter === 'string') return currentCharacter; // numbers
-      if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter; // alphabet, reading
-      return ''; // Other modes don't trace a single character
+      if (typeof currentCharacter === 'string') return currentCharacter;
+      if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
+      return '';
   }, [mode, currentCharacter]);
 
   const itemForStory = useMemo(() => {
@@ -139,14 +159,13 @@ export default function GameClient({ mode }: GameClientProps) {
     if (mode !== 'shapes' || !currentCharacter || typeof currentCharacter !== 'object' || !('path' in currentCharacter)) return null;
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
-
+  
   const getTextToSpeak = useCallback(() => {
     if (mode === 'numbers') {
       const num = parseInt(itemToTrace, 10);
       return numberToWords(num) || itemToTrace;
     }
     if (mode === 'alphabet') {
-      // Speak the letter, then the word. e.g. "A, for Apple"
       if(typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
         return `${currentCharacter.letter}, for ${currentCharacter.word}`;
       }
@@ -160,20 +179,20 @@ export default function GameClient({ mode }: GameClientProps) {
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !speechSynthesis || !isSoundReady || !text) return;
     
-    // Cancel any currently speaking utterance
     speechSynthesis.cancel();
     
     const utterance = new SpeechSynthesisUtterance(text);
     if (femaleVoice) {
       utterance.voice = femaleVoice;
     }
-    utterance.rate = 0.8; // Speak a bit slower for kids
+    utterance.rate = 0.8;
     speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, isSoundReady, femaleVoice]);
 
-  
   useEffect(() => {
     setStartTime(Date.now());
+    setIsCorrectAnswer(null);
+    setLastTranscript(null);
     
     const controller = new AbortController();
 
@@ -183,7 +202,6 @@ export default function GameClient({ mode }: GameClientProps) {
            playSound(textToSpeak);
         }
 
-        // Handle story generation
         if (mode === 'story') {
             setIsStoryLoading(true);
             setStory(null);
@@ -194,7 +212,7 @@ export default function GameClient({ mode }: GameClientProps) {
             }
             try {
                 const storyResponse = await getStory(itemForStory);
-                if (controller.signal.aborted) return; // Check if aborted
+                if (controller.signal.aborted) return;
                 if (storyResponse.success && storyResponse.data) {
                   setStory(storyResponse.data.story);
                   setStoryAudioUrl(storyResponse.data.audioUrl);
@@ -202,14 +220,13 @@ export default function GameClient({ mode }: GameClientProps) {
                    toast({ variant: "destructive", title: "Could not create a story", description: storyResponse.error || "The AI storyteller is taking a break." });
                 }
             } catch (e) {
-                 if (controller.signal.aborted) return; // Check if aborted
+                 if (controller.signal.aborted) return;
                  toast({ variant: "destructive", title: "Error fetching story", description: "An unexpected error occurred." });
             } finally {
                 if (!controller.signal.aborted) setIsStoryLoading(false);
             }
         } 
         
-        // Handle counting item generation
         else if (mode === 'counting') {
             setIsCountingLoading(true);
             setCountingImageUrls([]);
@@ -218,7 +235,7 @@ export default function GameClient({ mode }: GameClientProps) {
             if (count > 0 && itemToCountWord) {
               try {
                 const imageResponse = await getImageForWord(itemToCountWord);
-                if (controller.signal.aborted) return; // Check if aborted
+                if (controller.signal.aborted) return;
                 if (imageResponse.success && imageResponse.data?.imageUrl) {
                   setCountingImageUrls(Array(count).fill(imageResponse.data.imageUrl));
                 } else {
@@ -226,7 +243,7 @@ export default function GameClient({ mode }: GameClientProps) {
                   setCountingImageUrls([]);
                 }
               } catch (e) {
-                  if (controller.signal.aborted) return; // Check if aborted
+                  if (controller.signal.aborted) return;
                   toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
                   setCountingImageUrls([]);
               } finally {
@@ -242,10 +259,11 @@ export default function GameClient({ mode }: GameClientProps) {
 
     return () => {
         if (speechSynthesis) speechSynthesis.cancel();
+        if (speechRecognition) speechRecognition.stop();
         controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, itemForCounting, getTextToSpeak, playSound, speechSynthesis]);
+  }, [currentIndex, mode, toast, itemForStory, itemForCounting, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -288,6 +306,48 @@ export default function GameClient({ mode }: GameClientProps) {
     setShowInterstitial(false);
     handleNext();
   }, [handleNext]);
+
+  // --- Speech Recognition Logic ---
+  const handleStartListening = () => {
+    if (!speechRecognition || isListening) return;
+
+    setIsListening(true);
+    setIsCorrectAnswer(null);
+    setLastTranscript(null);
+
+    speechRecognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript.toLowerCase().trim();
+      setLastTranscript(transcript);
+
+      const currentCount = itemForCounting;
+      const countAsWord = numberToWords(currentCount);
+      const countAsNumber = currentCount.toString();
+
+      if (transcript === countAsWord || transcript === countAsNumber) {
+        setIsCorrectAnswer(true);
+        playSound("Correct!");
+        setTimeout(() => {
+          handleCompletion();
+        }, 1500);
+      } else {
+        setIsCorrectAnswer(false);
+        playSound("Try again.");
+      }
+      setIsListening(false);
+    };
+
+    speechRecognition.onerror = (event) => {
+      console.error("Speech recognition error", event.error);
+      toast({ variant: "destructive", title: "Could not hear you", description: "Please try speaking again."});
+      setIsListening(false);
+    };
+
+    speechRecognition.onend = () => {
+      setIsListening(false);
+    };
+
+    speechRecognition.start();
+  };
 
   const renderMainContent = () => {
     switch (mode) {
@@ -339,6 +399,10 @@ export default function GameClient({ mode }: GameClientProps) {
             count={itemForCounting}
             imageUrls={countingImageUrls}
             isLoading={isCountingLoading}
+            isListening={isListening}
+            lastTranscript={lastTranscript}
+            isCorrect={isCorrectAnswer}
+            onStartListening={handleStartListening}
             onComplete={handleCompletion}
           />
         );
