@@ -31,22 +31,30 @@ const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
 // Simple Levenshtein distance function for fuzzy matching
 function levenshtein(s1: string, s2: string): number {
-    if (s1.length > s2.length) { [s1, s2] = [s2, s1]; }
-    const distances = Array.from({ length: s1.length + 1 }, (_, i) => i);
-    for (let j = 0; j < s2.length; j++) {
-        let prev = distances[0];
-        distances[0]++;
-        for (let i = 0; i < s1.length; i++) {
-            const temp = distances[i+1];
-            distances[i+1] = Math.min(
-                distances[i] + 1, 
-                distances[i+1] + 1,
-                prev + (s1[i] === s2[j] ? 0 : 1) 
-            );
-            prev = temp;
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+    const costs = [];
+    for (let i = 0; i <= s1.length; i++) {
+        let lastValue = i;
+        for (let j = 0; j <= s2.length; j++) {
+            if (i === 0) {
+                costs[j] = j;
+            } else {
+                if (j > 0) {
+                    let newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) !== s2.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    }
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+        }
+        if (i > 0) {
+            costs[s2.length] = lastValue;
         }
     }
-    return distances[s1.length];
+    return costs[s2.length];
 }
 
 interface GameClientProps {
@@ -198,8 +206,6 @@ export default function GameClient({ mode }: GameClientProps) {
   }, [soundEnabled, speechSynthesis, femaleVoice]);
 
   const fetchCountingImages = useCallback(async (signal: AbortSignal) => {
-      setIsCountingLoading(true);
-      setCountingImageUrls([]);
       const count = itemForCounting;
       const itemToCountWord = "apple"; 
       if (count > 0 && itemToCountWord) {
@@ -216,11 +222,7 @@ export default function GameClient({ mode }: GameClientProps) {
             if (signal.aborted) return;
             toast({ variant: "destructive", title: "Error fetching images", description: "An unexpected error occurred." });
             setCountingImageUrls([]);
-        } finally {
-          if (!signal.aborted) setIsCountingLoading(false);
         }
-      } else {
-        setIsCountingLoading(false);
       }
   }, [itemForCounting, toast]);
   
@@ -229,7 +231,7 @@ export default function GameClient({ mode }: GameClientProps) {
     setStartTime(Date.now());
     setIsCorrectAnswer(null);
     setLastTranscript(null);
-    setCountingImageUrls([]); // Clear images for the new number
+    setCountingImageUrls([]);
     
     const controller = new AbortController();
 
@@ -263,6 +265,14 @@ export default function GameClient({ mode }: GameClientProps) {
                 if (!controller.signal.aborted) setIsStoryLoading(false);
             }
         }
+        
+        if (mode === 'counting') {
+            setIsCountingLoading(true);
+            await fetchCountingImages(controller.signal);
+            if (!controller.signal.aborted) {
+                setIsCountingLoading(false);
+            }
+        }
     };
 
     fetchUIData();
@@ -273,7 +283,7 @@ export default function GameClient({ mode }: GameClientProps) {
         controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
+  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, fetchCountingImages, speechSynthesis, speechRecognition]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -335,12 +345,19 @@ export default function GameClient({ mode }: GameClientProps) {
       let isMatch = false;
       const spokenWords = transcript.split(/\s+/);
       
+      // More forgiving check
       for (const spokenWord of spokenWords) {
-        if (spokenWord === countAsNumber) {
+        if (spokenWord === countAsNumber || spokenWord === countAsWord) {
             isMatch = true;
             break;
         }
-        if (countAsWord && levenshtein(spokenWord, countAsWord) <= 2) {
+        // Allow Levenshtein distance of 1 for small words
+        if (countAsWord && countAsWord.length <= 4 && levenshtein(spokenWord, countAsWord) <= 1) {
+            isMatch = true;
+            break;
+        }
+        // Allow Levenshtein distance of 2 for longer words
+        if (countAsWord && countAsWord.length > 4 && levenshtein(spokenWord, countAsWord) <= 2) {
             isMatch = true;
             break;
         }
@@ -349,15 +366,6 @@ export default function GameClient({ mode }: GameClientProps) {
       if (isMatch) {
         setIsCorrectAnswer(true);
         playSound("Correct!");
-        
-        const controller = new AbortController();
-        fetchCountingImages(controller.signal);
-        
-        // Automatically go to next after a delay
-        setTimeout(() => {
-            handleCompletion();
-        }, 3000); 
-
       } else {
         setIsCorrectAnswer(false);
         playSound("Try again.");
@@ -440,9 +448,9 @@ export default function GameClient({ mode }: GameClientProps) {
             imageUrls={countingImageUrls}
             isLoading={isCountingLoading}
             isListening={isListening}
-            lastTranscript={lastTranscript}
             isCorrect={isCorrectAnswer}
             onStartListening={handleStartListening}
+            onNext={handleCompletion}
           />
         );
       case "drawing":
