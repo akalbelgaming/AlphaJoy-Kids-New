@@ -77,7 +77,7 @@ export default function Home() {
              width={40}
              height={40}
              className="rounded-full"
-             data-ai-hint="happy girl"
+             data-ai-hint="cartoon girl"
            />
            <h1 className="text-base sm:text-lg md:text-xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories &amp; Art</h1>
            <Image 
@@ -86,7 +86,7 @@ export default function Home() {
              width={40}
              height={40}
              className="rounded-full"
-             data-ai-hint="happy boy"
+             data-ai-hint="cartoon boy"
            />
         </div>
       </header>
