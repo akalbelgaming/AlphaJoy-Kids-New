@@ -71,9 +71,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         }
       };
 
+      // Workaround for browsers that load voices asynchronously
       if (synth.getVoices().length > 0) {
         loadVoices();
-      } else {
+      } else if (synth.onvoiceschanged !== undefined) {
         synth.onvoiceschanged = loadVoices;
       }
     } else {
@@ -102,9 +103,13 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   }, [mode]);
   
+  const getCharacterData = useCallback((index: number) => {
+    return characterSet[index];
+  }, [characterSet]);
+
   const currentCharacter = useMemo(
-    () => characterSet[currentIndex],
-    [characterSet, currentIndex]
+    () => getCharacterData(currentIndex),
+    [getCharacterData, currentIndex]
   );
   
   const itemToTrace = useMemo(() => {
@@ -132,14 +137,34 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !speechSynthesis || !text) return;
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    if (voice) {
-      utterance.voice = voice;
+    try {
+        speechSynthesis.cancel(); // Stop any previous speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        if (voice) {
+          utterance.voice = voice;
+        }
+        utterance.rate = 0.9;
+        speechSynthesis.speak(utterance);
+    } catch(e) {
+        console.error("Speech synthesis failed", e);
     }
-    utterance.rate = 0.9;
-    speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, voice]);
+
+  const getTextToSpeak = useCallback((char: any) => {
+      if (!char) return '';
+      if (mode === 'story' && typeof char === 'object' && 'story' in char) {
+        return char.story;
+      } else if (mode === 'numbers' && typeof char === 'string') {
+        return numberToWords(parseInt(char, 10)) || char;
+      } else if (mode === 'alphabet' && typeof char === 'object' && 'letter' in char) {
+        return `${char.letter}, for ${char.word}`;
+      } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
+        return char.word;
+      } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
+        return `${char.character} से ${char.word}`;
+      }
+      return '';
+  }, [mode]);
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -149,59 +174,37 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (speechSynthesis) {
         speechSynthesis.cancel();
     }
-    
-    // This logic handles what to say or do when the character changes
-    const storyCharacter = itemForStory;
-    let textToSpeak = '';
-    if (mode === 'story' && storyCharacter?.story) {
-      textToSpeak = storyCharacter.story;
-    } else if (mode === 'numbers') {
-      textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
-    } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
-      textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
-    } else if (mode === 'reading') {
-      textToSpeak = itemToTrace;
-    } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
-      textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
-    }
-
-    if (textToSpeak) {
-      playSound(textToSpeak);
-    }
-
-  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, currentCharacter, speechSynthesis]);
+  }, [currentIndex, mode, speechSynthesis]);
   
   const handleReplaySound = () => {
-    let textToSpeak = '';
-    const storyCharacter = itemForStory;
-    if (mode === 'story' && storyCharacter?.story) {
-      textToSpeak = storyCharacter.story;
-    } else if (mode === 'numbers') {
-      textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
-    } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
-      textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
-    } else if (mode === 'reading') {
-      textToSpeak = itemToTrace;
-    } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
-      textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
-    }
-
+    const textToSpeak = getTextToSpeak(currentCharacter);
     if (textToSpeak) {
       playSound(textToSpeak);
     }
   };
   
+  const navigateAndPlaySound = useCallback((newIndex: number) => {
+    setCurrentIndex(newIndex);
+    const nextCharacter = getCharacterData(newIndex);
+    const textToSpeak = getTextToSpeak(nextCharacter);
+    if (textToSpeak) {
+      playSound(textToSpeak);
+    }
+  }, [getCharacterData, getTextToSpeak, playSound]);
+
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
-      setCurrentIndex((prev) => (prev + 1) % characterSet.length);
+      const newIndex = (currentIndex + 1) % characterSet.length;
+      navigateAndPlaySound(newIndex);
     }
-  }, [characterSet.length]);
+  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
 
   const handlePrev = useCallback(() => {
     if (characterSet.length > 0) {
-      setCurrentIndex((prev) => (prev - 1 + characterSet.length) % characterSet.length);
+      const newIndex = (currentIndex - 1 + characterSet.length) % characterSet.length;
+      navigateAndPlaySound(newIndex);
     }
-  }, [characterSet.length]);
+  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
 
   const handleCompletion = useCallback(() => {
     const endTime = Date.now();
@@ -367,3 +370,5 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </div>
   );
 }
+
+    
