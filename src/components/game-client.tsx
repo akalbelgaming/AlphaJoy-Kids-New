@@ -19,7 +19,7 @@ import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
-import { getStory } from "@/lib/story";
+import { getStory } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -167,7 +167,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       }
     } else {
       toast({ variant: 'destructive', title: 'Could not get story', description: response.error });
-      setStory('Could not create a story for this.');
+      setStory(response.error || 'Could not create a story for this.');
     }
     setIsStoryLoading(false);
   }, [toast]);

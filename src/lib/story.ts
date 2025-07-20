@@ -11,6 +11,8 @@ export async function getStory(word: string) {
   if (!word) {
     return { success: false, error: 'A word must be provided.' };
   }
+  // The check for API key will now be in the server action, 
+  // this function will only be called if the key exists.
   try {
     const result = await generateStory({ topic: word });
     if (!result || !result.story || !result.audioUrl) {

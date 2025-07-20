@@ -5,6 +5,7 @@ import {
   type AdaptiveDifficultyInput,
 } from '@/ai/flows/adaptive-difficulty';
 import {generateColoringPage} from '@/ai/flows/generate-coloring-page-flow';
+import { getStory as getStoryFromFlow } from '@/lib/story';
 
 export async function getAdaptiveDifficulty(input: AdaptiveDifficultyInput) {
   try {
@@ -32,4 +33,13 @@ export async function getColoringPage(word: string) {
       error instanceof Error ? error.message : 'An unknown error occurred.';
     return {success: false, error: message};
   }
+}
+
+export async function getStory(word: string) {
+  // Check if the API key is available in the environment
+  if (!process.env.GOOGLE_API_KEY) {
+    console.warn("GOOGLE_API_KEY is not set. Story generation is disabled.");
+    return { success: false, error: "Story feature is not available right now. Please try again later." };
+  }
+  return getStoryFromFlow(word);
 }
