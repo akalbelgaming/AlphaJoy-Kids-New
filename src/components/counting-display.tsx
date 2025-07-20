@@ -29,11 +29,11 @@ export function CountingDisplay({
 }: CountingDisplayProps) {
 
   return (
-    <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
-      <div className="w-full max-w-2xl flex items-center justify-center" style={{minHeight: '420px'}}>
+    <div className="w-full h-full flex flex-1 flex-col gap-4 items-center justify-center">
+      <div className="w-full max-w-2xl flex items-center justify-center flex-1">
         {showReward ? (
           <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
-            <CardContent className="min-h-[400px] flex flex-col items-center justify-center gap-4 p-4">
+            <CardContent className="flex flex-col items-center justify-center gap-4 p-4 min-h-[300px]">
               <div className={cn("grid gap-2 items-center justify-center",
                 count > 5 ? 'grid-cols-5' : `grid-cols-${count}`
               )}>
@@ -47,7 +47,7 @@ export function CountingDisplay({
           </Card>
         ) : (
           <Card className="w-full shadow-lg border-2 animate-fade-in-zoom">
-            <CardHeader className="min-h-[400px] flex items-center justify-center">
+            <CardHeader className="flex items-center justify-center min-h-[300px]">
               <CardTitle className="text-center">
                 <p className="text-[12rem] font-bold text-primary drop-shadow-lg leading-none">{count}</p>
               </CardTitle>
