@@ -52,7 +52,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
   const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
   
-  const [speechRecognition, setSpeechRecognition] = useState<SpeechRecognition | null>(null);
+  // States for counting game
   const [isListening, setIsListening] = useState(false);
   const [showReward, setShowReward] = useState(false);
 
@@ -81,17 +81,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
         }
       } else {
           console.warn("Speech Synthesis not supported in this browser.");
-      }
-      
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (SpeechRecognition) {
-          const recognition = new SpeechRecognition();
-          recognition.continuous = false;
-          recognition.lang = 'en-US';
-          recognition.interimResults = false;
-          setSpeechRecognition(recognition);
-      } else {
-          console.warn("Speech Recognition not supported in this browser.");
       }
     }
   }, []);
@@ -214,11 +203,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
     return () => {
         if (speechSynthesis) speechSynthesis.cancel();
-        if (speechRecognition) speechRecognition.stop();
         controller.abort();
     };
 
-  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis, speechRecognition]);
+  }, [currentIndex, mode, toast, itemForStory, getTextToSpeak, playSound, speechSynthesis]);
   
   const handleReplaySound = () => {
     const text = getTextToSpeak();
@@ -263,45 +251,18 @@ export default function GameClient({ mode }: {mode: Mode}) {
     setShowInterstitial(false);
     handleNext();
   }, [handleNext]);
-
-  const handleStartListening = () => {
-    if (!speechRecognition || isListening) return;
-
-    setIsListening(true);
-    
-    speechRecognition.onresult = (event) => {
-      // Forgiving logic: Any speech result is considered a success.
-      setShowReward(true);
-      playSound("Great job!");
-      setIsListening(false);
-    };
-
-    speechRecognition.onerror = (event) => {
-      if (event.error === 'not-allowed') {
-        toast({
-          variant: "destructive",
-          title: "Microphone Access Denied",
-          description: "Please allow microphone access in your browser settings to use this feature.",
-        });
-      } else {
-        // Even on error (like no-speech), we'll treat it as an attempt and show the reward.
+  
+  const handleSpeakButtonClick = () => {
+    // No actual voice recognition, just show the reward instantly
+    // to give positive feedback for the "effort" of pressing the button.
+    setIsListening(true); // Show loading spinner for a moment for effect
+    setTimeout(() => {
         setShowReward(true);
-      }
-      setIsListening(false);
-    };
-
-    speechRecognition.onend = () => {
-      if (isListening) {
+        playSound("Great job!");
         setIsListening(false);
-        // If recognition ends without a result (e.g., timeout), still show the reward.
-        if (!showReward) {
-          setShowReward(true);
-        }
-      }
-    };
-
-    speechRecognition.start();
+    }, 200); // A short delay to make it feel responsive
   };
+
 
   const renderMainContent = () => {
     switch (mode) {
@@ -353,7 +314,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             count={itemForCounting}
             isListening={isListening}
             showReward={showReward}
-            onStartListening={handleStartListening}
+            onSpeak={handleSpeakButtonClick}
             onNext={handleCompletion}
           />
         );
@@ -434,5 +395,3 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </div>
   );
 }
-
-    
