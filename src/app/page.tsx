@@ -1,14 +1,6 @@
 import Link from 'next/link';
 import {
   BookOpen,
-  Hash,
-  Shapes,
-  Calculator,
-  ScanEye,
-  PenSquare,
-  BookCopy,
-  ToyBrick,
-  Languages,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdBanner } from '@/components/ad-placeholder';
@@ -66,45 +58,13 @@ const activities = [
   }
 ];
 
-// Girl Icon SVG Component
-const GirlIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2C9.24 2 7 4.24 7 7c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5zm0 10c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z" fill="#FFC0CB"/>
-    <path d="M12,13c-2.67,0-8,1.34-8,4v3h16v-3C20,14.34,14.67,13,12,13z M12,12c2.76,0,5-2.24,5-5s-2.24-5-5-5 S7,4.24,7,7S9.24,12,12,12z" fill="none"/>
-  </svg>
-);
-
-// Boy Icon SVG Component
-const BoyIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-    <path d="M12 2C9.24 2 7 4.24 7 7c0 2.76 2.24 5 5 5s5-2.24 5-5c0-2.76-2.24-5-5-5zm0 10c-3.31 0-6 2.69-6 6v2h12v-2c0-3.31-2.69-6-6-6z" fill="#89CFF0"/>
-    <path d="M12,13c-2.67,0-8,1.34-8,4v3h16v-3C20,14.34,14.67,13,12,13z M12,12c2.76,0,5-2.24,5-5s-2.24-5-5-5 S7,4.24,7,7S9.24,12,12,12z" fill="none"/>
-  </svg>
-);
-
-
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
-        <div className="container mx-auto flex items-center justify-between gap-2">
-           <Image 
-             src="https://placehold.co/40x40.png" 
-             alt="Girl icon"
-             width={40}
-             height={40}
-             className="rounded-full"
-             data-ai-hint="cartoon girl"
-           />
-           <h1 className="text-base sm:text-lg md:text-xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories &amp; Art</h1>
-           <Image 
-             src="https://placehold.co/40x40.png" 
-             alt="Boy icon"
-             width={40}
-             height={40}
-             className="rounded-full"
-             data-ai-hint="cartoon boy"
-           />
+        <div className="container mx-auto flex items-center justify-center gap-3">
+           <BookOpen className="h-8 w-8 flex-shrink-0" />
+           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories &amp; Art</h1>
         </div>
       </header>
       
