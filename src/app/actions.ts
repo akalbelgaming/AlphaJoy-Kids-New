@@ -4,7 +4,6 @@ import { adaptiveDifficulty, type AdaptiveDifficultyInput } from '@/ai/flows/ada
 import { generateImage } from '@/ai/flows/generate-image-flow';
 import { generateStory } from '@/ai/flows/generate-story-flow';
 import { generateColoringPage } from '@/ai/flows/generate-coloring-page-flow';
-import { generateAudio } from '@/ai/flows/generate-audio-flow';
 
 export async function getAdaptiveDifficulty(input: AdaptiveDifficultyInput) {
   try {
@@ -36,7 +35,7 @@ export async function getStory(word: string) {
       return { success: false, error: 'The AI failed to return a story.' };
     }
     return { success: true, data: result };
-  } catch (error) {
+  } catch (error)
     console.error(`Error in getStory for "${word}":`, error);
     const message = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, error: message };
@@ -58,29 +57,4 @@ export async function getColoringPage(word: string) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred.';
     return { success: false, error: message };
   }
-}
-
-export async function getAudioForText(text: string) {
-    if (!text) {
-        return { success: false, error: 'Text must be provided.' };
-    }
-    try {
-        const result = await generateAudio({ text });
-        if (result && result.audioUrl) {
-            return { success: true, data: result };
-        } else {
-             // The flow now handles errors internally and returns null.
-             // We can provide a more specific error message based on observing the server logs,
-             // but for the client, a generic failure is sufficient.
-             // A common failure reason is hitting the API rate limit.
-             const errorMessage = 'You may have exceeded the daily sound limit. Please try again tomorrow.';
-             return { success: false, error: errorMessage };
-        }
-    } catch (error) {
-        // This catch block will now likely only catch infrastructure-level errors,
-        // as the flow itself is handling AI API errors.
-        console.error(`A critical error occurred in getAudioForText for "${text}":`, error);
-        const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-        return { success: false, error: message };
-    }
 }

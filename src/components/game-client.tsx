@@ -6,13 +6,14 @@ import {
   ArrowRight,
   ArrowLeft,
   Volume2,
-  VolumeX
+  VolumeX,
+  Loader2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, AlphabetCharacter } from "@/lib/characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
-import { getStory, getImageForWord, getAudioForText } from "@/app/actions";
+import { getStory, getImageForWord } from "@/app/actions";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -55,13 +56,43 @@ export default function GameClient({ mode }: GameClientProps) {
   const [countingImageUrls, setCountingImageUrls] = useState<string[]>([]);
   const [isCountingLoading, setIsCountingLoading] = useState(false);
   
-  const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioCache = useRef<Map<string, string | null>>(new Map());
+  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
+  const [femaleVoice, setFemaleVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const [isSoundReady, setIsSoundReady] = useState(false);
+  
   const audioRef = useRef<HTMLAudioElement>(null);
-  const audioAbortControllerRef = useRef<AbortController | null>(null);
 
   const { toast } = useToast();
+  
+  // Effect to initialize speech synthesis
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+      const synth = window.speechSynthesis;
+      setSpeechSynthesis(synth);
+      
+      const loadVoices = () => {
+        const voices = synth.getVoices();
+        if (voices.length > 0) {
+          // Find a female voice, preferring local ones
+          const female = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
+                         voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
+                         voices.find(v => v.lang.startsWith('en'));
+          setFemaleVoice(female || null);
+          setIsSoundReady(true);
+        }
+      };
+
+      // Voices load asynchronously
+      if (synth.getVoices().length > 0) {
+        loadVoices();
+      } else {
+        synth.onvoiceschanged = loadVoices;
+      }
+    } else {
+        setIsSoundReady(false);
+    }
+  }, []);
 
   const characterSet = useMemo(() => {
     switch (mode) {
@@ -114,99 +145,42 @@ export default function GameClient({ mode }: GameClientProps) {
       const num = parseInt(itemToTrace, 10);
       return numberToWords(num) || itemToTrace;
     }
-    if (mode === 'alphabet' || mode === 'reading') {
+    if (mode === 'alphabet') {
+      // Speak the letter, then the word. e.g. "A, for Apple"
+      if(typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
+        return `${currentCharacter.letter}, for ${currentCharacter.word}`;
+      }
+    }
+    if (mode === 'reading') {
       return itemToTrace;
     }
     return '';
-  }, [mode, itemToTrace]);
+  }, [mode, itemToTrace, currentCharacter]);
+
+  const playSound = useCallback((text: string) => {
+    if (!soundEnabled || !speechSynthesis || !isSoundReady || !text) return;
+    
+    // Cancel any currently speaking utterance
+    speechSynthesis.cancel();
+    
+    const utterance = new SpeechSynthesisUtterance(text);
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+    }
+    utterance.rate = 0.8; // Speak a bit slower for kids
+    speechSynthesis.speak(utterance);
+  }, [soundEnabled, speechSynthesis, isSoundReady, femaleVoice]);
+
   
-  const [currentAudioUrl, setCurrentAudioUrl] = useState<string | null | undefined>(undefined);
-
-  const playAudio = useCallback((url: string | null) => {
-    if (url && audioRef.current && soundEnabled) {
-      audioRef.current.src = url;
-      audioRef.current.play().catch(e => console.error("Audio playback failed:", e));
-    }
-  }, [soundEnabled]);
-
-  const fetchCharacterAudio = useCallback(async (textToSpeak: string, controller: AbortController) => {
-    if (audioCache.current.has(textToSpeak)) {
-      const cachedUrl = audioCache.current.get(textToSpeak)!;
-      setCurrentAudioUrl(cachedUrl);
-      playAudio(cachedUrl);
-      return;
-    }
-
-    setIsAudioLoading(true);
-    setCurrentAudioUrl(undefined); // Reset while loading
-    try {
-      const response = await getAudioForText(textToSpeak);
-      if (controller.signal.aborted) return;
-
-      const audioUrl = response.data?.audioUrl;
-
-      if (response.success && audioUrl) {
-        audioCache.current.set(textToSpeak, audioUrl);
-        setCurrentAudioUrl(audioUrl);
-        playAudio(audioUrl);
-      } else {
-        audioCache.current.set(textToSpeak, null); // Cache the failure
-        setCurrentAudioUrl(null);
-        if (response.error?.includes('daily sound limit')) {
-             toast({
-                variant: "destructive",
-                title: "Daily Sound Limit Reached",
-                description: "You've used all the free sounds for today. Please try again tomorrow!",
-                duration: 8000
-             });
-        }
-      }
-    } catch (error) {
-       if (controller.signal.aborted) return;
-       console.error("An unexpected error occurred while fetching audio:", error);
-       toast({ variant: "destructive", title: "Audio Error", description: "An unexpected error occurred." });
-    } finally {
-       if (!controller.signal.aborted) {
-        setIsAudioLoading(false);
-       }
-    }
-  }, [toast, playAudio]);
-  
-  const handleReplaySound = useCallback(async () => {
-    const textToSpeak = getTextToSpeak();
-    if (!textToSpeak || !soundEnabled || isAudioLoading) return;
-
-    // Always try to fetch if the current URL is null (failed before)
-    if (currentAudioUrl === null) {
-      const controller = new AbortController();
-      audioAbortControllerRef.current = controller;
-      await fetchCharacterAudio(textToSpeak, controller);
-    } else if (currentAudioUrl) {
-      playAudio(currentAudioUrl);
-    }
-  }, [getTextToSpeak, soundEnabled, isAudioLoading, fetchCharacterAudio, playAudio, currentAudioUrl]);
-
-
   useEffect(() => {
     setStartTime(Date.now());
     
-    // Abort any ongoing audio requests from previous character
-    if (audioAbortControllerRef.current) {
-        audioAbortControllerRef.current.abort();
-    }
-    setIsAudioLoading(false);
-
-    // Create a new AbortController for the current character's requests
     const controller = new AbortController();
-    audioAbortControllerRef.current = controller;
 
     const fetchUIData = async () => {
-        // Handle audio for traceable items
         const textToSpeak = getTextToSpeak();
-        if (soundEnabled && textToSpeak && ['numbers', 'alphabet', 'reading'].includes(mode)) {
-          fetchCharacterAudio(textToSpeak, controller);
-        } else {
-          setCurrentAudioUrl(undefined); // Not an audio mode
+        if (textToSpeak) {
+           playSound(textToSpeak);
         }
 
         // Handle story generation
@@ -266,12 +240,17 @@ export default function GameClient({ mode }: GameClientProps) {
 
     fetchUIData();
 
-    // Cleanup function to abort on component unmount or dependency change
     return () => {
+        if (speechSynthesis) speechSynthesis.cancel();
         controller.abort();
     };
 
-  }, [currentIndex, mode, soundEnabled, toast, itemForStory, itemForCounting, getTextToSpeak, fetchCharacterAudio]);
+  }, [currentIndex, mode, toast, itemForStory, itemForCounting, getTextToSpeak, playSound, speechSynthesis]);
+  
+  const handleReplaySound = () => {
+    const text = getTextToSpeak();
+    playSound(text);
+  };
   
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
@@ -381,7 +360,7 @@ export default function GameClient({ mode }: GameClientProps) {
   };
 
   const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading'].includes(mode);
-  const isSoundButtonDisabled = !soundEnabled || isAudioLoading || currentAudioUrl === null;
+  const isSoundButtonDisabled = !soundEnabled || !isSoundReady;
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
@@ -422,10 +401,12 @@ export default function GameClient({ mode }: GameClientProps) {
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
-              {currentAudioUrl === null ? (
-                <VolumeX className={cn("h-7 w-7")} />
+              {!isSoundReady && soundEnabled ? (
+                <Loader2 className="h-7 w-7 animate-spin" />
+              ) : soundEnabled ? (
+                <Volume2 className={cn("h-7 w-7")} />
               ) : (
-                <Volume2 className={cn("h-7 w-7", isAudioLoading && "animate-pulse")} />
+                <VolumeX className={cn("h-7 w-7")} />
               )}
             </Button>
           )}
