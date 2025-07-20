@@ -1,32 +1,40 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React, { useEffect } from "react";
+import React from "react";
+import { useEffect } from "react";
 
 /**
  * A component that renders a real Google AdSense banner ad unit.
  */
 export function AdBanner({ className }: { className?: string }) {
   useEffect(() => {
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense error:", err);
-    }
+    const pushAd = () => {
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (err) {
+        console.error("AdSense error:", err);
+      }
+    };
+
+    // Delay the ad push slightly to ensure the container has dimensions
+    const timeoutId = setTimeout(pushAd, 100);
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-center bg-gray-100 text-black min-h-[60px]",
+        "flex w-full items-center justify-center bg-gray-100 text-black min-h-[50px]",
         className
       )}
     >
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-3781633352100587" // Your publisher ID is correct.
+        data-ad-client="ca-pub-3781633352100587"
         data-ad-slot="YOUR_AD_SLOT_ID" // TODO: Replace with your Ad Unit ID
         data-ad-format="auto"
         data-full-width-responsive="true"
@@ -34,7 +42,6 @@ export function AdBanner({ className }: { className?: string }) {
     </div>
   );
 }
-
 
 /**
  * NOTE: This component is now deprecated. Google AdSense automatically
