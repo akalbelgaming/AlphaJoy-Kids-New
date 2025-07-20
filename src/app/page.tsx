@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AdBanner } from '@/components/ad-placeholder';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 const activities = [
   {
@@ -70,11 +71,23 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between gap-2">
-           {/* Girl Icon */}
-           <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" strokeWidth="1.5"/><path d="M18 20V18.5C18 16.567 16.433 15 14.5 15H9.5C7.567 15 6 16.567 6 18.5V20" stroke="currentColor" strokeWidth="1.5"/><path d="M4.5 10.5C4.5 10.5 5.5 10 6 9.5M19.5 10.5C19.5 10.5 18.5 10 18 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+           <Image 
+             src="https://placehold.co/40x40.png" 
+             alt="Girl icon"
+             width={40}
+             height={40}
+             className="rounded-full"
+             data-ai-hint="happy girl"
+           />
            <h1 className="text-base sm:text-lg md:text-xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories &amp; Art</h1>
-           {/* Boy Icon */}
-           <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke="currentColor" strokeWidth="1.5"/><path d="M18 20V18.5C18 16.567 16.433 15 14.5 15H9.5C7.567 15 6 16.567 6 18.5V20" stroke="currentColor" strokeWidth="1.5"/></svg>
+           <Image 
+             src="https://placehold.co/40x40.png" 
+             alt="Boy icon"
+             width={40}
+             height={40}
+             className="rounded-full"
+             data-ai-hint="happy boy"
+           />
         </div>
       </header>
       
