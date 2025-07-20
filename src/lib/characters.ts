@@ -2,7 +2,7 @@ export interface AlphabetCharacter {
   letter: string;
   word: string;
   hint: string;
-  story?: string;
+  story: string;
 }
 
 export interface ShapeCharacter {
@@ -14,32 +14,32 @@ export interface ShapeCharacter {
 export const numbers: string[] = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
 export const alphabet: AlphabetCharacter[] = [
-  { letter: 'A', word: 'Apple', hint: 'red apple', story: 'A is for Apple, so round and red,\nA tasty, healthy snack before bed!' },
-  { letter: 'B', word: 'Ball', hint: 'bouncy ball', story: 'B is for Ball, bounce it high and low,\nThrow it to a friend, watch it go, go, go!' },
-  { letter: 'C', word: 'Cat', hint: 'cute cat', story: 'C is for Cat, with a purr so sweet,\nChasing little mice with its tiny feet.' },
-  { letter: 'D', word: 'Dog', hint: 'friendly dog', story: 'D is for Dog, with a happy bark,\nPlaying in the sunshine at the big, green park.' },
-  { letter: 'E', word: 'Egg', hint: 'white egg', story: 'E is for Egg, in a nest so high,\nWaiting for a baby bird to learn to fly.' },
-  { letter: 'F', word: 'Fish', hint: 'swimming fish', story: 'F is for Fish, with a shiny tail,\nSwimming in the ocean, what a watery trail!' },
-  { letter: 'G', word: 'Goat', hint: 'farm goat', story: 'G is for Goat, with a funny beard,\nEating all the grass, which is a little weird!' },
-  { letter: 'H', word: 'Hat', hint: 'sun hat', story: 'H is for Hat, on a sunny day,\nKeeps the bright old sun far, far away.' },
-  { letter: 'I', word: 'Igloo', hint: 'snow igloo', story: 'I is for Igloo, made of ice and snow,\nWhere the little penguins have a party, ho ho ho!' },
-  { letter: 'J', word: 'Jar', hint: 'jam jar', story: 'J is for Jar, full of yummy jam,\nSweet and sticky, thank you ma\'am!' },
-  { letter: 'K', word: 'Kite', hint: 'flying kite', story: 'K is for Kite, flying in the blue,\nHigher than the houses, me and you!' },
-  { letter: 'L', word: 'Lion', hint: 'roaring lion', story: 'L is for Lion, with a mighty roar,\nKing of the jungle, and so much more!' },
-  { letter: 'M', word: 'Monkey', hint: 'swinging monkey', story: 'M is for Monkey, in the treetop high,\nSwinging by its tail, way up in the sky.' },
-  { letter: 'N', word: 'Nest', hint: 'bird nest', story: 'N is for Nest, way up in the tree,\nHome to a little bird family.' },
-  { letter: 'O', word: 'Orange', hint: 'orange fruit', story: 'O is for Orange, juicy, sweet, and round,\nThe best citrus fruit that can be found.' },
-  { letter: 'P', word: 'Pencil', hint: 'yellow pencil', story: 'P is for Pencil, to write and draw,\nThe best invention that you ever saw!' },
-  { letter: 'Q', word: 'Queen', hint: 'royal queen', story: 'Q is for Queen, with a shiny crown,\nThe ruler of a very happy town.' },
-  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit', story: 'R is for Rabbit, with ears so long,\nHops around the garden, singing a happy song.' },
-  { letter: 'S', word: 'Sun', hint: 'bright sun', story: 'S is for Sun, with a golden light,\nMaking our world so warm and bright.' },
-  { letter: 'T', word: 'Tiger', hint: 'striped tiger', story: 'T is for Tiger, with stripes of black,\nCreeping through the jungle for a little snack.' },
-  { letter: 'U', word: 'Urn', hint: 'clay urn', story: 'U is for Urn, a pot so grand,\nCrafted with care by a skillful hand.' },
-  { letter: 'V', word: 'Violin', hint: 'musical violin', story: 'V is for Violin, with a lovely sound,\nMaking happy music all around.' },
-  { letter: 'W', word: 'Watch', hint: 'wrist watch', story: 'W is for Watch, with a tick-tock sound,\nTelling us the time as the hands go round.' },
-  { letter: 'X', word: 'X-ray', hint: 'bone x-ray', story: 'X is for X-ray, a magic view,\nShows the bones inside of you!' },
-  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht', story: 'Y is for Yacht, on the ocean wide,\nSailing on the water with the wind and tide.' },
-  { letter: 'Z', word: 'Zebra', hint: 'striped zebra', story: 'Z is for Zebra, with stripes so neat,\nCan you count them all? What a tricky feat!' },
+  { letter: 'A', word: 'Apple', hint: 'red apple', story: 'A shiny Apple, red and round,\nThe tastiest treat I\'ve ever found!' },
+  { letter: 'B', word: 'Ball', hint: 'bouncy ball', story: 'A bouncy Ball, so big and bright,\nLoves to jump with all its might!' },
+  { letter: 'C', word: 'Cat', hint: 'cute cat', story: 'A cozy Cat, with a purr so sweet,\nNaps in sunbeams, on tired little feet.' },
+  { letter: 'D', word: 'Dog', hint: 'friendly dog', story: 'A happy Dog, with a wagging tail,\nBarks "hello!" on the garden trail.' },
+  { letter: 'E', word: 'Egg', hint: 'white egg', story: 'A little Egg, so smooth and white,\nHolds a sleepy baby bird inside!' },
+  { letter: 'F', word: 'Fish', hint: 'swimming fish', story: 'A tiny Fish, with a "swish" and "swoosh",\nBlows bubbly kisses from a seaweed bush.' },
+  { letter: 'G', word: 'Goat', hint: 'farm goat', story: 'A silly Goat, with a fuzzy chin,\nEats pajamas, what a grin!' },
+  { letter: 'H', word: 'Hat', hint: 'sun hat', story: 'A floppy Hat, for a sunny day,\nKeeps the happy sunbeams far away.' },
+  { letter: 'I', word: 'Igloo', hint: 'snow igloo', story: 'An icy Igloo, round and grand,\nThe coolest little house in all the land!' },
+  { letter: 'J', word: 'Jar', hint: 'jam jar', story: 'A sticky Jar, of strawberry jam,\n"Yummy in my tummy!" thank you, ma\'am!' },
+  { letter: 'K', word: 'Kite', hint: 'flying kite', story: 'A dancing Kite, on a string so long,\nSings to the clouds a windy song.' },
+  { letter: 'L', word: 'Lion', hint: 'roaring lion', story: 'A mighty Lion, with a giant ROAR,\nShakes the jungle floor and asks for more!' },
+  { letter: 'M', word: 'Monkey', hint: 'swinging monkey', story: 'A cheeky Monkey, full of glee,\nSwings by his tail from tree to tree!' },
+  { letter: 'N', word: 'Nest', hint: 'bird nest', story: 'A cozy Nest, made of twigs and string,\nWhere the baby bluebirds learn to sing.' },
+  { letter: 'O', word: 'Orange', hint: 'orange fruit', story: 'A juicy Orange, a sweet surprise,\nA little ball of sunshine for your eyes!' },
+  { letter: 'P', word: 'Pencil', hint: 'yellow pencil', story: 'A pointy Pencil, sharp and new,\nDraws magical worlds for me and you.' },
+  { letter: 'Q', word: 'Queen', hint: 'royal queen', story: 'A lovely Queen, with a sparkly crown,\nIs the kindest person in the town.' },
+  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit', story: 'A fluffy Rabbit, with a twitchy nose,\nHops through the flowers, on its tippy-toes.' },
+  { letter: 'S', word: 'Sun', hint: 'bright sun', story: 'The happy Sun, with a golden face,\nWakes the world with a warm embrace.' },
+  { letter: 'T', word: 'Tiger', hint: 'striped tiger', story: 'A stripy Tiger, orange and black,\nLoves to sneak and pounce for a snack!' },
+  { letter: 'U', word: 'Urn', hint: 'clay urn', story: 'A sturdy Urn, a pot so grand,\nCrafted with care by a skillful hand.' },
+  { letter: 'V', word: 'Violin', hint: 'musical violin', story: 'A little Violin, sings a tune so sweet,\nMakes you want to dance with your happy feet.' },
+  { letter: 'W', word: 'Watch', hint: 'wrist watch', story: 'A ticking Watch, goes "tick-tock-tick",\nTime for fun, be quick, be quick!' },
+  { letter: 'X', word: 'X-ray', hint: 'bone x-ray', story: 'An X-ray shows, with a magic flash,\nThe bones inside you in a dash!' },
+  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht', story: 'A sailing Yacht, on the ocean blue,\n"Adventure calls!" for me and you.' },
+  { letter: 'Z', word: 'Zebra', hint: 'striped zebra', story: 'A dizzy Zebra, black and white,\nIs a walking, talking, stripy sight!' },
 ];
 
 export const shapes: ShapeCharacter[] = [

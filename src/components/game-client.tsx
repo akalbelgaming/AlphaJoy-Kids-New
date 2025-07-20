@@ -19,7 +19,6 @@ import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
-import { getStory } from "@/app/actions";
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -45,10 +44,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const [showInterstitial, setShowInterstitial] = useState(false);
 
-  const [story, setStory] = useState<string | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isStoryLoading, setIsStoryLoading] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
@@ -134,12 +130,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
 
-  useEffect(() => {
-    if (audioUrl) {
-      audioRef.current?.play().catch(e => console.error("Audio play failed:", e));
-    }
-  }, [audioUrl]);
-  
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !speechSynthesis || !text) return;
     speechSynthesis.cancel();
@@ -151,27 +141,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
     speechSynthesis.speak(utterance);
   }, [soundEnabled, speechSynthesis, voice]);
 
-  const fetchStory = useCallback(async (word: string) => {
-    if (!word) return;
-    setIsStoryLoading(true);
-    setStory(null);
-    setAudioUrl(null);
-
-    const response = await getStory(word);
-    if (response.success && response.data) {
-      setStory(response.data.story);
-      setAudioUrl(response.data.audioUrl);
-      if (audioRef.current) {
-        audioRef.current.src = response.data.audioUrl;
-        audioRef.current.play().catch(e => console.error("Audio play failed:", e));
-      }
-    } else {
-      toast({ variant: 'destructive', title: 'Could not get story', description: response.error });
-      setStory(response.error || 'Could not create a story for this.');
-    }
-    setIsStoryLoading(false);
-  }, [toast]);
-  
   useEffect(() => {
     setStartTime(Date.now());
     if (mode === 'counting') {
@@ -183,41 +152,31 @@ export default function GameClient({ mode }: {mode: Mode}) {
     
     // This logic handles what to say or do when the character changes
     const storyCharacter = itemForStory;
-    if (mode === 'story' && storyCharacter?.word) {
-      fetchStory(storyCharacter.word);
-    } else {
-      let textToSpeak = '';
-      if (mode === 'numbers') {
-        textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
-      } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
-        textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
-      } else if (mode === 'reading') {
-        textToSpeak = itemToTrace;
-      } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
-        textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
-      }
-
-      if (textToSpeak) {
-        playSound(textToSpeak);
-      }
+    let textToSpeak = '';
+    if (mode === 'story' && storyCharacter?.story) {
+      textToSpeak = storyCharacter.story;
+    } else if (mode === 'numbers') {
+      textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
+    } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
+      textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
+    } else if (mode === 'reading') {
+      textToSpeak = itemToTrace;
+    } else if (mode === 'hindi' && typeof currentCharacter === 'object' && 'character' in currentCharacter) {
+      textToSpeak = `${currentCharacter.character} से ${currentCharacter.word}`;
     }
 
-  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, currentCharacter, speechSynthesis, fetchStory]);
+    if (textToSpeak) {
+      playSound(textToSpeak);
+    }
+
+  }, [currentIndex, mode, itemForStory, itemToTrace, playSound, currentCharacter, speechSynthesis]);
   
   const handleReplaySound = () => {
-    if (mode === 'story') {
-      if (audioUrl && audioRef.current) {
-        audioRef.current.currentTime = 0;
-        audioRef.current.play().catch(e => console.error("Audio replay failed:", e));
-      } else if (story && !isStoryLoading) {
-        const storyCharacter = itemForStory;
-        if (storyCharacter?.word) fetchStory(storyCharacter.word);
-      }
-      return;
-    }
-    
     let textToSpeak = '';
-    if (mode === 'numbers') {
+    const storyCharacter = itemForStory;
+    if (mode === 'story' && storyCharacter?.story) {
+      textToSpeak = storyCharacter.story;
+    } else if (mode === 'numbers') {
       textToSpeak = numberToWords(parseInt(itemToTrace, 10)) || itemToTrace;
     } else if (mode === 'alphabet' && typeof currentCharacter === 'object' && 'letter' in currentCharacter) {
       textToSpeak = `${currentCharacter.letter}, for ${currentCharacter.word}`;
@@ -313,12 +272,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
           <StoryDisplay
             key={`${mode}-${currentIndex}`}
             word={itemForStory?.word || ''}
-            story={story}
-            audioUrl={audioUrl}
+            story={itemForStory?.story || 'No story available.'}
+            audioUrl={null} // No longer using pre-generated audio
             isLoading={isStoryLoading}
             onComplete={handleCompletion}
             onReplayAudio={handleReplaySound}
-            isAudioAvailable={!!audioUrl}
+            isAudioAvailable={soundEnabled && !!speechSynthesis}
           />
         );
        case "counting":
@@ -353,7 +312,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
-      <audio ref={audioRef} src={audioUrl ?? undefined} className="hidden" />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
         <CustomizationPanel 
