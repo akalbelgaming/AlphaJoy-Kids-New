@@ -69,20 +69,18 @@ export async function getAudioForText(text: string) {
         if (result && result.audioUrl) {
             return { success: true, data: result };
         } else {
-             // Check for 429 error specifically for a better message
-             const isRateLimitError = result && (result as any).error?.message?.includes('429');
-             const errorMessage = isRateLimitError
-               ? 'You have exceeded the daily sound limit. Please try again tomorrow. (429)'
-               : 'The AI failed to generate sound.';
+             // The flow now handles errors internally and returns null.
+             // We can provide a more specific error message based on observing the server logs,
+             // but for the client, a generic failure is sufficient.
+             // A common failure reason is hitting the API rate limit.
+             const errorMessage = 'You may have exceeded the daily sound limit. Please try again tomorrow.';
              return { success: false, error: errorMessage };
         }
     } catch (error) {
-        console.error(`Error in getAudioForText for "${text}":`, error);
+        // This catch block will now likely only catch infrastructure-level errors,
+        // as the flow itself is handling AI API errors.
+        console.error(`A critical error occurred in getAudioForText for "${text}":`, error);
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
-        // Check for 429 in the catch block as well for safety
-        const finalMessage = message.includes('429')
-            ? 'You have exceeded the daily sound limit. Please try again tomorrow. (429)'
-            : message;
-        return { success: false, error: finalMessage };
+        return { success: false, error: message };
     }
 }
