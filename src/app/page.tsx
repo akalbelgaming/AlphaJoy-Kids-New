@@ -68,14 +68,14 @@ const activities = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <header className="p-4 bg-primary text-primary-foreground shadow-lg">
+      <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center gap-4">
            <ToyBrick className="h-8 w-8" />
            <h1 className="text-2xl font-bold font-headline">Trace & Learn</h1>
         </div>
       </header>
       
-      <main className="flex-1 p-6 md:p-8 mb-24">
+      <main className="flex-1 p-6 pt-6 md:p-8 mb-24">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
           {activities.map((activity, index) => (
             <Link href={activity.href} key={activity.href} className="group">
