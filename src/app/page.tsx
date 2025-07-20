@@ -93,6 +93,11 @@ export default function Home() {
 
       <div className="fixed bottom-0 left-0 right-0 p-2 bg-background/80 backdrop-blur-sm border-t">
         <AdBanner className="max-w-4xl mx-auto"/>
+        <div className="text-center mt-2">
+            <Link href="/privacy" className="text-xs text-muted-foreground hover:underline">
+              Privacy Policy
+            </Link>
+        </div>
       </div>
     </div>
   );
