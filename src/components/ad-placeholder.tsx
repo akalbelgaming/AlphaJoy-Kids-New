@@ -3,6 +3,15 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useEffect } from "react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 /**
  * A component that renders a real Google AdSense banner ad unit.
@@ -18,10 +27,18 @@ export function AdBanner({ className }: { className?: string }) {
       }
     };
 
-    // Delay the ad push slightly to ensure the container has dimensions
-    const timeoutId = setTimeout(pushAd, 100);
-
-    return () => clearTimeout(timeoutId);
+    // Wait until the document is fully loaded before trying to push the ad.
+    if (document.readyState === "complete") {
+      pushAd();
+    } else {
+      const listener = () => {
+        pushAd();
+        window.removeEventListener("load", listener);
+      };
+      window.addEventListener("load", listener);
+      // Cleanup listener on component unmount
+      return () => window.removeEventListener("load", listener);
+    }
   }, []);
 
   return (
@@ -34,7 +51,7 @@ export function AdBanner({ className }: { className?: string }) {
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-3781633352100587"
+        data-ad-client="ca-pub-3781633352100587" // This is your publisher ID
         data-ad-slot="YOUR_AD_SLOT_ID" // TODO: Replace with your Ad Unit ID
         data-ad-format="auto"
         data-full-width-responsive="true"
@@ -44,9 +61,8 @@ export function AdBanner({ className }: { className?: string }) {
 }
 
 /**
- * NOTE: This component is now deprecated. Google AdSense automatically
- * handles interstitial ads when page-level ads are enabled.
- * This component is kept for potential future use but is not active.
+ * A component that shows an interstitial ad.
+ * This is currently disabled but kept for reference.
  */
 export function InterstitialAd({
   isOpen,
@@ -57,11 +73,33 @@ export function InterstitialAd({
 }) {
   useEffect(() => {
     if (isOpen) {
-      // Immediately call onClose to prevent the ad from showing,
-      // as Google will handle it automatically.
-      onClose();
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (e) {
+        console.error("Interstitial ad error", e);
+      }
     }
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
-  return null; // Render nothing
+  if (!isOpen) return null;
+
+  return (
+     <AlertDialog open={isOpen} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Advertisement</AlertDialogTitle>
+          <AlertDialogDescription>
+            Please enjoy this ad while we load the next activity for you.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="min-h-[250px] flex items-center justify-center">
+            {/* AdSense will automatically fill this */}
+        </div>
+        <AlertDialogFooter>
+          <AlertDialogAction onClick={onClose}>Continue to App</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 }

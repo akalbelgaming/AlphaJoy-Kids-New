@@ -13,7 +13,11 @@ export function InterstitialWrapper({ children }: { children: React.ReactNode })
   const previousPath = useRef<string | null>(pathname);
 
   useEffect(() => {
-    if (adTriggerPaths.includes(pathname) && previousPath.current === '/') {
+    // This feature is currently disabled.
+    // AdSense will automatically place interstitial ads where appropriate.
+    const shouldShowAd = false; 
+
+    if (shouldShowAd && adTriggerPaths.includes(pathname) && previousPath.current === '/') {
       setShowAd(true);
     }
     
