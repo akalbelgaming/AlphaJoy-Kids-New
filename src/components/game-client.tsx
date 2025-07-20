@@ -208,6 +208,7 @@ export default function GameClient({ mode }: GameClientProps) {
   const fetchCountingImages = useCallback(async (signal: AbortSignal) => {
       setIsCountingLoading(true);
       const count = itemForCounting;
+      // Using a simple, consistent word for image generation
       const itemToCountWord = "apple"; 
       if (count > 0 && itemToCountWord) {
         try {
@@ -356,7 +357,6 @@ export default function GameClient({ mode }: GameClientProps) {
       if (isMatch) {
         setIsCorrectAnswer(true);
         playSound("Correct!");
-        // Fetch images after correct answer
         const controller = new AbortController();
         fetchCountingImages(controller.signal);
       } else {

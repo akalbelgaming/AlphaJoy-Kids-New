@@ -5,7 +5,7 @@ import React from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Mic, Check, X, ArrowRight } from 'lucide-react';
+import { Mic, Check, X, ArrowRight, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface CountingDisplayProps {
@@ -48,12 +48,12 @@ export function CountingDisplay({
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
       <Card className="w-full max-w-2xl shadow-lg border-2">
         <CardContent className="min-h-[300px] flex flex-col items-center justify-center gap-4 p-4">
-            {isLoading && !showImages ? (
+            {isLoading && showImages ? (
                 <div className="w-full h-full min-h-[250px] bg-muted/30 rounded-lg flex items-center justify-center">
-                    <Skeleton className="w-48 h-12" />
+                    <Loader2 className="w-16 h-16 text-primary animate-spin" />
                 </div>
             ) : showImages ? (
-                <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-zoom">
+                <div className="flex flex-wrap items-center justify-center gap-4 animate-fade-in-zoom p-4">
                    {imageUrls.slice(0, 12).map((url, index) => (
                         <div key={index} className="relative w-24 h-24 p-2 bg-white rounded-lg shadow-inner">
                             <Image
@@ -85,7 +85,7 @@ export function CountingDisplay({
           <Button 
               size="lg" 
               onClick={onNext} 
-              className="w-32"
+              className="w-32 animate-fade-in-zoom"
           >
               Next <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
