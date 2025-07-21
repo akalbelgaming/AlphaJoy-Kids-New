@@ -8,7 +8,7 @@ import { Loader2, BookOpen, Check, Volume2 } from 'lucide-react';
 interface StoryDisplayProps {
   word: string;
   story: string | null;
-  audioUrl: string | null; // This will be null now, but keeping for prop consistency
+  audioUrl: string | null;
   isLoading: boolean;
   onComplete: () => void;
   onReplayAudio: () => void;
@@ -35,20 +35,15 @@ export function StoryDisplay({
           </CardTitle>
         </CardHeader>
         <CardContent className="min-h-[250px] flex flex-col items-center justify-center gap-6 p-6">
-          {isLoading ? (
-            <div className="flex flex-col items-center gap-4 text-muted-foreground">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
-              <p>Loading story...</p>
-            </div>
-          ) : story ? (
+          {story ? (
             <>
               <p className="text-lg text-center leading-relaxed p-4 bg-primary/5 rounded-lg whitespace-pre-wrap">
                 {story}
               </p>
               {isAudioAvailable && (
-                 <Button variant="outline" onClick={onReplayAudio}>
-                    <Volume2 className="mr-2 h-5 w-5"/>
-                    Listen Again
+                 <Button variant="outline" onClick={onReplayAudio} disabled={isLoading}>
+                    {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Volume2 className="mr-2 h-5 w-5"/>}
+                    {isLoading ? 'Loading...' : 'Listen Again'}
                  </Button>
               )}
             </>

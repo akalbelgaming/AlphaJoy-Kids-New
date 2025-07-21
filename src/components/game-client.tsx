@@ -19,6 +19,7 @@ import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
+import { getAudioForText } from '@/app/actions';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -44,44 +45,15 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const [showInterstitial, setShowInterstitial] = useState(false);
 
-  const [isStoryLoading, setIsStoryLoading] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
   
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [speechSynthesis, setSpeechSynthesis] = useState<SpeechSynthesis | null>(null);
-  const [voice, setVoice] = useState<SpeechSynthesisVoice | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   // States for counting game
   const [showReward, setShowReward] = useState(false);
 
   const { toast } = useToast();
-  
-  useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const synth = window.speechSynthesis;
-      setSpeechSynthesis(synth);
-      
-      const loadVoices = () => {
-        const voices = synth.getVoices();
-        if (voices.length > 0) {
-          const enVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Female')) ||
-                         voices.find(v => v.lang.startsWith('en') && (v.name.includes('Google') || v.name.includes('Microsoft'))) ||
-                         voices.find(v => v.lang.startsWith('en'));
-          const hiVoice = voices.find(v => v.lang.startsWith('hi'));
-          setVoice(mode === 'hindi' ? (hiVoice || enVoice) : enVoice);
-        }
-      };
-
-      // Workaround for browsers that load voices asynchronously
-      if (synth.getVoices().length > 0) {
-        loadVoices();
-      } else if (synth.onvoiceschanged !== undefined) {
-        synth.onvoiceschanged = loadVoices;
-      }
-    } else {
-        console.warn("Speech Synthesis not supported in this browser.");
-    }
-  }, [mode]);
-
 
   const characterSet = useMemo(() => {
     switch (mode) {
@@ -134,48 +106,54 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (mode !== 'shapes' || !currentCharacter || typeof currentCharacter !== 'object' || !('path' in currentCharacter)) return null;
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
-
-  const playSound = useCallback((text: string) => {
-    if (!soundEnabled || !speechSynthesis || !text) return;
-    try {
-        speechSynthesis.cancel(); // Stop any previous speech
-        const utterance = new SpeechSynthesisUtterance(text);
-        if (voice) {
-          utterance.voice = voice;
-        }
-        utterance.rate = 0.9;
-        speechSynthesis.speak(utterance);
-    } catch(e) {
-        console.error("Speech synthesis failed", e);
-    }
-  }, [soundEnabled, speechSynthesis, voice]);
-
-  const getTextToSpeak = useCallback((char: any) => {
-      if (!char) return '';
-      if (mode === 'story' && typeof char === 'object' && 'story' in char) {
-        return char.story;
-      } else if (mode === 'numbers' && typeof char === 'string') {
+  
+  const getTextToSpeak = useCallback((char: any): string => {
+    if (!char) return '';
+    if (mode === 'story' && typeof char === 'object' && 'story' in char) {
+      return char.story;
+    } else if (mode === 'numbers' && typeof char === 'string') {
+      return numberToWords(parseInt(char, 10)) || char;
+    } else if (mode === 'alphabet' && typeof char === 'object' && 'letter' in char) {
+      return `${char.letter}, for ${char.word}`;
+    } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
+      return char.word;
+    } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
+      return `${char.character} से ${char.word}`;
+    } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
-      } else if (mode === 'alphabet' && typeof char === 'object' && 'letter' in char) {
-        return `${char.letter}, for ${char.word}`;
-      } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
-        return char.word;
-      } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
-        return `${char.character} से ${char.word}`;
-      }
-      return '';
+    }
+    return '';
   }, [mode]);
 
-  useEffect(() => {
-    setStartTime(Date.now());
-    if (mode === 'counting') {
-        setShowReward(false);
+  const playSound = useCallback(async (text: string) => {
+    if (!soundEnabled || !text || isAudioLoading) return;
+    setIsAudioLoading(true);
+    try {
+      const voice = mode === 'hindi' ? 'Achernar' : 'Algenib';
+      const response = await getAudioForText(text, voice);
+      if (response.success && response.data?.audioUrl && audioRef.current) {
+        audioRef.current.src = response.data.audioUrl;
+        audioRef.current.play().catch(e => console.error("Audio play failed", e));
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Audio Error',
+          description: response.error || 'Could not play audio.',
+        });
+      }
+    } catch (e) {
+      console.error("Failed to get audio", e);
+      toast({
+          variant: 'destructive',
+          title: 'Audio Error',
+          description: 'Failed to generate audio.',
+      });
+    } finally {
+      setIsAudioLoading(false);
     }
-    if (speechSynthesis) {
-        speechSynthesis.cancel();
-    }
-  }, [currentIndex, mode, speechSynthesis]);
-  
+  }, [soundEnabled, isAudioLoading, mode, toast]);
+
+
   const handleReplaySound = () => {
     const textToSpeak = getTextToSpeak(currentCharacter);
     if (textToSpeak) {
@@ -185,12 +163,17 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const navigateAndPlaySound = useCallback((newIndex: number) => {
     setCurrentIndex(newIndex);
-    const nextCharacter = getCharacterData(newIndex);
-    const textToSpeak = getTextToSpeak(nextCharacter);
+  }, []);
+
+  useEffect(() => {
+    // Auto-play sound for the new character/item when index changes.
+    const textToSpeak = getTextToSpeak(getCharacterData(currentIndex));
     if (textToSpeak) {
-      playSound(textToSpeak);
+        playSound(textToSpeak);
     }
-  }, [getCharacterData, getTextToSpeak, playSound]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex, getCharacterData, getTextToSpeak]); // Intentionally not including playSound to avoid re-triggering on its state changes
+
 
   const handleNext = useCallback(() => {
     if (characterSet.length > 0) {
@@ -205,6 +188,13 @@ export default function GameClient({ mode }: {mode: Mode}) {
       navigateAndPlaySound(newIndex);
     }
   }, [characterSet.length, currentIndex, navigateAndPlaySound]);
+
+  useEffect(() => {
+    setStartTime(Date.now());
+    if (mode === 'counting') {
+        setShowReward(false);
+    }
+  }, [currentIndex, mode]);
 
   const handleCompletion = useCallback(() => {
     const endTime = Date.now();
@@ -233,7 +223,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const handleCountTap = () => {
     setShowReward(true);
-    playSound(numberToWords(itemForCounting) || itemForCounting.toString());
+    playSound(getTextToSpeak(currentCharacter));
   };
 
 
@@ -276,11 +266,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
             key={`${mode}-${currentIndex}`}
             word={itemForStory?.word || ''}
             story={itemForStory?.story || 'No story available.'}
-            audioUrl={null} // No longer using pre-generated audio
-            isLoading={isStoryLoading}
+            audioUrl={null}
+            isLoading={isAudioLoading}
             onComplete={handleCompletion}
             onReplayAudio={handleReplaySound}
-            isAudioAvailable={soundEnabled && !!speechSynthesis}
+            isAudioAvailable={soundEnabled}
           />
         );
        case "counting":
@@ -310,10 +300,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting'].includes(mode);
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
+      <audio ref={audioRef} className="hidden" />
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
@@ -346,14 +337,16 @@ export default function GameClient({ mode }: {mode: Mode}) {
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={!soundEnabled}
+              disabled={!soundEnabled || isAudioLoading}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
-              {soundEnabled ? (
-                <Volume2 className={cn("h-7 w-7", isStoryLoading && "animate-pulse")} />
+              {isAudioLoading ? (
+                  <Loader2 className="h-7 w-7 animate-spin" />
+              ) : soundEnabled ? (
+                <Volume2 className="h-7 w-7" />
               ) : (
-                <VolumeX className={cn("h-7 w-7")} />
+                <VolumeX className="h-7 w-7" />
               )}
             </Button>
           )}
@@ -370,5 +363,3 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </div>
   );
 }
-
-    
