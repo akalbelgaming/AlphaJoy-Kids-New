@@ -113,9 +113,10 @@ export function TracingCanvas({
     // This handles longer words like in the reading section
     fontSize = 'text-[150px]';
   } else {
-    // Default size for single/double letters and Hindi characters
+    // Default size for single/double letters and Hindi characters, including composite ones.
     fontSize = 'text-[350px]';
   }
+
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
