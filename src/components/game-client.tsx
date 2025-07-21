@@ -124,9 +124,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
       return `${char.character} se ${char.word}`;
     } else if (mode === 'hindivowels' && typeof char === 'object' && 'character' in char) {
-      // Custom logic for transliteration, e.g., for "a = अ", speak "a se a"
       const [eng, hindi] = char.character.split(' = ');
-      return `${eng} se ${char.word}`;
+      return `${eng} se ${hindi}`;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && typeof char === 'string') {
@@ -258,7 +257,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
 
   useEffect(() => {
-    handleReplaySound();
+    // This effect only handles re-playing sound when the index changes, not on initial load
+    if(currentIndex !== 0) {
+      handleReplaySound();
+    }
   }, [currentIndex]);
 
 
