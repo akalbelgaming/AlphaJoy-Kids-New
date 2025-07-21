@@ -30,43 +30,43 @@ const activities = [
    {
     "href": '/hindivowels',
     "title": 'Hindi Swar',
-    "icon": <div className="text-3xl font-bold">a = अ</div>,
+    icon: <div className="text-5xl font-bold">a=अ</div>,
     "color": 'from-rose-400 to-rose-600 text-white',
   },
   {
     "href": '/pahada',
     "title": 'Pahada',
-    "icon": <div className="text-3xl font-bold">2x1</div>,
+    icon: <div className="text-5xl font-bold">2x1</div>,
     "color": 'from-cyan-400 to-cyan-600 text-white',
   },
   {
     "href": '/shapes',
     "title": 'Shapes',
-    "icon": <div className="text-4xl">△</div>,
+    "icon": <div className="text-5xl">△</div>,
     "color": 'from-yellow-400 to-yellow-600 text-white',
   },
   {
     "href": '/counting',
     "title": 'Counting',
-    "icon": <div className="text-xl font-bold">1,2,3</div>,
+    "icon": <div className="text-5xl font-bold">123</div>,
     "color": 'from-green-400 to-green-600 text-white',
   },
   {
     "href": '/reading',
     "title": 'Reading',
-    "icon": <div className="text-4xl font-bold">Aa</div>,
+    "icon": <div className="text-5xl font-bold">Aa</div>,
     "color": 'from-purple-400 to-purple-600 text-white',
   },
   {
     "href": '/drawing',
     "title": 'Drawing',
-    "icon": <div className="text-4xl">✎</div>,
+    "icon": <div className="text-5xl">✎</div>,
     "color": 'from-indigo-400 to-indigo-600 text-white',
   },
   {
     "href": '/story',
     "title": 'Story Time',
-    "icon": <div className="text-4xl">📖</div>,
+    "icon": <div className="text-5xl">📖</div>,
     "color": 'from-pink-400 to-pink-600 text-white',
   }
 ];
