@@ -7,7 +7,8 @@ import {
   ArrowLeft,
   Volume2,
   VolumeX,
-  Loader2
+  Loader2,
+  Gift,
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
@@ -25,6 +26,16 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AdBanner } from "./ad-placeholder";
 import { ColoringClient } from "./coloring-client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
 type Difficulty = "easy" | "medium" | "hard";
@@ -78,14 +89,18 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [completionTimes, setCompletionTimes] = useState<number[]>([]);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(false); // Default to false on server
+  const [soundEnabled, setSoundEnabled] = useState(false);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const speechQueueRef = useRef<string[]>([]);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   
   // States for counting game
   const [showReward, setShowReward] = useState(false);
+  
+  // State for the rewarded ad gate
+  const [showAdGate, setShowAdGate] = useState(false);
+  const [completionCountForAd, setCompletionCountForAd] = useState(0);
+  const AD_GATE_THRESHOLD = 5; // Show ad after every 5 completions
 
   const { toast } = useToast();
 
@@ -380,8 +395,28 @@ export default function GameClient({ mode }: {mode: Mode}) {
       setCompletionTimes((prev) => [...prev, (endTime - startTime) / 1000]);
     }
     setCompletions((prev) => prev + 1);
-    handleNext();
-  }, [handleNext, startTime]);
+    
+    const newCompletionCount = completionCountForAd + 1;
+    setCompletionCountForAd(newCompletionCount);
+
+    if (mode !== 'drawing' && newCompletionCount >= AD_GATE_THRESHOLD) {
+      setShowAdGate(true);
+    } else {
+      handleNext();
+    }
+
+  }, [handleNext, startTime, completionCountForAd, mode]);
+
+  const handleAdWatched = () => {
+    setCompletionCountForAd(0); // Reset counter
+    setShowAdGate(false);
+    toast({
+        title: "Thank you!",
+        description: "You've unlocked more fun activities."
+    });
+    handleNext(); // Proceed to next item
+  };
+
   
   const handleClear = useCallback(() => {
     setClears((prev) => prev + 1);
@@ -524,47 +559,65 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }
 
   return (
-    <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      
-      <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
-        {renderSidePanel()}
-        <AdBanner />
-      </aside>
+    <>
+      <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
+        
+        <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
+          {renderSidePanel()}
+          <AdBanner />
+        </aside>
 
-      <main className="flex-1 flex flex-col items-center justify-start relative">
-        <div className="w-full flex justify-center items-center mb-4 gap-4">
-          <Button variant="outline" size="lg" onClick={handlePrev} disabled={characterSet.length === 0}>
-            <ArrowLeft className="mr-2" /> Prev
-          </Button>
-          
-          {isSoundAvailableForMode && mode !== 'pahada' && (
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={handleReplaySound} 
-              disabled={!soundEnabled || isSpeaking}
-              className="rounded-full w-14 h-14"
-              aria-label="Replay Sound"
-            >
-              {isSpeaking ? (
-                  <Loader2 className="h-7 w-7 animate-spin" />
-              ) : soundEnabled ? (
-                <Volume2 className="h-7 w-7" />
-              ) : (
-                <VolumeX className="h-7 w-7" />
-              )}
+        <main className="flex-1 flex flex-col items-center justify-start relative">
+          <div className="w-full flex justify-center items-center mb-4 gap-4">
+            <Button variant="outline" size="lg" onClick={handlePrev} disabled={characterSet.length === 0}>
+              <ArrowLeft className="mr-2" /> Prev
             </Button>
-          )}
+            
+            {isSoundAvailableForMode && mode !== 'pahada' && (
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={handleReplaySound} 
+                disabled={!soundEnabled || isSpeaking}
+                className="rounded-full w-14 h-14"
+                aria-label="Replay Sound"
+              >
+                {isSpeaking ? (
+                    <Loader2 className="h-7 w-7 animate-spin" />
+                ) : soundEnabled ? (
+                  <Volume2 className="h-7 w-7" />
+                ) : (
+                  <VolumeX className="h-7 w-7" />
+                )}
+              </Button>
+            )}
 
-          <Button variant="outline" size="lg" onClick={handleNext} disabled={characterSet.length === 0}>
-            Next <ArrowRight className="ml-2" />
-          </Button>
-        </div>
+            <Button variant="outline" size="lg" onClick={handleNext} disabled={characterSet.length === 0}>
+              Next <ArrowRight className="ml-2" />
+            </Button>
+          </div>
 
-        <div className="w-full flex-1 flex flex-col items-center justify-center">
-            {renderMainContent()}
-        </div>
-      </main>
-    </div>
+          <div className="w-full flex-1 flex flex-col items-center justify-center">
+              {renderMainContent()}
+          </div>
+        </main>
+      </div>
+      <AlertDialog open={showAdGate} onOpenChange={setShowAdGate}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Great Job!</AlertDialogTitle>
+            <AlertDialogDescription>
+              You've done a great job on the last few activities! Watch a short ad to unlock the next set of fun exercises.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowAdGate(false)}>Maybe Later</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAdWatched}>
+              <Gift className="mr-2" /> Watch Ad & Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
