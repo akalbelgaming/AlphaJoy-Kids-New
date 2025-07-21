@@ -122,24 +122,30 @@ export default function GameClient({ mode }: {mode: Mode}) {
   );
   
   const itemToTrace = useMemo(() => {
-      if (!currentCharacter) return '';
-      if (typeof currentCharacter === 'string') return currentCharacter;
-      if (Array.isArray(currentCharacter)) return ''; // Pahada is now an array
-      
-      const hindiCharRegex = /[\u0900-\u097F]/;
-      if (hindiCharRegex.test(character)) {
-        return character;
-      }
-      
-      if (character.length > 2) {
-        if(character.includes('=')) return character;
-        return character.toUpperCase();
-      }
+    if (!currentCharacter) return '';
+    
+    // Determine the character string to be traced
+    let character = '';
+    if (typeof currentCharacter === 'string') {
+      character = currentCharacter;
+    } else if ('letter' in currentCharacter) { // AlphabetCharacter
+      character = mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
+    } else if ('character' in currentCharacter) { // HindiCharacter
+      character = currentCharacter.character;
+    } else if ('display' in currentCharacter) { // HindiTransliteratedCharacter
+      character = currentCharacter.display;
+    } else if (Array.isArray(currentCharacter)) { // Pahada tables
+      return ''; // Not traced
+    }
 
-      if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
-      if ('character' in currentCharacter) return currentCharacter.character; // For HindiCharacter
-      if ('display' in currentCharacter) return currentCharacter.display; // For HindiTransliteratedCharacter
-      return '';
+    if (!character) return '';
+
+    // Final formatting for tracing canvas
+    if (typeof currentCharacter === 'string' && currentCharacter.length > 2 && !currentCharacter.includes('=')) {
+      return currentCharacter.toUpperCase();
+    }
+    
+    return character;
   }, [mode, currentCharacter]);
 
   const itemForStory = useMemo(() => {
