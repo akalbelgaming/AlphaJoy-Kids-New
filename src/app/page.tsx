@@ -30,7 +30,7 @@ const activities = [
    {
     "href": '/hindivowels',
     "title": 'Hindi Swar',
-    icon: <div className="text-5xl font-bold">a=अ</div>,
+    icon: <div className="text-5xl font-bold">अa</div>,
     "color": 'from-rose-400 to-rose-600 text-white',
   },
   {
