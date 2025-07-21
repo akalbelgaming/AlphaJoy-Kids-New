@@ -304,7 +304,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      <audio ref={audioRef} className="hidden" />
+      <audio ref={audioRef} className="hidden" onEnded={() => setIsAudioLoading(false)} onError={() => setIsAudioLoading(false)} onCanPlayThrough={() => setIsAudioLoading(false)} />
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
