@@ -38,6 +38,7 @@ const generateColoringPageFlow = ai.defineFlow(
       prompt: `A simple, single object for a coloring book page: ${input.prompt}. Thick black lines on a plain white background. For a small child.`,
       config: {
         responseModalities: ['TEXT', 'IMAGE'],
+        personGeneration: 'dont_allow', // Explicitly disallow generating people
       },
     });
 
