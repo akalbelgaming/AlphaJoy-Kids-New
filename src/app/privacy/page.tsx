@@ -1,9 +1,19 @@
+
+'use client';
+
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
 
 export default function PrivacyPolicyPage() {
+  const [lastUpdated, setLastUpdated] = useState('');
+
+  useEffect(() => {
+    setLastUpdated(new Date().toLocaleDateString());
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-2 bg-primary text-primary-foreground shadow-md sticky top-0 z-50">
@@ -24,7 +34,7 @@ export default function PrivacyPolicyPage() {
             <CardTitle>Privacy Policy for Play Pad: ABC, Stories & Art</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
-            <p><strong>Last Updated:</strong> {new Date().toLocaleDateString()}</p>
+            <p><strong>Last Updated:</strong> {lastUpdated || 'Loading...'}</p>
 
             <p>
               Welcome to "Play Pad: ABC, Stories & Art". We are committed to protecting your privacy, especially for our youngest users. This Privacy Policy explains what information we collect and how we use it.
