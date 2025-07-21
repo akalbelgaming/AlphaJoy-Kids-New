@@ -23,6 +23,9 @@ interface TracingCanvasProps {
 
 const MIN_PATH_LENGTH_FOR_COMPLETION = 100; // Heuristic value for minimum drawing effort
 
+// Regular expression to check if the string contains any Hindi characters
+const hindiCharRegex = /[\u0900-\u097F]/;
+
 export function TracingCanvas({
   character,
   onComplete,
@@ -105,15 +108,19 @@ export function TracingCanvas({
   
   const isTransliteration = character.includes(' = ');
   const [englishPart, hindiPart] = isTransliteration ? character.split(' = ') : ['', ''];
-
+  const isHindiCharacter = hindiCharRegex.test(character);
+  
   let fontSize;
   if (isTransliteration) {
     fontSize = 'text-[200px]';
+  } else if (isHindiCharacter) {
+    // Force a consistent large size for all single Hindi characters, including composites
+    fontSize = 'text-[350px]';
   } else if (character.length > 2) {
     // This handles longer words like in the reading section
     fontSize = 'text-[150px]';
   } else {
-    // Default size for single/double letters and Hindi characters, including composite ones.
+    // Default size for single/double English letters
     fontSize = 'text-[350px]';
   }
 
