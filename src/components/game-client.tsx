@@ -163,7 +163,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = cleanup;
     utterance.onerror = (e) => {
-      console.error("SpeechSynthesis Error:", e);
+      console.error("SpeechSynthesis Error:", e.error);
       cleanup();
     };
 
