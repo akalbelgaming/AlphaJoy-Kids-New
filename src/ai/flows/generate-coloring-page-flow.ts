@@ -41,7 +41,7 @@ const generateColoringPageFlow = ai.defineFlow(
       },
     });
 
-    if (!media || !media.url || finishReason !== 'STOP') {
+    if (!media || !media.url) {
       const reason = finishReason ? `Finish reason: ${finishReason}` : 'No media URL returned.';
       console.error('Coloring page generation failed.', { finishReason });
       throw new Error(`Coloring page generation failed. ${reason}`);
