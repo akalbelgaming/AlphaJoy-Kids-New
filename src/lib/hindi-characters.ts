@@ -1,3 +1,4 @@
+
 export interface HindiCharacter {
   character: string;
   word: string;
@@ -67,16 +68,16 @@ export const hindiConsonants: HindiCharacter[] = [
 export const hindiCharacters: HindiCharacter[] = [...hindiVowels, ...hindiConsonants];
 
 export const hindiTransliteratedCharacters: HindiTransliteratedCharacter[] = [
-  { display: 'a = अ', pronunciation: 'a', hindi: 'अ' },
+  { display: 'a = अ', pronunciation: 'ey', hindi: 'अ' },
   { display: 'aa = आ', pronunciation: 'double a', hindi: 'आ' },
-  { display: 'i = इ', pronunciation: 'i', hindi: 'इ' },
-  { display: 'ee = ई', pronunciation: 'double e', hindi: 'ई' },
-  { display: 'u = उ', pronunciation: 'u', hindi: 'उ' },
+  { display: 'i = इ', pronunciation: 'ee', hindi: 'इ' },
+  { display: 'ee = ई', pronunciation: 'double ee', hindi: 'ई' },
+  { display: 'u = उ', pronunciation: 'you', hindi: 'उ' },
   { display: 'oo = ऊ', pronunciation: 'double o', hindi: 'ऊ' },
   { display: 'ri = ऋ', pronunciation: 'r i', hindi: 'ऋ' },
-  { display: 'e = ए', pronunciation: 'e', hindi: 'ए' },
+  { display: 'e = ए', pronunciation: 'ee', hindi: 'ए' },
   { display: 'ai = ऐ', pronunciation: 'a i', hindi: 'ऐ' },
-  { display: 'o = ओ', pronunciation: 'o', hindi: 'ओ' },
+  { display: 'o = ओ', pronunciation: 'oh', hindi: 'ओ' },
   { display: 'au = औ', pronunciation: 'a u', hindi: 'औ' },
   { display: 'an = अं', pronunciation: 'a n', hindi: 'अं' },
   { display: 'ah = अः', pronunciation: 'a h', hindi: 'अः' },
@@ -106,11 +107,12 @@ export const hindiTransliteratedCharacters: HindiTransliteratedCharacter[] = [
   { display: 'r = र', pronunciation: 'r', hindi: 'र' },
   { display: 'l = ल', pronunciation: 'l', hindi: 'ल' },
   { display: 'v = व', pronunciation: 'v', hindi: 'व' },
-  { display: 'sh = श', pronunciation: 's h', hindi: 'श' },
-  { display: 'sh = ष', pronunciation: 's h', hindi: 'ष' },
-  { display: 's = स', pronunciation: 's', hindi: 'स' },
+  { display: 'sh = श', pronunciation: 'talavya sha', hindi: 'श' },
+  { display: 'sh = ष', pronunciation: 'murdhanya sha', hindi: 'ष' },
+  { display: 's = स', pronunciation: 'dantya sa', hindi: 'स' },
   { display: 'h = ह', pronunciation: 'h', hindi: 'ह' },
   { display: 'ksh = क्ष', pronunciation: 'k s h', hindi: 'क्ष' },
   { display: 'tr = त्र', pronunciation: 't r', hindi: 'त्र' },
   { display: 'gy = ज्ञ', pronunciation: 'g y', hindi: 'ज्ञ' },
 ];
+
