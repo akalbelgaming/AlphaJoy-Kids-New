@@ -83,6 +83,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const speechQueueRef = useRef<string[]>([]);
+  const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   
   // States for counting game
   const [showReward, setShowReward] = useState(false);
@@ -152,7 +155,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return currentCharacter as string[];
   }, [mode, currentCharacter]);
 
-  const getTextToSpeak = useCallback((char: any): string => {
+  const getTextToSpeak = useCallback((char: any): string | string[] => {
     if (!char) return '';
 
     if (mode === 'hindi' && typeof char === 'object' && 'character' in char && 'word' in char) {
@@ -176,80 +179,89 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && Array.isArray(char)) {
-        return char.map(pahadaToSpeech).join(', ');
+        return char.map(pahadaToSpeech);
     }
     return '';
   }, [mode]);
 
-  const playSound = useCallback((text: string) => {
-    if (!soundEnabled || !text || typeof window === 'undefined' || !window.speechSynthesis) return;
+  const playSound = useCallback((textOrQueue: string | string[]) => {
+    if (!soundEnabled || !textOrQueue || typeof window === 'undefined' || !window.speechSynthesis) return;
 
     const cleanup = () => {
-      setIsSpeaking(false);
-      if (utteranceRef.current) {
-        utteranceRef.current.onend = null;
-        utteranceRef.current.onerror = null;
-        utteranceRef.current.onstart = null;
-        utteranceRef.current = null;
-      }
+        setIsSpeaking(false);
+        if (utteranceRef.current) {
+            utteranceRef.current.onend = null;
+            utteranceRef.current.onerror = null;
+            utteranceRef.current.onstart = null;
+            utteranceRef.current = null;
+        }
+        if (speechTimeoutRef.current) {
+            clearTimeout(speechTimeoutRef.current);
+            speechTimeoutRef.current = null;
+        }
     };
 
+    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
     cleanup();
+    speechQueueRef.current = [];
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utteranceRef.current = utterance;
+    const queue = Array.isArray(textOrQueue) ? textOrQueue : [textOrQueue];
+    speechQueueRef.current = [...queue];
 
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = cleanup;
-    utterance.onerror = (e) => {
-      console.error("SpeechSynthesis Error:", e.error);
-      cleanup();
+    const speakNext = () => {
+        if (speechQueueRef.current.length === 0) {
+            cleanup();
+            return;
+        }
+
+        const text = speechQueueRef.current.shift();
+        if (!text) {
+            cleanup();
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utteranceRef.current = utterance;
+
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => {
+            if (speechQueueRef.current.length > 0) {
+                // Pause for 1 second before the next line in pahada mode
+                if (mode === 'pahada') {
+                    speechTimeoutRef.current = setTimeout(speakNext, 1000);
+                } else {
+                    speakNext();
+                }
+            } else {
+                cleanup();
+            }
+        };
+        utterance.onerror = (e) => {
+            console.error("SpeechSynthesis Error:", e.error);
+            cleanup();
+        };
+
+        const voices = window.speechSynthesis.getVoices();
+        if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
+            utterance.lang = 'hi-IN';
+            const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
+            if (hindiVoice) utterance.voice = hindiVoice;
+        } else {
+            utterance.lang = 'en-US';
+            let femaleVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')));
+            if (femaleVoice) utterance.voice = femaleVoice;
+        }
+        window.speechSynthesis.speak(utterance);
     };
 
-    // Enhanced voice selection logic
-    const voices = window.speechSynthesis.getVoices();
-    if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
-      utterance.lang = 'hi-IN';
-      const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
-      if (hindiVoice) {
-        utterance.voice = hindiVoice;
-      }
-    } else {
-      utterance.lang = 'en-US';
-      // Try to find a female voice
-      let femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Female'));
-      if (!femaleVoice) {
-        femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Samantha'));
-      }
-      if (!femaleVoice) {
-        femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google US English'));
-      }
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
-      }
-      // If no specific female voice is found, the browser will use its default en-US voice.
-    }
-    
-    // The 'voiceschanged' event is crucial for some browsers like Chrome on Android
-    if (voices.length === 0) {
+    if (window.speechSynthesis.getVoices().length === 0) {
         window.speechSynthesis.onvoiceschanged = () => {
-            // Re-run the voice selection logic
-            const updatedVoices = window.speechSynthesis.getVoices();
-             if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
-                const hindiVoice = updatedVoices.find(voice => voice.lang === 'hi-IN');
-                if (hindiVoice) utterance.voice = hindiVoice;
-            } else {
-                let femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Female'));
-                 if (!femaleVoice) femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Samantha'));
-                 if (!femaleVoice) femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Google US English'));
-                 if (femaleVoice) utterance.voice = femaleVoice;
-            }
-            window.speechSynthesis.speak(utterance);
-            window.speechSynthesis.onvoiceschanged = null; // Clean up the event listener
+            speakNext();
+            window.speechSynthesis.onvoiceschanged = null;
         };
     } else {
-        window.speechSynthesis.speak(utterance);
+        speakNext();
     }
   }, [soundEnabled, mode]);
 
