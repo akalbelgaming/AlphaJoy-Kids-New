@@ -9,6 +9,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/letters',
     '/numbers',
     '/hindi',
+    '/hindivowels',
+    '/pahada',
     '/shapes',
     '/counting',
     '/reading',

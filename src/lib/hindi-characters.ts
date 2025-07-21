@@ -5,8 +5,7 @@ export interface HindiCharacter {
   type: 'vowel' | 'consonant';
 }
 
-export const hindiCharacters: HindiCharacter[] = [
-  // Vowels (Swar)
+export const hindiVowels: HindiCharacter[] = [
   { character: 'अ', word: 'अनार', hint: 'red fruit', type: 'vowel' },
   { character: 'आ', word: 'आम', hint: 'king of fruits', type: 'vowel' },
   { character: 'इ', word: 'इमली', hint: 'sour tamarind', type: 'vowel' },
@@ -20,7 +19,9 @@ export const hindiCharacters: HindiCharacter[] = [
   { character: 'औ', word: 'औरत', hint: 'woman', type: 'vowel' },
   { character: 'अं', word: 'अंगूर', hint: 'grapes', type: 'vowel' },
   { character: 'अः', word: 'नमः', hint: 'a greeting', type: 'vowel' },
-  // Consonants (Vyanjan)
+];
+
+export const hindiConsonants: HindiCharacter[] = [
   { character: 'क', word: 'कमल', hint: 'lotus flower', type: 'consonant' },
   { character: 'ख', word: 'खरगोश', hint: 'rabbit', type: 'consonant' },
   { character: 'ग', word: 'गमला', hint: 'flower pot', type: 'consonant' },
@@ -55,3 +56,5 @@ export const hindiCharacters: HindiCharacter[] = [
   { character: 'त्र', word: 'त्रिशूल', hint: 'trident', type: 'consonant' },
   { character: 'ज्ञ', word: 'ज्ञानी', hint: 'knowledgeable person', type: 'consonant' },
 ];
+
+export const hindiCharacters: HindiCharacter[] = [...hindiVowels, ...hindiConsonants];

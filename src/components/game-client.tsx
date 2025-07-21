@@ -10,7 +10,7 @@ import {
   Loader2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
-import { hindiCharacters, type HindiCharacter } from "@/lib/hindi-characters";
+import { hindiCharacters, hindiVowels, type HindiCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -23,11 +23,13 @@ import { numberToWords, cn } from '@/lib/utils';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
+
+const pahada: string[] = Array.from({ length: 10 }, (_, i) => `2 x ${i + 1} = ${2 * (i + 1)}`);
 
 export default function GameClient({ mode }: {mode: Mode}) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -68,6 +70,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return alphabet;
       case "hindi":
         return hindiCharacters;
+      case "hindivowels":
+        return hindiVowels;
+      case "pahada":
+        return pahada;
       default:
         return [];
     }
@@ -117,8 +123,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
       return char.word;
     } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
       return `${char.character} से ${char.word}`;
+    } else if (mode === 'hindivowels' && typeof char === 'object' && 'character' in char) {
+      return `${char.character} से ${char.word}`;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
+    } else if (mode === 'pahada' && typeof char === 'string') {
+        return char.replace('x', 'times').replace('=', 'is');
     }
     return '';
   }, [mode]);
@@ -151,7 +161,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
     // Enhanced voice selection logic
     const voices = window.speechSynthesis.getVoices();
-    if (mode === 'hindi') {
+    if (mode === 'hindi' || mode === 'hindivowels') {
       utterance.lang = 'hi-IN';
       const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
       if (hindiVoice) {
@@ -178,7 +188,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         window.speechSynthesis.onvoiceschanged = () => {
             // Re-run the voice selection logic
             const updatedVoices = window.speechSynthesis.getVoices();
-             if (mode === 'hindi') {
+             if (mode === 'hindi' || mode === 'hindivowels') {
                 const hindiVoice = updatedVoices.find(voice => voice.lang === 'hi-IN');
                 if (hindiVoice) utterance.voice = hindiVoice;
             } else {
@@ -306,6 +316,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "numbers":
       case "reading":
       case "hindi":
+      case "pahada":
+      case "hindivowels":
         return (
           <TracingCanvas
             key={`${mode}-${currentIndex}`}
@@ -372,7 +384,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting', 'pahada', 'hindivowels'].includes(mode);
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">

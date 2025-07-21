@@ -26,6 +26,18 @@ const activities = [
     "icon": <div className="text-4xl font-bold">अ</div>,
     "color": 'from-orange-400 to-orange-600 text-white',
   },
+   {
+    "href": '/hindivowels',
+    "title": 'Hindi Swar',
+    "icon": <div className="text-3xl font-bold">अ आ</div>,
+    "color": 'from-rose-400 to-rose-600 text-white',
+  },
+  {
+    "href": '/pahada',
+    "title": 'Pahada',
+    "icon": <div className="text-3xl font-bold">2x1</div>,
+    "color": 'from-cyan-400 to-cyan-600 text-white',
+  },
   {
     "href": '/shapes',
     "title": 'Shapes',
