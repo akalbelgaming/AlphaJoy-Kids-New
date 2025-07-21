@@ -105,7 +105,9 @@ export function TracingCanvas({
   
   const isNumeric = /^\d+$/.test(character);
   let fontSize = 'text-[350px]';
-  if (character.length > 2 && !isNumeric) {
+  if (character.includes('=')) { // For Hindi transliteration like "a = अ"
+    fontSize = 'text-[200px]';
+  } else if (character.length > 2 && !isNumeric) {
     fontSize = 'text-[150px]';
   } else if (character.length > 1 && !isNumeric) {
     fontSize = 'text-[200px]';

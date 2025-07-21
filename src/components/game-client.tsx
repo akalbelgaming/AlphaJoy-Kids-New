@@ -123,8 +123,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
       return char.word;
     } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
       return `${char.character} से ${char.word}`;
-    } else if (mode === 'hindivowels' && typeof char === 'object' && 'character' in char) {
-      return `${char.character} से ${char.word}`;
+    } else if (mode === 'hindivowels' && typeof char === 'object' && 'word' in char) {
+      // Custom logic for transliteration, e.g., for "a = अ", speak "a se a"
+      const [eng, hindi] = char.character.split(' = ');
+      return `${eng} se ${hindi}`;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && typeof char === 'string') {
