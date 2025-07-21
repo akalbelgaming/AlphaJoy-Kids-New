@@ -126,29 +126,73 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const playSound = useCallback((text: string) => {
     if (!soundEnabled || !text || typeof window === 'undefined' || !window.speechSynthesis) return;
 
-    // Cancel any ongoing speech
+    const cleanup = () => {
+      setIsSpeaking(false);
+      if (utteranceRef.current) {
+        utteranceRef.current.onend = null;
+        utteranceRef.current.onerror = null;
+        utteranceRef.current.onstart = null;
+        utteranceRef.current = null;
+      }
+    };
+
     window.speechSynthesis.cancel();
+    cleanup();
 
     const utterance = new SpeechSynthesisUtterance(text);
     utteranceRef.current = utterance;
 
     utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+    utterance.onend = cleanup;
+    utterance.onerror = (e) => {
+      console.error("SpeechSynthesis Error:", e);
+      cleanup();
+    };
 
-    // Language and Voice selection
+    // Enhanced voice selection logic
+    const voices = window.speechSynthesis.getVoices();
     if (mode === 'hindi') {
       utterance.lang = 'hi-IN';
-      const voices = window.speechSynthesis.getVoices();
       const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
       if (hindiVoice) {
         utterance.voice = hindiVoice;
       }
     } else {
       utterance.lang = 'en-US';
+      // Try to find a female voice
+      let femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Female'));
+      if (!femaleVoice) {
+        femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Samantha'));
+      }
+      if (!femaleVoice) {
+        femaleVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('Google US English'));
+      }
+      if (femaleVoice) {
+        utterance.voice = femaleVoice;
+      }
+      // If no specific female voice is found, the browser will use its default en-US voice.
     }
     
-    window.speechSynthesis.speak(utterance);
+    // The 'voiceschanged' event is crucial for some browsers like Chrome on Android
+    if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            // Re-run the voice selection logic
+            const updatedVoices = window.speechSynthesis.getVoices();
+             if (mode === 'hindi') {
+                const hindiVoice = updatedVoices.find(voice => voice.lang === 'hi-IN');
+                if (hindiVoice) utterance.voice = hindiVoice;
+            } else {
+                let femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Female'));
+                 if (!femaleVoice) femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Samantha'));
+                 if (!femaleVoice) femaleVoice = updatedVoices.find(v => v.lang === 'en-US' && v.name.includes('Google US English'));
+                 if (femaleVoice) utterance.voice = femaleVoice;
+            }
+            window.speechSynthesis.speak(utterance);
+            window.speechSynthesis.onvoiceschanged = null; // Clean up the event listener
+        };
+    } else {
+        window.speechSynthesis.speak(utterance);
+    }
   }, [soundEnabled, mode]);
 
 
@@ -161,23 +205,44 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const navigateAndPlaySound = useCallback((newIndex: number) => {
     setCurrentIndex(newIndex);
-    const textToSpeak = getTextToSpeak(getCharacterData(newIndex));
-    if (textToSpeak) {
-      playSound(textToSpeak);
-    }
+    // Wait a moment before playing sound to allow UI to update
+    setTimeout(() => {
+        const textToSpeak = getTextToSpeak(getCharacterData(newIndex));
+        if (textToSpeak) {
+            playSound(textToSpeak);
+        }
+    }, 100);
   }, [getCharacterData, playSound, getTextToSpeak]);
 
   useEffect(() => {
-    // Preload voices
+    // This effect ensures sound plays on initial load of the component
+    // We wait for voices to be loaded.
+    const speakOnLoad = () => {
+        const textToSpeak = getTextToSpeak(currentCharacter);
+        if (textToSpeak) {
+            playSound(textToSpeak);
+        }
+    }
+
     if (typeof window !== 'undefined' && window.speechSynthesis) {
-      window.speechSynthesis.getVoices();
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            speakOnLoad();
+        } else {
+            window.speechSynthesis.onvoiceschanged = () => {
+                speakOnLoad();
+                window.speechSynthesis.onvoiceschanged = null;
+            }
+        }
     }
-    
-    const textToSpeak = getTextToSpeak(currentCharacter);
-    if (textToSpeak) {
-        playSound(textToSpeak);
-    }
-  }, [currentIndex, getCharacterData, playSound, getTextToSpeak]);
+
+    // Cleanup function to cancel speech if the component unmounts
+    return () => {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [currentIndex]);
 
 
   const handleNext = useCallback(() => {
