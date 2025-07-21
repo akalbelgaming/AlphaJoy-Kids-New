@@ -12,19 +12,19 @@ const activities = [
   {
     href: '/letters',
     title: 'Letters',
-    icon: <div className="text-4xl font-bold flex items-center justify-center">A</div>,
+    icon: <div className="text-4xl font-bold">A</div>,
     color: 'from-red-400 to-red-600 text-white',
   },
   {
     href: '/numbers',
     title: 'Numbers',
-    icon: <div className="text-3xl font-bold flex items-center justify-center">123</div>,
+    icon: <div className="text-3xl font-bold">123</div>,
     "color": 'from-blue-400 to-blue-600 text-white',
   },
   {
     "href": '/hindi',
     "title": 'Hindi',
-    "icon": <div className="text-4xl font-bold flex items-center justify-center">अ</div>,
+    "icon": <div className="text-4xl font-bold">अ</div>,
     "color": 'from-orange-400 to-orange-600 text-white',
   },
    {
