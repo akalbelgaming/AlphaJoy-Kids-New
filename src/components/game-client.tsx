@@ -10,7 +10,7 @@ import {
   Loader2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
-import { hindiCharacters, hindiVowels, type HindiCharacter } from "@/lib/hindi-characters";
+import { hindiCharacters, hindiVowels, hindiTransliteratedVowels, type HindiCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -71,7 +71,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "hindi":
         return hindiCharacters;
       case "hindivowels":
-        return hindiVowels;
+        return hindiTransliteratedVowels;
       case "pahada":
         return pahada;
       default:
@@ -122,11 +122,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
       return char.word;
     } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
-      return `${char.character} से ${char.word}`;
-    } else if (mode === 'hindivowels' && typeof char === 'object' && 'word' in char) {
+      return `${char.character} se ${char.word}`;
+    } else if (mode === 'hindivowels' && typeof char === 'object' && 'character' in char) {
       // Custom logic for transliteration, e.g., for "a = अ", speak "a se a"
       const [eng, hindi] = char.character.split(' = ');
-      return `${eng} se ${hindi}`;
+      return `${eng} se ${char.word}`;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && typeof char === 'string') {
@@ -254,6 +254,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
         window.speechSynthesis.cancel();
       }
     };
+  }, []); // Only run once on component mount for initial sound
+
+
+  useEffect(() => {
+    handleReplaySound();
   }, [currentIndex]);
 
 

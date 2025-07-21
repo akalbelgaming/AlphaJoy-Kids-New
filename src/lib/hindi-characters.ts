@@ -6,19 +6,35 @@ export interface HindiCharacter {
 }
 
 export const hindiVowels: HindiCharacter[] = [
-  { character: 'a = अ', word: 'a se anar', hint: 'red fruit', type: 'vowel' },
-  { character: 'aa = आ', word: 'aa se aam', hint: 'king of fruits', type: 'vowel' },
-  { character: 'i = इ', word: 'i se imli', hint: 'sour tamarind', type: 'vowel' },
-  { character: 'ee = ई', word: 'ee se eekh', hint: 'sweet sugarcane', type: 'vowel' },
-  { character: 'u = उ', word: 'u se ullu', hint: 'night bird', type: 'vowel' },
-  { character: 'oo = ऊ', word: 'oo se oon', hint: 'soft wool', type: 'vowel' },
-  { character: 'ri = ऋ', word: 'ri se rishi', hint: 'wise sage', type: 'vowel' },
-  { character: 'e = ए', word: 'e se edi', hint: 'body part heel', type: 'vowel' },
-  { character: 'ai = ऐ', word: 'ai se ainak', hint: 'spectacles', type: 'vowel' },
-  { character: 'o = ओ', word: 'o se okhli', hint: 'mortar', type: 'vowel' },
-  { character: 'au = औ', word: 'au se aurat', hint: 'woman', type: 'vowel' },
-  { character: 'an = अं', word: 'an se angoor', hint: 'grapes', type: 'vowel' },
-  { character: 'ah = अः', word: 'ah se namah', hint: 'a greeting', type: 'vowel' },
+  { character: 'अ', word: 'anar', hint: 'red fruit', type: 'vowel' },
+  { character: 'आ', word: 'aam', hint: 'king of fruits', type: 'vowel' },
+  { character: 'इ', word: 'imli', hint: 'sour tamarind', type: 'vowel' },
+  { character: 'ई', word: 'eekh', hint: 'sweet sugarcane', type: 'vowel' },
+  { character: 'उ', word: 'ullu', hint: 'night bird', type: 'vowel' },
+  { character: 'ऊ', word: 'oon', hint: 'soft wool', type: 'vowel' },
+  { character: 'ऋ', word: 'rishi', hint: 'wise sage', type: 'vowel' },
+  { character: 'ए', word: 'edi', hint: 'body part heel', type: 'vowel' },
+  { character: 'ऐ', word: 'ainak', hint: 'spectacles', type: 'vowel' },
+  { character: 'ओ', word: 'okhli', hint: 'mortar', type: 'vowel' },
+  { character: 'औ', word: 'aurat', hint: 'woman', type: 'vowel' },
+  { character: 'अं', word: 'angoor', hint: 'grapes', type: 'vowel' },
+  { character: 'अः', word: 'namah', hint: 'a greeting', type: 'vowel' },
+];
+
+export const hindiTransliteratedVowels: HindiCharacter[] = [
+  { character: 'a = अ', word: 'anar', hint: 'red fruit', type: 'vowel' },
+  { character: 'aa = आ', word: 'aam', hint: 'king of fruits', type: 'vowel' },
+  { character: 'i = इ', word: 'imli', hint: 'sour tamarind', type: 'vowel' },
+  { character: 'ee = ई', word: 'eekh', hint: 'sweet sugarcane', type: 'vowel' },
+  { character: 'u = उ', word: 'ullu', hint: 'night bird', type: 'vowel' },
+  { character: 'oo = ऊ', word: 'oon', hint: 'soft wool', type: 'vowel' },
+  { character: 'ri = ऋ', word: 'rishi', hint: 'wise sage', type: 'vowel' },
+  { character: 'e = ए', word: 'edi', hint: 'body part heel', type: 'vowel' },
+  { character: 'ai = ऐ', word: 'ainak', hint: 'spectacles', type: 'vowel' },
+  { character: 'o = ओ', word: 'okhli', hint: 'mortar', type: 'vowel' },
+  { character: 'au = औ', word: 'aurat', hint: 'woman', type: 'vowel' },
+  { character: 'an = अं', word: 'angoor', hint: 'grapes', type: 'vowel' },
+  { character: 'ah = अः', word: 'namah', hint: 'a greeting', type: 'vowel' },
 ];
 
 export const hindiConsonants: HindiCharacter[] = [
