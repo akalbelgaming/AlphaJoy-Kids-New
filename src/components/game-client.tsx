@@ -13,18 +13,17 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type Alph
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
-import { AdBanner } from "@/components/ad-placeholder";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
 import { PahadaDisplay } from '@/components/pahada-display';
-import { ColoringClient } from '@/components/coloring-client';
 
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import { AdBanner } from "./ad-placeholder";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
 type Difficulty = "easy" | "medium" | "hard";
@@ -459,8 +458,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return (
             <ColoringCanvas
                 key={`${mode}-${currentIndex}`}
-                imageUrl={null}
-                isLoading={false}
                 onComplete={handleCompletion}
                 onClear={handleClear}
                 strokeColor={strokeColor}
@@ -469,7 +466,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         );
       case "coloring":
          return (
-            <ColoringClient
+            <ColoringCanvas
+                key={`${mode}-${currentIndex}`}
+                onComplete={handleCompletion}
+                onClear={handleClear}
                 strokeColor={strokeColor}
                 strokeWidth={strokeWidth}
             />
@@ -481,11 +481,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting', 'pahada', 'hindivowels'].includes(mode);
 
-  // Hide customization panel for coloring mode as it has its own controls.
-  if (mode === 'coloring') {
-    return <main className="flex-1 flex flex-col items-center justify-start relative w-full p-4 lg:p-6">{renderMainContent()}</main>
-  }
-  
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       
