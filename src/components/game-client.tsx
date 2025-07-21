@@ -113,6 +113,19 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const getTextToSpeak = useCallback((char: any): string => {
     if (!char) return '';
+
+    if (mode === 'hindi' && typeof char === 'object' && 'pronunciation' in char) {
+      const hindiChar = char as HindiCharacter;
+      const pronunciation = hindiChar.pronunciation === 'aa' ? 'double a' : hindiChar.pronunciation;
+      return `${pronunciation} se ${hindiChar.character}`;
+    }
+    
+    if (mode === 'hindivowels' && typeof char === 'object' && 'pronunciation' in char) {
+        const hindiChar = char as HindiCharacter;
+        const pronunciation = hindiChar.pronunciation === 'aa' ? 'double a' : hindiChar.pronunciation;
+        return `${pronunciation} se ${hindiChar.character.split(' = ')[1]}`;
+    }
+
     if (mode === 'story' && typeof char === 'object' && 'story' in char) {
       return char.story;
     } else if (mode === 'numbers' && typeof char === 'string') {
@@ -121,11 +134,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
       return `${char.letter}, for ${char.word}`;
     } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
       return char.word;
-    } else if (mode === 'hindi' && typeof char === 'object' && 'character' in char) {
-      return `${char.character} se ${char.word}`;
-    } else if (mode === 'hindivowels' && typeof char === 'object' && 'character' in char) {
-      const [eng, hindi] = char.character.split(' = ');
-      return `${eng} se ${hindi}`;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && typeof char === 'string') {
