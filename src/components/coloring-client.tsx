@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ColoringCanvas } from '@/components/coloring-canvas';
@@ -33,16 +33,10 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
   const [isLoading, setIsLoading] = useState(false);
   const [showRewardDialog, setShowRewardDialog] = useState(false);
   
-  const [strokeColor, setStrokeColor] = useState("#000000");
-  const [strokeWidth, setStrokeWidth] = useState(12);
+  const [strokeColor, setStrokeColor] = useState(initialStrokeColor);
+  const [strokeWidth, setStrokeWidth] = useState(initialStrokeWidth);
 
   const { toast } = useToast();
-  
-  useEffect(() => {
-    setStrokeColor(initialStrokeColor);
-    setStrokeWidth(initialStrokeWidth);
-  }, [initialStrokeColor, initialStrokeWidth]);
-
 
   const handleGenerateClick = () => {
     if (!prompt) {
