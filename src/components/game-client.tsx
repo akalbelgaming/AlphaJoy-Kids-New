@@ -24,6 +24,7 @@ import { PahadaDisplay } from '@/components/pahada-display';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { AdBanner } from "./ad-placeholder";
+import { ColoringClient } from "./coloring-client";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
 type Difficulty = "easy" | "medium" | "hard";
@@ -100,8 +101,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "shapes":
         return shapes;
       case "drawing":
+        return []; // No character set for free draw
       case "coloring":
-        return alphabet;
+        return []; // No character set for coloring
       case "hindi":
         return hindiCharacters;
       case "hindivowels":
@@ -114,6 +116,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [mode]);
   
   const getCharacterData = useCallback((index: number) => {
+    if (index < 0 || index >= characterSet.length) return null;
     return characterSet[index];
   }, [characterSet]);
 
@@ -126,27 +129,27 @@ export default function GameClient({ mode }: {mode: Mode}) {
     if (!currentCharacter) return '';
     
     // Determine the character string to be traced
-    let character = '';
+    let characterStr = '';
     if (typeof currentCharacter === 'string') {
-      character = currentCharacter;
+      characterStr = currentCharacter;
     } else if ('letter' in currentCharacter) { // AlphabetCharacter
-      character = mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
+      characterStr = mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
     } else if ('character' in currentCharacter) { // HindiCharacter
-      character = currentCharacter.character;
+      characterStr = currentCharacter.character;
     } else if ('display' in currentCharacter) { // HindiTransliteratedCharacter
-      character = currentCharacter.display;
+      characterStr = currentCharacter.display;
     } else if (Array.isArray(currentCharacter)) { // Pahada tables
       return ''; // Not traced
     }
 
-    if (!character) return '';
+    if (!characterStr) return '';
 
     // Final formatting for tracing canvas
     if (typeof currentCharacter === 'string' && currentCharacter.length > 2 && !currentCharacter.includes('=')) {
-      return currentCharacter.toUpperCase();
+      return characterStr.toUpperCase();
     }
     
-    return character;
+    return characterStr;
   }, [mode, currentCharacter]);
 
   const itemForStory = useMemo(() => {
@@ -179,7 +182,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     
     if (mode === 'hindivowels' && typeof char === 'object' && 'pronunciation' in char && 'hindi' in char) {
         const translitChar = char as HindiTransliteratedCharacter;
-        return translitChar.pronunciation;
+        return `${translitChar.pronunciation} se ${translitChar.hindi}`;
     }
 
     if (mode === 'story' && typeof char === 'object' && 'story' in char) {
@@ -293,10 +296,13 @@ export default function GameClient({ mode }: {mode: Mode}) {
   };
   
   const navigateAndPlaySound = useCallback((newIndex: number) => {
+    const charData = getCharacterData(newIndex);
+    if (!charData) return;
+
     setCurrentIndex(newIndex);
     // Wait a moment before playing sound to allow UI to update
     setTimeout(() => {
-        const textToSpeak = getTextToSpeak(getCharacterData(newIndex));
+        const textToSpeak = getTextToSpeak(charData);
         if (textToSpeak) {
             playSound(textToSpeak);
         }
@@ -384,6 +390,33 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
+  const renderSidePanel = () => {
+    if (mode === 'coloring') {
+      return (
+        <ColoringClient 
+          strokeColor={strokeColor}
+          strokeWidth={strokeWidth}
+        />
+      );
+    }
+    return (
+      <CustomizationPanel 
+          fontFamily={fontFamily}
+          onFontFamilyChange={setFontFamily}
+          strokeColor={strokeColor}
+          onStrokeColorChange={setStrokeColor}
+          strokeWidth={strokeWidth}
+          onStrokeWidthChange={setStrokeWidth}
+          difficulty={difficulty}
+          onDifficultyChange={setDifficulty}
+          completions={completions}
+          clears={clears}
+          completionTimes={completionTimes}
+          soundEnabled={soundEnabled}
+          onSoundEnabledChange={setSoundEnabled}
+      />
+    );
+  };
 
   const renderMainContent = () => {
     switch (mode) {
@@ -419,7 +452,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         );
       case "shapes":
         const shape = itemForShapes;
-        if (!shape) return null;
+        if (!shape) return <Loader2 className="h-16 w-16 animate-spin" />;
         return (
             <ShapeColoringCanvas
                 key={`${mode}-${currentIndex}`}
@@ -433,6 +466,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             />
         );
       case "story":
+        if (!itemForStory) return <Loader2 className="h-16 w-16 animate-spin" />;
         return (
           <StoryDisplay
             key={`${mode}-${currentIndex}`}
@@ -457,6 +491,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "drawing":
         return (
             <ColoringCanvas
+                imageUrl={null}
+                isLoading={false}
                 key={`${mode}-${currentIndex}`}
                 onComplete={handleCompletion}
                 onClear={handleClear}
@@ -465,15 +501,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
             />
         );
       case "coloring":
-         return (
-            <ColoringCanvas
-                key={`${mode}-${currentIndex}`}
-                onComplete={handleCompletion}
-                onClear={handleClear}
-                strokeColor={strokeColor}
-                strokeWidth={strokeWidth}
-            />
-         );
+         // The main coloring UI is rendered via the side panel's client component
+         return null;
       default:
         return <p>Select a mode to start playing!</p>;
     }
@@ -481,25 +510,19 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting', 'pahada', 'hindivowels'].includes(mode);
 
+  if (mode === 'coloring') {
+    return (
+      <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
+        {renderSidePanel()}
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
-        <CustomizationPanel 
-            fontFamily={fontFamily}
-            onFontFamilyChange={setFontFamily}
-            strokeColor={strokeColor}
-            onStrokeColorChange={setStrokeColor}
-            strokeWidth={strokeWidth}
-            onStrokeWidthChange={setStrokeWidth}
-            difficulty={difficulty}
-            onDifficultyChange={setDifficulty}
-            completions={completions}
-            clears={clears}
-            completionTimes={completionTimes}
-            soundEnabled={soundEnabled}
-            onSoundEnabledChange={setSoundEnabled}
-        />
+        {renderSidePanel()}
         <AdBanner />
       </aside>
 
