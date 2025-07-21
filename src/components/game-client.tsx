@@ -238,7 +238,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
             }
         };
         utterance.onerror = (e) => {
-            console.error("SpeechSynthesis Error:", e.error);
+            if (e.error !== 'interrupted') {
+                console.error("SpeechSynthesis Error:", e.error);
+            }
             cleanup();
         };
 
