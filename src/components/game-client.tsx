@@ -29,7 +29,40 @@ type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
-const pahada: string[] = Array.from({ length: 10 }, (_, i) => `2 x ${i + 1} = ${2 * (i + 1)}`);
+// Generate tables from 2 to 20
+const pahada: string[] = [];
+for (let i = 2; i <= 20; i++) {
+  for (let j = 1; j <= 10; j++) {
+    pahada.push(`${i} x ${j} = ${i * j}`);
+  }
+}
+
+// Function to convert table string to voice string
+const pahadaToSpeech = (tableString: string): string => {
+    const parts = tableString.match(/(\d+) x (\d+) = (\d+)/);
+    if (!parts) return tableString;
+
+    const [, num1, num2, result] = parts;
+    const num2Word = numberToWords(parseInt(num2, 10))?.replace(' ', '') || num2;
+    const suffix = 'ja';
+    const pronunciation = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+    const num2Pronunciation = parseInt(num2) >= 1 && parseInt(num2) <= 10 ? pronunciation[parseInt(num2) - 1] : num2Word;
+
+    let textToSpeak = `${num1} ${num2Pronunciation} ${suffix} ${result}`;
+
+    if (num2 === '1') {
+        textToSpeak = `${num1} anja ${result}`;
+    } else if (num2 === '2') {
+        textToSpeak = `${num1} tuja ${result}`;
+    } else if (num2 === '3') {
+        textToSpeak = `${num1} thrija ${result}`;
+    } else {
+        textToSpeak = `${num1} ${num2Pronunciation} ja ${result}`;
+    }
+
+    return textToSpeak;
+};
+
 
 export default function GameClient({ mode }: {mode: Mode}) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -136,7 +169,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && typeof char === 'string') {
-        return char.replace('x', 'times').replace('=', 'is');
+        return pahadaToSpeech(char);
     }
     return '';
   }, [mode]);
