@@ -19,6 +19,8 @@ import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
+import { PahadaDisplay } from '@/components/pahada-display';
+
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -30,37 +32,36 @@ type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
 // Generate tables from 2 to 20
-const pahada: string[] = [];
+const pahadaTables: string[][] = [];
 for (let i = 2; i <= 20; i++) {
+  const table: string[] = [];
   for (let j = 1; j <= 10; j++) {
-    pahada.push(`${i} x ${j} = ${i * j}`);
+    table.push(`${i} x ${j} = ${i * j}`);
   }
+  pahadaTables.push(table);
 }
 
 // Function to convert table string to voice string
-const pahadaToSpeech = (tableString: string): string => {
-    const parts = tableString.match(/(\d+) x (\d+) = (\d+)/);
-    if (!parts) return tableString;
+const pahadaToSpeech = (tableLine: string): string => {
+    const parts = tableLine.match(/(\d+) x (\d+) = (\d+)/);
+    if (!parts) return tableLine;
 
     const [, num1, num2, result] = parts;
     const num2Word = numberToWords(parseInt(num2, 10))?.replace(' ', '') || num2;
-    const suffix = 'ja';
+    
+    // Hindi-style pronunciation for numbers 1-10
     const pronunciation = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
-    const num2Pronunciation = parseInt(num2) >= 1 && parseInt(num2) <= 10 ? pronunciation[parseInt(num2) - 1] : num2Word;
-
-    let textToSpeak = `${num1} ${num2Pronunciation} ${suffix} ${result}`;
+    const num2Pronunciation = parseInt(num2, 10) >= 1 && parseInt(num2, 10) <= 10 ? pronunciation[parseInt(num2, 10) - 1] : num2Word;
 
     if (num2 === '1') {
-        textToSpeak = `${num1} anja ${result}`;
+      return `${num1} anja ${result}`;
     } else if (num2 === '2') {
-        textToSpeak = `${num1} tuja ${result}`;
+      return `${num1} tuja ${result}`;
     } else if (num2 === '3') {
-        textToSpeak = `${num1} thrija ${result}`;
-    } else {
-        textToSpeak = `${num1} ${num2Pronunciation} ja ${result}`;
+      return `${num1} thrija ${result}`;
     }
-
-    return textToSpeak;
+    // Generic pronunciation for 4-10
+    return `${num1} ${num2Pronunciation} ja ${result}`;
 };
 
 
@@ -106,7 +107,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "hindivowels":
         return hindiTransliteratedCharacters;
       case "pahada":
-        return pahada;
+        return pahadaTables;
       default:
         return [];
     }
@@ -124,6 +125,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const itemToTrace = useMemo(() => {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
+      if (Array.isArray(currentCharacter)) return ''; // Pahada is now an array
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
       if ('character' in currentCharacter) return currentCharacter.character; // For HindiCharacter
       if ('display' in currentCharacter) return currentCharacter.display; // For HindiTransliteratedCharacter
@@ -145,6 +147,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return currentCharacter as ShapeCharacter;
   }, [mode, currentCharacter]);
   
+  const itemForPahada = useMemo(() => {
+    if (mode !== 'pahada' || !Array.isArray(currentCharacter)) return null;
+    return currentCharacter as string[];
+  }, [mode, currentCharacter]);
+
   const getTextToSpeak = useCallback((char: any): string => {
     if (!char) return '';
 
@@ -168,8 +175,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       return char.word;
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
-    } else if (mode === 'pahada' && typeof char === 'string') {
-        return pahadaToSpeech(char);
+    } else if (mode === 'pahada' && Array.isArray(char)) {
+        return char.map(pahadaToSpeech).join(', ');
     }
     return '';
   }, [mode]);
@@ -202,7 +209,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
     // Enhanced voice selection logic
     const voices = window.speechSynthesis.getVoices();
-    if (mode === 'hindi' || mode === 'hindivowels') {
+    if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
       utterance.lang = 'hi-IN';
       const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
       if (hindiVoice) {
@@ -229,7 +236,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         window.speechSynthesis.onvoiceschanged = () => {
             // Re-run the voice selection logic
             const updatedVoices = window.speechSynthesis.getVoices();
-             if (mode === 'hindi' || mode === 'hindivowels') {
+             if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
                 const hindiVoice = updatedVoices.find(voice => voice.lang === 'hi-IN');
                 if (hindiVoice) utterance.voice = hindiVoice;
             } else {
@@ -365,7 +372,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "numbers":
       case "reading":
       case "hindi":
-      case "pahada":
       case "hindivowels":
         return (
           <TracingCanvas
@@ -377,6 +383,19 @@ export default function GameClient({ mode }: {mode: Mode}) {
             strokeWidth={strokeWidth}
             difficulty={difficulty}
             fontFamily={fontFamily}
+          />
+        );
+      case "pahada":
+        const table = itemForPahada;
+        if (!table) return <Loader2 className="h-16 w-16 animate-spin" />;
+        return (
+          <PahadaDisplay
+            key={`${mode}-${currentIndex}`}
+            table={table}
+            onComplete={handleCompletion}
+            onReplayAudio={handleReplaySound}
+            isAudioAvailable={soundEnabled}
+            isSpeaking={isSpeaking}
           />
         );
       case "shapes":
@@ -464,7 +483,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             <ArrowLeft className="mr-2" /> Prev
           </Button>
           
-          {isSoundAvailableForMode && (
+          {isSoundAvailableForMode && mode !== 'pahada' && (
             <Button 
               variant="outline" 
               size="icon" 
