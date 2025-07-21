@@ -107,6 +107,7 @@ export function CustomizationPanel({
                 checked={soundEnabled}
                 onCheckedChange={onSoundEnabledChange}
                 aria-label="Toggle sound"
+                suppressHydrationWarning
               />
           </div>
           <Separator />
@@ -203,7 +204,7 @@ export function CustomizationPanel({
                   <TrendingUp className="h-4 w-4" />
                   Current Level:
                 </span>{" "}
-                <span className="capitalize font-bold text-foreground">{difficulty}</span>
+                <span className="capitalize font-bold text-foreground" suppressHydrationWarning>{difficulty}</span>
               </div>
             </div>
           <Button
