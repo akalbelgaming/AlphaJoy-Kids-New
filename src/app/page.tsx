@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import {
   BookOpen,
@@ -11,19 +12,19 @@ const activities = [
   {
     href: '/letters',
     title: 'Letters',
-    icon: <div className="text-4xl font-bold">A</div>,
+    icon: <div className="text-4xl font-bold flex items-center justify-center">A</div>,
     color: 'from-red-400 to-red-600 text-white',
   },
   {
     href: '/numbers',
     title: 'Numbers',
-    icon: <div className="text-3xl font-bold">123</div>,
+    icon: <div className="text-3xl font-bold flex items-center justify-center">123</div>,
     "color": 'from-blue-400 to-blue-600 text-white',
   },
   {
     "href": '/hindi',
     "title": 'Hindi',
-    "icon": <div className="text-4xl font-bold">अ</div>,
+    "icon": <div className="text-4xl font-bold flex items-center justify-center">अ</div>,
     "color": 'from-orange-400 to-orange-600 text-white',
   },
    {
@@ -76,7 +77,7 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-center gap-3">
            <div className="text-3xl flex-shrink-0">📖</div>
-           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories &amp; Art</h1>
+           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories & Art</h1>
         </div>
       </header>
       

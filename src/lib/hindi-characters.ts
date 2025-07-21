@@ -68,7 +68,7 @@ export const hindiConsonants: HindiCharacter[] = [
 export const hindiCharacters: HindiCharacter[] = [...hindiVowels, ...hindiConsonants];
 
 export const hindiTransliteratedCharacters: HindiTransliteratedCharacter[] = [
-  { display: 'a = अ', pronunciation: 'ey', hindi: 'अ' },
+  { display: 'a = अ', pronunciation: 'e', hindi: 'अ' },
   { display: 'aa = आ', pronunciation: 'double a', hindi: 'आ' },
   { display: 'i = इ', pronunciation: 'i', hindi: 'इ' },
   { display: 'ee = ई', pronunciation: 'double ee', hindi: 'ई' },
