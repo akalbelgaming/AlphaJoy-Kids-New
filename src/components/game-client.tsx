@@ -10,7 +10,7 @@ import {
   Loader2
 } from "lucide-react";
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
-import { hindiCharacters, hindiVowels, hindiTransliteratedVowels, type HindiCharacter } from "@/lib/hindi-characters";
+import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
 import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
@@ -71,7 +71,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
       case "hindi":
         return hindiCharacters;
       case "hindivowels":
-        return hindiTransliteratedVowels;
+        return hindiTransliteratedCharacters;
       case "pahada":
         return pahada;
       default:
@@ -92,7 +92,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
-      if ('character' in currentCharacter) return currentCharacter.character;
+      if ('character' in currentCharacter) return currentCharacter.character; // For HindiCharacter
+      if ('display' in currentCharacter) return currentCharacter.display; // For HindiTransliteratedCharacter
       return '';
   }, [mode, currentCharacter]);
 
@@ -114,16 +115,14 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const getTextToSpeak = useCallback((char: any): string => {
     if (!char) return '';
 
-    if (mode === 'hindi' && typeof char === 'object' && 'pronunciation' in char) {
-      const hindiChar = char as HindiCharacter;
-      const pronunciation = hindiChar.pronunciation === 'aa' ? 'double a' : hindiChar.pronunciation;
-      return `${pronunciation} se ${hindiChar.character}`;
+    if (mode === 'hindi' && typeof char === 'object' && 'character' in char && 'word' in char) {
+        const hindiChar = char as HindiCharacter;
+        return `${hindiChar.character} se ${hindiChar.word}`;
     }
     
-    if (mode === 'hindivowels' && typeof char === 'object' && 'pronunciation' in char) {
-        const hindiChar = char as HindiCharacter;
-        const pronunciation = hindiChar.pronunciation === 'aa' ? 'double a' : hindiChar.pronunciation;
-        return `${pronunciation} se ${hindiChar.character.split(' = ')[1]}`;
+    if (mode === 'hindivowels' && typeof char === 'object' && 'pronunciation' in char && 'hindi' in char) {
+        const translitChar = char as HindiTransliteratedCharacter;
+        return `${translitChar.pronunciation} se ${translitChar.hindi}`;
     }
 
     if (mode === 'story' && typeof char === 'object' && 'story' in char) {
