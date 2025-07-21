@@ -19,7 +19,6 @@ import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
-import { getAudioForText } from '@/app/actions';
 
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -45,10 +44,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const [showInterstitial, setShowInterstitial] = useState(false);
 
-  const [isAudioLoading, setIsAudioLoading] = useState(false);
-  
+  const [isSpeaking, setIsSpeaking] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   
   // States for counting game
   const [showReward, setShowReward] = useState(false);
@@ -125,33 +123,33 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return '';
   }, [mode]);
 
-  const playSound = useCallback(async (text: string) => {
-    if (!soundEnabled || !text || isAudioLoading) return;
-    setIsAudioLoading(true);
-    try {
-      const voice = mode === 'hindi' ? 'Achernar' : 'Algenib';
-      const response = await getAudioForText(text, voice);
-      if (response.success && response.data?.audioUrl && audioRef.current) {
-        audioRef.current.src = response.data.audioUrl;
-        audioRef.current.play().catch(e => console.error("Audio play failed", e));
-      } else {
-        toast({
-          variant: 'destructive',
-          title: 'Audio Error',
-          description: response.error || 'Could not play audio.',
-        });
+  const playSound = useCallback((text: string) => {
+    if (!soundEnabled || !text || typeof window === 'undefined' || !window.speechSynthesis) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utteranceRef.current = utterance;
+
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
+
+    // Language and Voice selection
+    if (mode === 'hindi') {
+      utterance.lang = 'hi-IN';
+      const voices = window.speechSynthesis.getVoices();
+      const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
+      if (hindiVoice) {
+        utterance.voice = hindiVoice;
       }
-    } catch (e) {
-      console.error("Failed to get audio", e);
-      toast({
-          variant: 'destructive',
-          title: 'Audio Error',
-          description: 'Failed to generate audio.',
-      });
-    } finally {
-      setIsAudioLoading(false);
+    } else {
+      utterance.lang = 'en-US';
     }
-  }, [soundEnabled, isAudioLoading, mode, toast]);
+    
+    window.speechSynthesis.speak(utterance);
+  }, [soundEnabled, mode]);
 
 
   const handleReplaySound = () => {
@@ -163,16 +161,23 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const navigateAndPlaySound = useCallback((newIndex: number) => {
     setCurrentIndex(newIndex);
-  }, []);
+    const textToSpeak = getTextToSpeak(getCharacterData(newIndex));
+    if (textToSpeak) {
+      playSound(textToSpeak);
+    }
+  }, [getCharacterData, playSound, getTextToSpeak]);
 
   useEffect(() => {
-    // Auto-play sound for the new character/item when index changes.
-    const textToSpeak = getTextToSpeak(getCharacterData(currentIndex));
+    // Preload voices
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+    }
+    
+    const textToSpeak = getTextToSpeak(currentCharacter);
     if (textToSpeak) {
         playSound(textToSpeak);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex, getCharacterData, getTextToSpeak]); // Intentionally not including playSound to avoid re-triggering on its state changes
+  }, [currentIndex, getCharacterData, playSound, getTextToSpeak]);
 
 
   const handleNext = useCallback(() => {
@@ -223,7 +228,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   const handleCountTap = () => {
     setShowReward(true);
-    playSound(getTextToSpeak(currentCharacter));
+    const textToSpeak = getTextToSpeak(currentCharacter);
+    if (textToSpeak) {
+      playSound(textToSpeak);
+    }
   };
 
 
@@ -266,8 +274,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             key={`${mode}-${currentIndex}`}
             word={itemForStory?.word || ''}
             story={itemForStory?.story || 'No story available.'}
-            audioUrl={null}
-            isLoading={isAudioLoading}
+            isLoading={isSpeaking}
             onComplete={handleCompletion}
             onReplayAudio={handleReplaySound}
             isAudioAvailable={soundEnabled}
@@ -304,7 +311,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      <audio ref={audioRef} className="hidden" onEnded={() => setIsAudioLoading(false)} onError={() => setIsAudioLoading(false)} onCanPlayThrough={() => setIsAudioLoading(false)} />
       <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
@@ -337,11 +343,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
               variant="outline" 
               size="icon" 
               onClick={handleReplaySound} 
-              disabled={!soundEnabled || isAudioLoading}
+              disabled={!soundEnabled || isSpeaking}
               className="rounded-full w-14 h-14"
               aria-label="Replay Sound"
             >
-              {isAudioLoading ? (
+              {isSpeaking ? (
                   <Loader2 className="h-7 w-7 animate-spin" />
               ) : soundEnabled ? (
                 <Volume2 className="h-7 w-7" />

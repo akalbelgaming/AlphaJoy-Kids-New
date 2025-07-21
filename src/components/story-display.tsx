@@ -8,7 +8,6 @@ import { Loader2, BookOpen, Check, Volume2 } from 'lucide-react';
 interface StoryDisplayProps {
   word: string;
   story: string | null;
-  audioUrl: string | null;
   isLoading: boolean;
   onComplete: () => void;
   onReplayAudio: () => void;
@@ -18,7 +17,6 @@ interface StoryDisplayProps {
 export function StoryDisplay({
   word,
   story,
-  audioUrl,
   isLoading,
   onComplete,
   onReplayAudio,
@@ -43,7 +41,7 @@ export function StoryDisplay({
               {isAudioAvailable && (
                  <Button variant="outline" onClick={onReplayAudio} disabled={isLoading}>
                     {isLoading ? <Loader2 className="mr-2 h-5 w-5 animate-spin"/> : <Volume2 className="mr-2 h-5 w-5"/>}
-                    {isLoading ? 'Loading...' : 'Listen Again'}
+                    {isLoading ? 'Speaking...' : 'Listen Again'}
                  </Button>
               )}
             </>
@@ -53,7 +51,7 @@ export function StoryDisplay({
         </CardContent>
       </Card>
       <div className="flex gap-4 mt-4">
-        <Button size="lg" onClick={onComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoading}>
+        <Button size="lg" onClick={onComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground">
           <Check className="mr-2 h-5 w-5" />
           Next
         </Button>
