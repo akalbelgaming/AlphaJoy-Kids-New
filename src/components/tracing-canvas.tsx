@@ -103,20 +103,17 @@ export function TracingCanvas({
     setPathLength(0);
   }, [character, fontFamily]);
   
-  const isNumeric = /^\d+$/.test(character);
-  let fontSize = 'text-[350px]';
-  if (character.includes('=')) { // For Hindi transliteration like "a = अ"
-    fontSize = 'text-[200px]';
-  } else if (character.length > 2 && !isNumeric) {
-    fontSize = 'text-[150px]';
-  } else if (character.length > 1 && !isNumeric) {
-    fontSize = 'text-[200px]';
-  } else if (character.length === 2 && isNumeric) {
-    fontSize = 'text-[280px]';
-  } else if (character.length > 2 && isNumeric) {
-    fontSize = 'text-[200px]'
-  }
+  const isTransliteration = character.includes(' = ');
+  const [englishPart, hindiPart] = isTransliteration ? character.split(' = ') : ['', ''];
 
+  let fontSize = 'text-[350px]';
+  if (isTransliteration) {
+    fontSize = 'text-[200px]';
+  } else if (character.length > 2) {
+    fontSize = 'text-[150px]';
+  } else if (character.length > 1) {
+    fontSize = 'text-[200px]';
+  }
 
   return (
     <div className="w-full h-full flex flex-col gap-4 items-center justify-center">
@@ -134,12 +131,18 @@ export function TracingCanvas({
           <text
             x="50%"
             y="50%"
-            dy="0.35em"
             textAnchor="middle"
             className={cn("select-none font-bold fill-muted-foreground pointer-events-none", fontSize, difficultyStyles[difficulty])}
             style={{ fontFamily }}
           >
-            {character}
+            {isTransliteration ? (
+              <>
+                <tspan x="50%" dy="-0.6em">{hindiPart}</tspan>
+                <tspan x="50%" dy="1.2em">{englishPart}</tspan>
+              </>
+            ) : (
+              <tspan dy="0.35em">{character}</tspan>
+            )}
           </text>
           
           {/* User drawing */}
