@@ -106,13 +106,15 @@ export function TracingCanvas({
   const isTransliteration = character.includes(' = ');
   const [englishPart, hindiPart] = isTransliteration ? character.split(' = ') : ['', ''];
 
-  let fontSize = 'text-[350px]';
+  let fontSize;
   if (isTransliteration) {
     fontSize = 'text-[200px]';
   } else if (character.length > 2) {
+    // This handles longer words like in the reading section
     fontSize = 'text-[150px]';
-  } else if (character.length > 1) {
-    fontSize = 'text-[200px]';
+  } else {
+    // Default size for single/double letters and Hindi characters
+    fontSize = 'text-[350px]';
   }
 
   return (
