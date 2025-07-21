@@ -12,19 +12,19 @@ const activities = [
   {
     href: '/letters',
     title: 'Letters',
-    icon: <div className="text-5xl font-bold leading-none">A</div>,
+    icon: <div className="text-8xl font-bold leading-none">A</div>,
     color: 'from-red-400 to-red-600 text-white',
   },
   {
     href: '/numbers',
     title: 'Numbers',
-    icon: <div className="text-5xl font-bold leading-none">123</div>,
+    icon: <div className="text-8xl font-bold leading-none">1</div>,
     "color": 'from-blue-400 to-blue-600 text-white',
   },
   {
     "href": '/hindi',
     "title": 'Hindi',
-    "icon": <div className="text-5xl font-bold leading-none">अ</div>,
+    "icon": <div className="text-8xl font-bold leading-none">अ</div>,
     "color": 'from-orange-400 to-orange-600 text-white',
   },
    {
@@ -92,7 +92,7 @@ export default function Home() {
                 )}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <CardContent className="flex flex-col items-center justify-center p-2 sm:p-4 gap-2 text-center">
+                <CardContent className="flex flex-col items-center justify-center p-2 sm:p-4 gap-2 text-center w-full h-full">
                   <div className="flex-1 flex items-center justify-center">
                     {activity.icon}
                   </div>
