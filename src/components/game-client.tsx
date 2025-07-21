@@ -78,7 +78,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [completionTimes, setCompletionTimes] = useState<number[]>([]);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(false); // Default to false on server
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const speechQueueRef = useRef<string[]>([]);
   const speechTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -346,6 +346,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
       handleReplaySound();
     }
   }, [currentIndex]);
+  
+  useEffect(() => {
+    // Set soundEnabled state only on the client
+    setSoundEnabled(true);
+  }, []);
 
 
   const handleNext = useCallback(() => {
