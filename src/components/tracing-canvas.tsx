@@ -130,7 +130,7 @@ export function TracingCanvas({
           {/* Guide character */}
           <text
             x="50%"
-            y={isTransliteration ? "35%" : "50%"} // Adjust vertical alignment
+            y={isTransliteration ? "45%" : "50%"} // Adjust vertical alignment
             dominantBaseline="middle"
             textAnchor="middle"
             className={cn("select-none font-bold fill-muted-foreground pointer-events-none", fontSize, difficultyStyles[difficulty])}
@@ -138,8 +138,8 @@ export function TracingCanvas({
           >
             {isTransliteration ? (
               <>
-                <tspan dy="0">{hindiPart}</tspan>
-                <tspan x="50%" dy="1.4em">{englishPart}</tspan>
+                <tspan dy="-0.2em">{hindiPart}</tspan>
+                <tspan x="50%" dy="1.1em">{englishPart}</tspan>
               </>
             ) : (
               <tspan dy="0.35em">{character}</tspan>
