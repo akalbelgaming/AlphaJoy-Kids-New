@@ -51,6 +51,12 @@ const activities = [
     "icon": <div className="text-5xl font-bold">123</div>,
     "color": 'from-green-400 to-green-600 text-white',
   },
+    {
+    "href": '/coloring',
+    "title": 'Coloring',
+    "icon": <div className="text-5xl">🎨</div>,
+    "color": 'from-teal-400 to-teal-600 text-white',
+  },
   {
     "href": '/reading',
     "title": 'Reading',

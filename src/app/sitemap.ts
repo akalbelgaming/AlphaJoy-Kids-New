@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/pahada',
     '/shapes',
     '/counting',
+    '/coloring',
     '/reading',
     '/drawing',
     '/story',
