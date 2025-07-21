@@ -39,37 +39,3 @@ export function AdBanner({ className }: { className?: string }) {
     </div>
   );
 }
-
-
-/**
- * A component that shows an interstitial ad.
- * This is currently disabled but kept for reference.
- */
-export function InterstitialAd({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  if (!isOpen) return null;
-
-  return (
-     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Advertisement</AlertDialogTitle>
-          <AlertDialogDescription>
-            Please enjoy this ad while we load the next activity for you.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <div className="min-h-[250px] flex items-center justify-center">
-            {/* AdSense will automatically fill this */}
-        </div>
-        <AlertDialogFooter>
-          <AlertDialogAction onClick={onClose}>Continue to App</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
-}

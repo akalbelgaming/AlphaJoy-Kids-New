@@ -13,7 +13,7 @@ import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type Alph
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
-import { AdBanner, InterstitialAd } from "@/components/ad-placeholder";
+import { AdBanner } from "@/components/ad-placeholder";
 import { ColoringCanvas } from "@/components/coloring-canvas";
 import { CountingDisplay } from "@/components/counting-display";
 import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
@@ -28,8 +28,6 @@ import { useToast } from "@/hooks/use-toast";
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
-
-const INTERSTITIAL_AD_FREQUENCY = 5; // Show ad after every 5 completions
 
 // Generate tables from 2 to 20
 const pahadaTables: string[][] = [];
@@ -77,8 +75,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [clears, setClears] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [completionTimes, setCompletionTimes] = useState<number[]>([]);
-
-  const [showInterstitial, setShowInterstitial] = useState(false);
 
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -129,6 +125,17 @@ export default function GameClient({ mode }: {mode: Mode}) {
       if (!currentCharacter) return '';
       if (typeof currentCharacter === 'string') return currentCharacter;
       if (Array.isArray(currentCharacter)) return ''; // Pahada is now an array
+      
+      const hindiCharRegex = /[\u0900-\u097F]/;
+      if (hindiCharRegex.test(character)) {
+        return character;
+      }
+      
+      if (character.length > 2) {
+        if(character.includes('=')) return character;
+        return character.toUpperCase();
+      }
+
       if ('letter' in currentCharacter) return mode === 'reading' ? currentCharacter.word : currentCharacter.letter;
       if ('character' in currentCharacter) return currentCharacter.character; // For HindiCharacter
       if ('display' in currentCharacter) return currentCharacter.display; // For HindiTransliteratedCharacter
@@ -165,7 +172,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     
     if (mode === 'hindivowels' && typeof char === 'object' && 'pronunciation' in char && 'hindi' in char) {
         const translitChar = char as HindiTransliteratedCharacter;
-        return `${translitChar.pronunciation} se ${translitChar.hindi}`;
+        return translitChar.pronunciation;
     }
 
     if (mode === 'story' && typeof char === 'object' && 'story' in char) {
@@ -355,24 +362,13 @@ export default function GameClient({ mode }: {mode: Mode}) {
       setCompletionTimes((prev) => [...prev, (endTime - startTime) / 1000]);
     }
 
-    const newCompletions = completions + 1;
-    setCompletions(newCompletions);
-
-    if (newCompletions > 0 && newCompletions % INTERSTITIAL_AD_FREQUENCY === 0) {
-      setShowInterstitial(true);
-    } else {
-      handleNext();
-    }
-  }, [completions, handleNext, startTime]);
+    setCompletions((prev) => prev + 1);
+    handleNext();
+  }, [handleNext, startTime]);
   
   const handleClear = useCallback(() => {
     setClears((prev) => prev + 1);
   }, []);
-  
-  const closeInterstitial = useCallback(() => {
-    setShowInterstitial(false);
-    handleNext();
-  }, [handleNext]);
   
   const handleCountTap = () => {
     setShowReward(true);
@@ -473,7 +469,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   return (
     <div className="flex-1 w-full flex flex-col lg:flex-row gap-6 p-4 lg:p-6 mb-24">
-      <InterstitialAd isOpen={showInterstitial} onClose={closeInterstitial} />
       
       <aside className="w-full lg:w-80 lg:flex-shrink-0 flex flex-col gap-6">
         <CustomizationPanel 
