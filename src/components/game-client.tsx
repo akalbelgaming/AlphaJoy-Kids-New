@@ -227,9 +227,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => {
             if (speechQueueRef.current.length > 0) {
-                // Pause for 1 second before the next line in pahada mode
+                // Pause before the next line in pahada mode
                 if (mode === 'pahada') {
-                    speechTimeoutRef.current = setTimeout(speakNext, 1000);
+                    speechTimeoutRef.current = setTimeout(speakNext, 500);
                 } else {
                     speakNext();
                 }
