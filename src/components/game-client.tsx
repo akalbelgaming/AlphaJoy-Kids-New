@@ -173,6 +173,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
     } else if (mode === 'numbers' && typeof char === 'string') {
       return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'alphabet' && typeof char === 'object' && 'letter' in char) {
+      if (char.letter === 'Z') {
+        return `Zee, for ${char.word}`;
+      }
       return `${char.letter}, for ${char.word}`;
     } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
       return char.word;
