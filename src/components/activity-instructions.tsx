@@ -2,7 +2,7 @@
 "use client";
 
 import { BookOpen, Brush, Fingerprint, MousePointer, Paintbrush, Square, Type, Volume2, Loader2 } from "lucide-react";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
 
