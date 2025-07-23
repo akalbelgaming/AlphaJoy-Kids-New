@@ -220,8 +220,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return `Zee, for ${char.word}`;
       }
       return `${char.letter}, for ${char.word}`;
-    } else if (mode === 'reading' && typeof char === 'object' && 'word' in char) {
-      return char.word;
+    } else if (mode === 'reading' && typeof char === 'object' && 'word' in char && 'meaningHi' in char) {
+      const alphaChar = char as AlphabetCharacter;
+      const spelling = alphaChar.word.split('').join(' ');
+      return [`${spelling}`, `${alphaChar.word}`, `${alphaChar.word} maane ${alphaChar.meaningHi}`];
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && Array.isArray(char)) {
@@ -280,7 +282,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         utterance.onend = () => {
             if (speechQueueRef.current.length > 0) {
                 // Pause before the next line in pahada/poem/kabita mode
-                if (mode === 'pahada' || mode === 'poem' || mode === 'kabita') {
+                if (mode === 'pahada' || mode === 'poem' || mode === 'kabita' || mode === 'reading') {
                     speechTimeoutRef.current = setTimeout(speakNext, 500);
                 } else {
                     speakNext();
@@ -297,7 +299,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         };
 
         const voices = window.speechSynthesis.getVoices();
-        if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada' || mode === 'kabita') {
+        if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada' || mode === 'kabita' || (Array.isArray(textOrQueue) && textOrQueue.some(t => /[\u0900-\u097F]/.test(t))) ) {
             utterance.lang = 'hi-IN';
             const hindiVoice = voices.find(voice => voice.lang === 'hi-IN' && (voice.name.includes('Kalpana') || voice.name.includes('Google')));
             if (hindiVoice) utterance.voice = hindiVoice;
@@ -665,3 +667,5 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </>
   );
 }
+
+    

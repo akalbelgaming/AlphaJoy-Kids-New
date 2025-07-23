@@ -4,6 +4,7 @@ export interface AlphabetCharacter {
   word: string;
   hint: string;
   story: string;
+  meaningHi: string;
 }
 
 export interface ShapeCharacter {
@@ -21,32 +22,32 @@ export interface Poem {
 export const numbers: string[] = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
 export const alphabet: AlphabetCharacter[] = [
-  { letter: 'A', word: 'Apple', hint: 'red apple', story: 'A shiny Apple, red and round,\nThe tastiest treat I\'ve ever found!' },
-  { letter: 'B', word: 'Ball', hint: 'bouncy ball', story: 'A bouncy Ball, so big and bright,\nLoves to jump with all its might!' },
-  { letter: 'C', word: 'Cat', hint: 'cute cat', story: 'A cozy Cat, with a purr so sweet,\nNaps in sunbeams, on tired little feet.' },
-  { letter: 'D', word: 'Dog', hint: 'friendly dog', story: 'A happy Dog, with a wagging tail,\nBarks "hello!" on the garden trail.' },
-  { letter: 'E', word: 'Egg', hint: 'white egg', story: 'A little Egg, so smooth and white,\nHolds a sleepy baby bird inside!' },
-  { letter: 'F', word: 'Fish', hint: 'swimming fish', story: 'A tiny Fish, with a "swish" and "swoosh",\nBlows bubbly kisses from a seaweed bush.' },
-  { letter: 'G', word: 'Goat', hint: 'farm goat', story: 'A silly Goat, with a fuzzy chin,\nEats pajamas, what a grin!' },
-  { letter: 'H', word: 'Hat', hint: 'sun hat', story: 'A floppy Hat, for a sunny day,\nKeeps the happy sunbeams far away.' },
-  { letter: 'I', word: 'Igloo', hint: 'snow igloo', story: 'An icy Igloo, round and grand,\nThe coolest little house in all the land!' },
-  { letter: 'J', word: 'Jar', hint: 'jam jar', story: 'A sticky Jar, of strawberry jam,\n"Yummy in my tummy!" thank you, ma\'am!' },
-  { letter: 'K', word: 'Kite', hint: 'flying kite', story: 'A dancing Kite, on a string so long,\nSings to the clouds a windy song.' },
-  { letter: 'L', word: 'Lion', hint: 'roaring lion', story: 'A mighty Lion, with a giant ROAR,\nShakes the jungle floor and asks for more!' },
-  { letter: 'M', word: 'Monkey', hint: 'swinging monkey', story: 'A cheeky Monkey, full of glee,\nSwings by his tail from tree to tree!' },
-  { letter: 'N', word: 'Nest', hint: 'bird nest', story: 'A cozy Nest, made of twigs and string,\nWhere the baby bluebirds learn to sing.' },
-  { letter: 'O', word: 'Orange', hint: 'orange fruit', story: 'A juicy Orange, a sweet surprise,\nA little ball of sunshine for your eyes!' },
-  { letter: 'P', word: 'Pencil', hint: 'yellow pencil', story: 'A pointy Pencil, sharp and new,\nDraws magical worlds for me and you.' },
-  { letter: 'Q', word: 'Queen', hint: 'royal queen', story: 'A lovely Queen, with a sparkly crown,\nIs the kindest person in the town.' },
-  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit', story: 'A fluffy Rabbit, with a twitchy nose,\nHops through the flowers, on its tippy-toes.' },
-  { letter: 'S', word: 'Sun', hint: 'bright sun', story: 'The happy Sun, with a golden face,\nWakes the world with a warm embrace.' },
-  { letter: 'T', word: 'Tiger', hint: 'striped tiger', story: 'A stripy Tiger, orange and black,\nLoves to sneak and pounce for a snack!' },
-  { letter: 'U', word: 'Urn', hint: 'clay urn', story: 'A sturdy Urn, a pot so grand,\nCrafted with care by a skillful hand.' },
-  { letter: 'V', word: 'Violin', hint: 'musical violin', story: 'A little Violin, sings a tune so sweet,\nMakes you want to dance with your happy feet.' },
-  { letter: 'W', word: 'Watch', hint: 'wrist watch', story: 'A ticking Watch, goes "tick-tock-tick",\nTime for fun, be quick, be quick!' },
-  { letter: 'X', word: 'X-ray', hint: 'bone x-ray', story: 'An X-ray shows, with a magic flash,\nThe bones inside you in a dash!' },
-  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht', story: 'A sailing Yacht, on the ocean blue,\n"Adventure calls!" for me and you.' },
-  { letter: 'Z', word: 'Zebra', hint: 'striped zebra', story: 'A dizzy Zebra, black and white,\nIs a walking, talking, stripy sight!' },
+  { letter: 'A', word: 'Apple', hint: 'red apple', story: 'A shiny Apple, red and round,\nThe tastiest treat I\'ve ever found!', meaningHi: 'Seb' },
+  { letter: 'B', word: 'Ball', hint: 'bouncy ball', story: 'A bouncy Ball, so big and bright,\nLoves to jump with all its might!', meaningHi: 'Gend' },
+  { letter: 'C', word: 'Cat', hint: 'cute cat', story: 'A cozy Cat, with a purr so sweet,\nNaps in sunbeams, on tired little feet.', meaningHi: 'Billi' },
+  { letter: 'D', word: 'Dog', hint: 'friendly dog', story: 'A happy Dog, with a wagging tail,\nBarks "hello!" on the garden trail.', meaningHi: 'Kutta' },
+  { letter: 'E', word: 'Egg', hint: 'white egg', story: 'A little Egg, so smooth and white,\nHolds a sleepy baby bird inside!', meaningHi: 'Anda' },
+  { letter: 'F', word: 'Fish', hint: 'swimming fish', story: 'A tiny Fish, with a "swish" and "swoosh",\nBlows bubbly kisses from a seaweed bush.', meaningHi: 'Machhli' },
+  { letter: 'G', word: 'Goat', hint: 'farm goat', story: 'A silly Goat, with a fuzzy chin,\nEats pajamas, what a grin!', meaningHi: 'Bakri' },
+  { letter: 'H', word: 'Hat', hint: 'sun hat', story: 'A floppy Hat, for a sunny day,\nKeeps the happy sunbeams far away.', meaningHi: 'Topi' },
+  { letter: 'I', word: 'Igloo', hint: 'snow igloo', story: 'An icy Igloo, round and grand,\nThe coolest little house in all the land!', meaningHi: 'Baraf ka ghar' },
+  { letter: 'J', word: 'Jar', hint: 'jam jar', story: 'A sticky Jar, of strawberry jam,\n"Yummy in my tummy!" thank you, ma\'am!', meaningHi: 'Martbaan' },
+  { letter: 'K', word: 'Kite', hint: 'flying kite', story: 'A dancing Kite, on a string so long,\nSings to the clouds a windy song.', meaningHi: 'Patang' },
+  { letter: 'L', word: 'Lion', hint: 'roaring lion', story: 'A mighty Lion, with a giant ROAR,\nShakes the jungle floor and asks for more!', meaningHi: 'Sher' },
+  { letter: 'M', word: 'Monkey', hint: 'swinging monkey', story: 'A cheeky Monkey, full of glee,\nSwings by his tail from tree to tree!', meaningHi: 'Bandar' },
+  { letter: 'N', word: 'Nest', hint: 'bird nest', story: 'A cozy Nest, made of twigs and string,\nWhere the baby bluebirds learn to sing.', meaningHi: 'Ghosla' },
+  { letter: 'O', word: 'Orange', hint: 'orange fruit', story: 'A juicy Orange, a sweet surprise,\nA little ball of sunshine for your eyes!', meaningHi: 'Santra' },
+  { letter: 'P', word: 'Pencil', hint: 'yellow pencil', story: 'A pointy Pencil, sharp and new,\nDraws magical worlds for me and you.', meaningHi: 'Kalam' },
+  { letter: 'Q', word: 'Queen', hint: 'royal queen', story: 'A lovely Queen, with a sparkly crown,\nIs the kindest person in the town.', meaningHi: 'Rani' },
+  { letter: 'R', word: 'Rabbit', hint: 'hopping rabbit', story: 'A fluffy Rabbit, with a twitchy nose,\nHops through the flowers, on its tippy-toes.', meaningHi: 'Khargosh' },
+  { letter: 'S', word: 'Sun', hint: 'bright sun', story: 'The happy Sun, with a golden face,\nWakes the world with a warm embrace.', meaningHi: 'Suraj' },
+  { letter: 'T', word: 'Tiger', hint: 'striped tiger', story: 'A stripy Tiger, orange and black,\nLoves to sneak and pounce for a snack!', meaningHi: 'Bagh' },
+  { letter: 'U', word: 'Urn', hint: 'clay urn', story: 'A sturdy Urn, a pot so grand,\nCrafted with care by a skillful hand.', meaningHi: 'Kalash' },
+  { letter: 'V', word: 'Violin', hint: 'musical violin', story: 'A little Violin, sings a tune so sweet,\nMakes you want to dance with your happy feet.', meaningHi: 'Sarangi' },
+  { letter: 'W', word: 'Watch', hint: 'wrist watch', story: 'A ticking Watch, goes "tick-tock-tick",\nTime for fun, be quick, be quick!', meaningHi: 'Ghadi' },
+  { letter: 'X', word: 'X-ray', hint: 'bone x-ray', story: 'An X-ray shows, with a magic flash,\nThe bones inside you in a dash!', meaningHi: 'X-ray' },
+  { letter: 'Y', word: 'Yacht', hint: 'sailing yacht', story: 'A sailing Yacht, on the ocean blue,\n"Adventure calls!" for me and you.', meaningHi: 'Naav' },
+  { letter: 'Z', word: 'Zebra', hint: 'striped zebra', story: 'A dizzy Zebra, black and white,\nIs a walking, talking, stripy sight!', meaningHi: 'Zebra' },
 ];
 
 export const shapes: ShapeCharacter[] = [
@@ -410,3 +411,5 @@ export const hindiKabitas: Poem[] = [
     ]
   }
 ];
+
+    
