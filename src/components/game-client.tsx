@@ -76,6 +76,21 @@ const pahadaToSpeech = (tableLine: string): string => {
     return `${num1} ${num2Pronunciation} ja ${result}`;
 };
 
+// Function to spell out a word, handling double letters
+const spellOutWord = (word: string): string[] => {
+    const spelling: string[] = [];
+    const lowerWord = word.toLowerCase();
+    for (let i = 0; i < lowerWord.length; i++) {
+        if (i + 1 < lowerWord.length && lowerWord[i] === lowerWord[i+1]) {
+            spelling.push(`double ${lowerWord[i]}`);
+            i++; // Skip the next character
+        } else {
+            spelling.push(lowerWord[i]);
+        }
+    }
+    return spelling;
+};
+
 
 export default function GameClient({ mode }: {mode: Mode}) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -222,8 +237,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
       return `${char.letter}, for ${char.word}`;
     } else if (mode === 'reading' && typeof char === 'object' && 'word' in char && 'meaningHi' in char) {
       const alphaChar = char as AlphabetCharacter;
-      const spelling = alphaChar.word.split('').join(' ');
-      return [`${spelling}`, `${alphaChar.word}`, `${alphaChar.word} maane ${alphaChar.meaningHi}`];
+      const spelling = spellOutWord(alphaChar.word);
+      return [...spelling, alphaChar.word.toLowerCase(), `${alphaChar.word.toLowerCase()} maane ${alphaChar.meaningHi}`];
     } else if (mode === 'counting' && typeof char === 'string') {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && Array.isArray(char)) {
@@ -303,7 +318,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             utterance.lang = 'hi-IN';
             const hindiVoice = voices.find(voice => voice.lang === 'hi-IN' && (voice.name.includes('Kalpana') || voice.name.includes('Google')));
             if (hindiVoice) utterance.voice = hindiVoice;
-        } else if (mode === 'poem') {
+        } else if (mode === 'poem' || (mode === 'reading' && Array.isArray(textOrQueue) && textOrQueue.some(t => /maane/.test(t)))) {
             utterance.lang = 'en-IN';
             let indianFemaleVoice = voices.find(v => v.lang === 'en-IN' && (v.name.includes('Female') || v.name.includes('Google')));
             if (indianFemaleVoice) {
@@ -667,5 +682,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </>
   );
 }
+
+    
 
     
