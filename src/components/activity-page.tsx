@@ -41,6 +41,7 @@ export default function ActivityPage({ mode, title }: ActivityPageProps) {
       <main className="flex-1 flex flex-col p-4">
         {isClient ? <GameClient mode={mode} /> : (
           <div className="flex-1 flex items-center justify-center">
+             {/* This will be shown to crawlers and during server render */}
             <ActivityInstructions mode={mode} />
           </div>
         )}

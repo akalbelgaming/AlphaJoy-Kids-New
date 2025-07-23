@@ -36,6 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ActivityInstructions } from "./activity-instructions";
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
 type Difficulty = "easy" | "medium" | "hard";
@@ -440,21 +441,24 @@ export default function GameClient({ mode }: {mode: Mode}) {
       );
     }
     return (
-      <CustomizationPanel 
-          fontFamily={fontFamily}
-          onFontFamilyChange={setFontFamily}
-          strokeColor={strokeColor}
-          onStrokeColorChange={setStrokeColor}
-          strokeWidth={strokeWidth}
-          onStrokeWidthChange={setStrokeWidth}
-          difficulty={difficulty}
-          onDifficultyChange={setDifficulty}
-          completions={completions}
-          clears={clears}
-          completionTimes={completionTimes}
-          soundEnabled={soundEnabled}
-          onSoundEnabledChange={setSoundEnabled}
-      />
+      <div className="flex flex-col gap-6">
+        <CustomizationPanel 
+            fontFamily={fontFamily}
+            onFontFamilyChange={setFontFamily}
+            strokeColor={strokeColor}
+            onStrokeColorChange={setStrokeColor}
+            strokeWidth={strokeWidth}
+            onStrokeWidthChange={setStrokeWidth}
+            difficulty={difficulty}
+            onDifficultyChange={setDifficulty}
+            completions={completions}
+            clears={clears}
+            completionTimes={completionTimes}
+            soundEnabled={soundEnabled}
+            onSoundEnabledChange={setSoundEnabled}
+        />
+        <ActivityInstructions mode={mode} />
+      </div>
     );
   };
 
