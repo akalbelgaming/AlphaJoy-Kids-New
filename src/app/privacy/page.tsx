@@ -11,7 +11,7 @@ export default function PrivacyPolicyPage() {
   const [lastUpdated, setLastUpdated] = useState('');
 
   useEffect(() => {
-    setLastUpdated(new Date().toLocaleDateString());
+    setLastUpdated(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
   }, []);
 
   return (
@@ -40,32 +40,46 @@ export default function PrivacyPolicyPage() {
               Welcome to "Play Pad: ABC, Stories & Art". We are committed to protecting your privacy, especially for our youngest users. This Privacy Policy explains what information we collect and how we use it.
             </p>
 
-            <h2 className="text-lg font-semibold text-foreground">Information We Collect</h2>
+            <h2 className="text-lg font-semibold text-foreground">1. Information We Collect</h2>
             <p>
-              We do not collect any personally identifiable information from our users. Our app is designed to be used anonymously. We do not require users to create an account, and we do not ask for personal details like name, email address, or location.
+              We do not collect any personally identifiable information (like name, email, or location) from our users. Our app is designed to be used anonymously and does not require an account to play.
             </p>
 
-            <h2 className="text-lg font-semibold text-foreground">Advertisements</h2>
+            <h2 className="text-lg font-semibold text-foreground">2. Non-Personal Information</h2>
             <p>
-              Our app displays advertisements through Google AdSense. Google AdSense may use cookies to serve ads based on a user's prior visits to this and other websites. These ads are managed by Google and are subject to Google's privacy policies. We have configured our ad settings to be suitable for a family and child-friendly audience.
+              We may collect anonymous, non-personal information to improve the app. This includes:
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>Usage Data:</strong> Which activities are most popular and how they are used.</li>
+              <li><strong>Device Information:</strong> The type of device (e.g., mobile or tablet) being used, to help us optimize our design.</li>
+            </ul>
+             <p>This information is completely anonymous and cannot be used to identify any individual user.</p>
+
+            <h2 className="text-lg font-semibold text-foreground">3. Artificial Intelligence (AI) Features</h2>
+            <p>
+              Our app uses Artificial Intelligence (AI) to provide a better experience.
+            </p>
+            <ul className="list-disc list-inside space-y-1">
+              <li><strong>Coloring Page Generation:</strong> When you enter a word (e.g., "Apple") to create a coloring page, that word is sent to an AI service to generate an image. We do not store these words.</li>
+               <li><strong>Adaptive Difficulty:</strong> The app analyzes anonymous gameplay data (like success rate and time taken) to suggest a more suitable difficulty level. This data is not linked to any individual.</li>
+            </ul>
+
+            <h2 className="text-lg font-semibold text-foreground">4. Advertisements</h2>
+            <p>
+              Our app displays advertisements through Google AdSense. Google may use cookies to serve ads. We have configured our ad settings to be suitable for a family and child-friendly audience. For more information, please see Google's advertising policies.
             </p>
 
-            <h2 className="text-lg font-semibold text-foreground">Non-Personal Information</h2>
+            <h2 className="text-lg font-semibold text-foreground">5. Children's Privacy</h2>
             <p>
-              We may collect non-personal information, such as device type and app usage data (e.g., which activities are most popular). This information is collected to improve the app's performance and user experience and is completely anonymous.
+              Our application is designed for children. We are committed to protecting children's privacy and do not knowingly collect any personal information from them. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us so we can take appropriate action.
             </p>
 
-            <h2 className="text-lg font-semibold text-foreground">Children's Privacy</h2>
-            <p>
-              Our application is designed for children. We do not knowingly collect any personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us so we can take appropriate action.
-            </p>
-
-            <h2 className="text-lg font-semibold text-foreground">Changes to This Privacy Policy</h2>
+            <h2 className="text-lg font-semibold text-foreground">6. Changes to This Privacy Policy</h2>
             <p>
               We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page. You are advised to review this Privacy Policy periodically for any changes.
             </p>
 
-            <h2 className="text-lg font-semibold text-foreground">Contact Us</h2>
+            <h2 className="text-lg font-semibold text-foreground">7. Contact Us</h2>
             <p>
               If you have any questions about this Privacy Policy, you can contact us through the app store listing page.
             </p>
