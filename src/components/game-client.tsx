@@ -301,6 +301,16 @@ export default function GameClient({ mode }: {mode: Mode}) {
             utterance.lang = 'hi-IN';
             const hindiVoice = voices.find(voice => voice.lang === 'hi-IN' && (voice.name.includes('Kalpana') || voice.name.includes('Google')));
             if (hindiVoice) utterance.voice = hindiVoice;
+        } else if (mode === 'poem') {
+            utterance.lang = 'en-IN';
+            let indianFemaleVoice = voices.find(v => v.lang === 'en-IN' && (v.name.includes('Female') || v.name.includes('Google')));
+            if (indianFemaleVoice) {
+                utterance.voice = indianFemaleVoice;
+            } else { // Fallback to en-US if en-IN is not available
+                utterance.lang = 'en-US';
+                let femaleVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')));
+                if (femaleVoice) utterance.voice = femaleVoice;
+            }
         } else {
             utterance.lang = 'en-US';
             let femaleVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Google US English')));
