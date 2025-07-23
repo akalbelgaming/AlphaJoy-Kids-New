@@ -10,7 +10,7 @@ import {
   Loader2,
   Gift,
 } from "lucide-react";
-import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter } from "@/lib/characters";
+import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter, englishPoems, hindiKabitas, type Poem } from "@/lib/characters";
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
 import { StoryDisplay } from "@/components/story-display";
@@ -20,6 +20,7 @@ import { ShapeColoringCanvas } from "@/components/shape-coloring-canvas";
 import { CustomizationPanel } from '@/components/customization-panel';
 import { numberToWords, cn } from '@/lib/utils';
 import { PahadaDisplay } from '@/components/pahada-display';
+import { PoemDisplay } from '@/components/poem-display';
 
 
 import { Button } from "@/components/ui/button";
@@ -38,7 +39,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ActivityInstructions } from "./activity-instructions";
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring" | "poem" | "kabita";
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
@@ -126,6 +127,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return hindiTransliteratedCharacters;
       case "pahada":
         return pahadaTables;
+      case "poem":
+        return englishPoems;
+      case "kabita":
+        return hindiKabitas;
       default:
         return [];
     }
@@ -188,6 +193,11 @@ export default function GameClient({ mode }: {mode: Mode}) {
     return currentCharacter as string[];
   }, [mode, currentCharacter]);
 
+  const itemForPoem = useMemo(() => {
+    if (mode !== 'poem' && mode !== 'kabita' || !currentCharacter || !('lines' in currentCharacter)) return null;
+    return currentCharacter as Poem;
+  }, [mode, currentCharacter]);
+
   const getTextToSpeak = useCallback((char: any): string | string[] => {
     if (!char) return '';
 
@@ -216,6 +226,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return numberToWords(parseInt(char, 10)) || char;
     } else if (mode === 'pahada' && Array.isArray(char)) {
         return char.map(pahadaToSpeech);
+    } else if ((mode === 'poem' || mode === 'kabita') && typeof char === 'object' && 'lines' in char) {
+      const poem = char as Poem;
+      return [poem.title, ...poem.lines];
     }
     return '';
   }, [mode]);
@@ -263,8 +276,8 @@ export default function GameClient({ mode }: {mode: Mode}) {
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => {
             if (speechQueueRef.current.length > 0) {
-                // Pause before the next line in pahada mode
-                if (mode === 'pahada') {
+                // Pause before the next line in pahada/poem/kabita mode
+                if (mode === 'pahada' || mode === 'poem' || mode === 'kabita') {
                     speechTimeoutRef.current = setTimeout(speakNext, 500);
                 } else {
                     speakNext();
@@ -281,7 +294,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         };
 
         const voices = window.speechSynthesis.getVoices();
-        if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada') {
+        if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada' || mode === 'kabita') {
             utterance.lang = 'hi-IN';
             const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
             if (hindiVoice) utterance.voice = hindiVoice;
@@ -494,6 +507,20 @@ export default function GameClient({ mode }: {mode: Mode}) {
             isSpeaking={isSpeaking}
           />
         );
+      case "poem":
+      case "kabita":
+        const poem = itemForPoem;
+        if (!poem) return <Loader2 className="h-16 w-16 animate-spin" />;
+        return (
+          <PoemDisplay
+            key={`${mode}-${currentIndex}`}
+            poem={poem}
+            onComplete={handleCompletion}
+            onReplayAudio={handleReplaySound}
+            isAudioAvailable={soundEnabled}
+            isSpeaking={isSpeaking}
+          />
+        );
       case "shapes":
         const shape = itemForShapes;
         if (!shape) return <Loader2 className="h-16 w-16 animate-spin" />;
@@ -552,7 +579,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
   };
 
-  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting', 'pahada', 'hindivowels'].includes(mode);
+  const isSoundAvailableForMode = ['numbers', 'alphabet', 'reading', 'story', 'hindi', 'counting', 'pahada', 'hindivowels', 'poem', 'kabita'].includes(mode);
 
   if (mode === 'coloring') {
     return (
@@ -577,7 +604,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
               <ArrowLeft className="mr-2" /> Prev
             </Button>
             
-            {isSoundAvailableForMode && mode !== 'pahada' && (
+            {isSoundAvailableForMode && !['pahada', 'poem', 'kabita'].includes(mode) && (
               <Button 
                 variant="outline" 
                 size="icon" 

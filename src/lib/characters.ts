@@ -11,6 +11,12 @@ export interface ShapeCharacter {
   viewBox: string;
 }
 
+export interface Poem {
+  title: string;
+  author: string;
+  lines: string[];
+}
+
 export const numbers: string[] = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
 
 export const alphabet: AlphabetCharacter[] = [
@@ -72,4 +78,70 @@ export const readingWords: { word: string }[] = [
     { word: 'CAR' },
     { word: 'BOOK' },
     { word: 'STAR' },
+];
+
+export const englishPoems: Poem[] = [
+  {
+    title: "Twinkle, Twinkle, Little Star",
+    author: "Jane Taylor",
+    lines: [
+      "Twinkle, twinkle, little star,",
+      "How I wonder what you are!",
+      "Up above the world so high,",
+      "Like a diamond in the sky."
+    ]
+  },
+  {
+    title: "Baa, Baa, Black Sheep",
+    author: "Traditional",
+    lines: [
+      "Baa, baa, black sheep,",
+      "Have you any wool?",
+      "Yes, sir, yes, sir,",
+      "Three bags full."
+    ]
+  },
+  {
+    title: "Jack and Jill",
+    author: "Traditional",
+    lines: [
+      "Jack and Jill went up the hill",
+      "To fetch a pail of water;",
+      "Jack fell down and broke his crown,",
+      "And Jill came tumbling after."
+    ]
+  }
+];
+
+export const hindiKabitas: Poem[] = [
+  {
+    title: "मछली जल की रानी है",
+    author: "पारंपरिक",
+    lines: [
+      "मछली जल की रानी है,",
+      "जीवन उसका पानी है।",
+      "हाथ लगाओ तो डर जाएगी,",
+      "बाहर निकालो तो मर जाएगी।"
+    ]
+  },
+  {
+    title: "आलू कचालू बेटा",
+    author: "पारंपरिक",
+    lines: [
+      "आलू कचालू बेटा कहाँ गए थे,",
+      "बन्दर की झोपड़ी में सो रहे थे।",
+      "बन्दर ने लात मारी रो रहे थे,",
+      "मम्मी ने प्यार किया हँस रहे थे।"
+    ]
+  },
+  {
+    title: "चंदा मामा दूर के",
+    author: "पारंपरिक",
+    lines: [
+      "चंदा मामा दूर के,",
+      "पुए पकाएं बूर के।",
+      "आप खाएं थाली में,",
+      "मुन्ने को दें प्याली में।"
+    ]
+  }
 ];

@@ -1,7 +1,7 @@
 
 "use client";
 
-import { BookOpen, Brush, Fingerprint, MousePointer, Paintbrush, Square, Type, Volume2, Loader2, Info } from "lucide-react";
+import { BookOpen, Brush, Fingerprint, MousePointer, Paintbrush, Square, Type, Volume2, Loader2, Info, Mic } from "lucide-react";
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Button } from "./ui/button";
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/accordion"
 
 
-type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
+type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring" | "poem" | "kabita";
 
 interface ActivityInstructionsProps {
     mode: Mode;
@@ -96,6 +96,20 @@ const instructions = {
         titleHi: "कैसे सुनें",
         textEn: "Listen to a short, fun story about the word on the screen. Click the 'Listen' button to hear the story again. Click 'Next' to hear a new story.",
         textHi: "स्क्रीन पर दिए गए शब्द के बारे में एक छोटी, मजेदार कहानी सुनें। कहानी को फिर से सुनने के लिए 'Listen' बटन पर क्लिक करें। एक नई कहानी सुनने के लिए 'Next' पर क्लिक करें।",
+    },
+    poem: {
+        icon: <Mic className="h-5 w-5" />,
+        titleEn: "How to Listen",
+        titleHi: "कैसे सुनें",
+        textEn: "Listen to a fun English poem. Click the 'Listen' button to hear the poem again. Click 'Next' to hear a new poem.",
+        textHi: "एक मजेदार अंग्रेजी कविता सुनें। कविता को फिर से सुनने के लिए 'Listen' बटन पर क्लिक करें। एक नई कविता सुनने के लिए 'Next' पर क्लिक करें।",
+    },
+    kabita: {
+        icon: <Mic className="h-5 w-5" />,
+        titleEn: "How to Listen",
+        titleHi: "कैसे सुनें",
+        textEn: "Listen to a fun Hindi poem. Click the 'Listen' button to hear the poem again. Click 'Next' to hear a new poem.",
+        textHi: "एक मजेदार हिंदी कविता सुनें। कविता को फिर से सुनने के लिए 'Listen' बटन पर क्लिक करें। एक नई कविता सुनने के लिए 'Next' पर क्लिक करें।",
     }
 };
 

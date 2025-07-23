@@ -17,6 +17,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/reading',
     '/drawing',
     '/story',
+    '/poem',
+    '/kabita',
     '/privacy',
   ].map((route) => ({
     url: `${URL}${route}`,
