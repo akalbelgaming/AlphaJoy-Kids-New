@@ -6,6 +6,7 @@ import GameClient from '@/components/game-client';
 import { AdBanner } from '@/components/ad-placeholder';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { ActivityInstructions } from './activity-instructions';
 
 type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading" | "drawing" | "hindi" | "pahada" | "hindivowels" | "coloring";
 
@@ -37,8 +38,12 @@ export default function ActivityPage({ mode, title }: ActivityPageProps) {
         </div>
       </header>
       
-      <main className="flex-1 flex flex-col">
-        {isClient && <GameClient mode={mode} />}
+      <main className="flex-1 flex flex-col p-4">
+        {isClient ? <GameClient mode={mode} /> : (
+          <div className="flex-1 flex items-center justify-center">
+            <ActivityInstructions mode={mode} />
+          </div>
+        )}
       </main>
 
       <div className="fixed bottom-0 left-0 right-0 p-2 bg-background/80 backdrop-blur-sm border-t z-10">
