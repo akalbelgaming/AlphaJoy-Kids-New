@@ -228,7 +228,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         return char.map(pahadaToSpeech);
     } else if ((mode === 'poem' || mode === 'kabita') && typeof char === 'object' && 'lines' in char) {
       const poem = char as Poem;
-      return [poem.title, ...poem.lines];
+      return poem.lines;
     }
     return '';
   }, [mode]);
@@ -272,6 +272,9 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
         const utterance = new SpeechSynthesisUtterance(text);
         utteranceRef.current = utterance;
+        
+        utterance.rate = 0.9; // Slightly slower for clarity
+        utterance.pitch = 1.1; // Slightly higher pitch
 
         utterance.onstart = () => setIsSpeaking(true);
         utterance.onend = () => {
@@ -296,7 +299,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
         const voices = window.speechSynthesis.getVoices();
         if (mode === 'hindi' || mode === 'hindivowels' || mode === 'pahada' || mode === 'kabita') {
             utterance.lang = 'hi-IN';
-            const hindiVoice = voices.find(voice => voice.lang === 'hi-IN');
+            const hindiVoice = voices.find(voice => voice.lang === 'hi-IN' && (voice.name.includes('Kalpana') || voice.name.includes('Google')));
             if (hindiVoice) utterance.voice = hindiVoice;
         } else {
             utterance.lang = 'en-US';
