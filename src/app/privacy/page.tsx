@@ -31,13 +31,13 @@ export default function PrivacyPolicyPage() {
       <main className="flex-1 p-4 md:p-6">
         <Card className="max-w-4xl mx-auto">
           <CardHeader>
-            <CardTitle>Privacy Policy for Play Pad: ABC, Stories & Art</CardTitle>
+            <CardTitle>Privacy Policy for AlphaJoy Kids: ABC, 123 & Art</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 text-muted-foreground">
             <p><strong>Last Updated:</strong> {lastUpdated || 'Loading...'}</p>
 
             <p>
-              Welcome to "Play Pad: ABC, Stories & Art". We are committed to protecting your privacy, especially for our youngest users. This Privacy Policy explains what information we collect and how we use it.
+              Welcome to "AlphaJoy Kids: ABC, 123 & Art". We are committed to protecting your privacy, especially for our youngest users. This Privacy Policy explains what information we collect and how we use it.
             </p>
 
             <h2 className="text-lg font-semibold text-foreground">1. Information We Collect</h2>

@@ -12,7 +12,7 @@ export function AppLogo({ className }: { className?: string }) {
     <div className={cn("relative rounded-full overflow-hidden", className)}>
         <Image
             src="/logo.png"
-            alt="Play Pad App Logo"
+            alt="AlphaJoy Kids App Logo"
             width={120}
             height={120}
             className="object-contain"

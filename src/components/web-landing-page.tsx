@@ -19,11 +19,11 @@ const content = {
     },
     hero: {
       title: "Where Learning is a Game!",
-      subtitle: "Play Pad is a fun and safe world for kids to learn through letters, numbers, colors, and stories.",
+      subtitle: "AlphaJoy Kids is a fun and safe world for kids to learn through letters, numbers, colors, and stories.",
       download_google: "Download from Google Play"
     },
     features: {
-      title: "What's Special in Play Pad?",
+      title: "What's Special in AlphaJoy Kids?",
       list: [
         { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters (ABC), numbers (123), and Hindi alphabets (कखग) with guided tracing.", bgColor: "bg-blue-500" },
         { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Color beautiful shapes or enjoy free-drawing on a digital canvas.", bgColor: "bg-green-500" },
@@ -34,7 +34,7 @@ const content = {
       ]
     },
     why: {
-      title: "Why Choose Play Pad?",
+      title: "Why Choose AlphaJoy Kids?",
       list: [
         { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "Safe for Kids", description: "We have implemented safe ads following AdSense policies to ensure a child-friendly environment." },
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "Parent-Approved", description: "This app is designed under parental guidance to provide a positive and educational experience for children." },
@@ -45,7 +45,7 @@ const content = {
       title: "A Glimpse of Our App",
     },
     footer: {
-      copyright: "© 2024 Play Pad. All rights reserved.",
+      copyright: "© 2024 AlphaJoy Kids. All rights reserved.",
       privacy: "Privacy Policy",
     }
   },
@@ -56,11 +56,11 @@ const content = {
     },
     hero: {
       title: "जहाँ सीखना एक खेल है!",
-      subtitle: "Play Pad बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।",
+      subtitle: "AlphaJoy Kids बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।",
       download_google: "Google Play से डाउनलोड करें"
     },
     features: {
-      title: "Play Pad में क्या है खास?",
+      title: "AlphaJoy Kids में क्या है खास?",
       list: [
         { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग के साथ अक्षर (ABC), अंक (123), और हिंदी अक्षर (कखग) लिखना सीखें।", bgColor: "bg-blue-500" },
         { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "सुंदर आकृतियों में रंग भरें या डिजिटल कैनवास पर मुफ्त ड्राइंग का आनंद लें।", bgColor: "bg-green-500" },
@@ -71,7 +71,7 @@ const content = {
       ]
     },
     why: {
-      title: "Play Pad क्यों चुनें?",
+      title: "AlphaJoy Kids क्यों चुनें?",
       list: [
         { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "बच्चों के लिए सुरक्षित", description: "हमने बच्चों की सुरक्षा को ध्यान में रखते हुए, AdSense की नीतियों का पालन करते हुए, केवल सुरक्षित विज्ञापन लगाए हैं।"},
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "माता-पिता द्वारा प्रमाणित", description: "यह ऐप माता-पिता की देखरेख में बनाया गया है ताकि बच्चों को एक सकारात्मक और सीखने योग्य माहौल मिल सके।"},
@@ -82,7 +82,7 @@ const content = {
       title: "हमारे App की एक झलक",
     },
     footer: {
-      copyright: "© 2024 प्ले पैड। सर्वाधिकार सुरक्षित।",
+      copyright: "© 2024 AlphaJoy Kids. सर्वाधिकार सुरक्षित।",
       privacy: "गोपनीयता नीति",
     }
   }
@@ -105,7 +105,7 @@ export function WebLandingPage() {
         <div className="container mx-auto flex justify-between items-center p-4">
           <div className="flex items-center gap-3">
             <AppLogo className="h-12 w-12 flex-shrink-0" />
-            <h1 className="text-xl font-bold text-primary">Play Pad</h1>
+            <h1 className="text-xl font-bold text-primary">AlphaJoy Kids</h1>
           </div>
           <div className="flex items-center gap-2">
              <Button variant="outline" size="sm" onClick={toggleLanguage}>
@@ -143,7 +143,7 @@ export function WebLandingPage() {
              <div className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-primary/20">
                 <Image 
                   src="https://placehold.co/1200x600.png"
-                  alt="Kids playing with Play Pad app on a tablet"
+                  alt="Kids playing with AlphaJoy Kids app on a tablet"
                   width={1200}
                   height={600}
                   className="w-full h-auto object-cover"
@@ -174,7 +174,7 @@ export function WebLandingPage() {
           </div>
         </section>
 
-        {/* Why Choose Play Pad Section */}
+        {/* Why Choose AlphaJoy Kids Section */}
         <section className="bg-white py-16 md:py-24 px-4">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">

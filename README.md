@@ -1,4 +1,4 @@
-# Play Pad: ABC, Stories & Art
+# AlphaJoy Kids: ABC, 123 & Art
 
 A fun and educational game for kids to learn letters, numbers, and more by tracing, with an interactive story time feature.
 
