@@ -431,7 +431,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
     const newCompletionCount = completionCountForAd + 1;
     setCompletionCountForAd(newCompletionCount);
 
-    const threshold = (mode === 'poem' || mode === 'kabita') ? 2 : AD_GATE_THRESHOLD;
+    let threshold = AD_GATE_THRESHOLD;
+    if (mode === 'poem' || mode === 'kabita') {
+      threshold = 2;
+    } else if (mode === 'pahada') {
+      threshold = 1;
+    }
 
     if (mode !== 'drawing' && newCompletionCount >= threshold) {
       setNextAction(() => action); // Store the action to be performed after the ad
