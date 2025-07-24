@@ -16,11 +16,15 @@ declare global {
 export function AdBanner({ className }: { className?: string }) {
 
   useEffect(() => {
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense error:", err);
-    }
+    const timeout = setTimeout(() => {
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (err) {
+          console.error("AdSense error:", err);
+        }
+    }, 100);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
@@ -38,11 +42,6 @@ export function AdBanner({ className }: { className?: string }) {
         data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
-       <script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-9307441315088203"
-        crossOrigin="anonymous"
-      ></script>
     </div>
   );
 }
