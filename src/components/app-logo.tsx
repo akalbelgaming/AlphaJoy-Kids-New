@@ -9,12 +9,12 @@ import Image from 'next/image';
  */
 export function AppLogo({ className }: { className?: string }) {
   return (
-    <div className={cn("relative h-12 w-12", className)}>
+    <div className={cn("relative", className)}>
         <Image
             src="/logo.png"
             alt="Play Pad App Logo"
-            fill
-            sizes="(max-width: 768px) 10vw, (max-width: 1200px) 5vw, 3vw"
+            width={40}
+            height={40}
             className="object-contain"
         />
     </div>
