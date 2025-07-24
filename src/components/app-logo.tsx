@@ -13,8 +13,8 @@ export function AppLogo({ className }: { className?: string }) {
         <Image
             src="/logo.png"
             alt="AlphaJoy Kids App Logo"
-            width={100}
-            height={100}
+            width={120}
+            height={120}
             className="object-contain h-full w-full"
         />
     </div>
