@@ -11,7 +11,7 @@ export function AppLogo({ className }: { className?: string }) {
   return (
     <div className={cn("relative", className)}>
         <Image
-            src="/logo.png"
+            src="/logo.png?v=2"
             alt="AlphaJoy Kids App Logo"
             width={120}
             height={120}
