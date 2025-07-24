@@ -130,7 +130,7 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="w-full flex items-center justify-center gap-3">
            <div className="text-3xl flex-shrink-0">📖</div>
-           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center whitespace-nowrap">Play Pad: ABC, Stories & Art</h1>
+           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center">Play Pad: ABC, Stories & Art</h1>
         </div>
       </header>
       
