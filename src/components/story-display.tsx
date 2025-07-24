@@ -1,9 +1,10 @@
+
 "use client";
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, BookOpen, Check, Volume2 } from 'lucide-react';
+import { Loader2, BookOpen, Check, Volume2, ArrowRight } from 'lucide-react';
 
 interface StoryDisplayProps {
   word: string;
@@ -52,8 +53,7 @@ export function StoryDisplay({
       </Card>
       <div className="flex gap-4 mt-4">
         <Button size="lg" onClick={onComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Check className="mr-2 h-5 w-5" />
-          Next
+          Next <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </div>

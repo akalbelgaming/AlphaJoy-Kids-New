@@ -4,7 +4,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Check, Volume2, Mic, Loader2 } from 'lucide-react';
+import { Check, Volume2, Mic, Loader2, ArrowRight } from 'lucide-react';
 import { ScrollArea } from './ui/scroll-area';
 import type { Poem } from '@/lib/characters';
 
@@ -57,8 +57,7 @@ export function PoemDisplay({
           </Button>
         )}
         <Button size="lg" onClick={onComplete} className="w-32 bg-accent hover:bg-accent/90 text-accent-foreground">
-          <Check className="mr-2 h-5 w-5" />
-          Next
+          Next <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </div>
     </div>

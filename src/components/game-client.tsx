@@ -117,6 +117,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   // State for the rewarded ad gate
   const [showAdGate, setShowAdGate] = useState(false);
   const [completionCountForAd, setCompletionCountForAd] = useState(0);
+  const [nextAction, setNextAction] = useState<(() => void) | null>(null);
   const AD_GATE_THRESHOLD = 5; // Show ad after every 5 completions
 
   const { toast } = useToast();
@@ -368,6 +369,21 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }, 100);
   }, [getCharacterData, playSound, getTextToSpeak]);
 
+  const attemptNext = useCallback(() => {
+    if (characterSet.length > 0) {
+      const newIndex = (currentIndex + 1) % characterSet.length;
+      navigateAndPlaySound(newIndex);
+    }
+  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
+
+  const attemptPrev = useCallback(() => {
+    if (characterSet.length > 0) {
+      const newIndex = (currentIndex - 1 + characterSet.length) % characterSet.length;
+      navigateAndPlaySound(newIndex);
+    }
+  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
+
+
   useEffect(() => {
     // This effect ensures sound plays on initial load of the component
     // We wait for voices to be loaded.
@@ -411,20 +427,25 @@ export default function GameClient({ mode }: {mode: Mode}) {
     setSoundEnabled(true);
   }, []);
 
+  const gateAction = (action: () => void) => {
+    const newCompletionCount = completionCountForAd + 1;
+    setCompletionCountForAd(newCompletionCount);
 
-  const handleNext = useCallback(() => {
-    if (characterSet.length > 0) {
-      const newIndex = (currentIndex + 1) % characterSet.length;
-      navigateAndPlaySound(newIndex);
+    if (mode !== 'drawing' && newCompletionCount >= AD_GATE_THRESHOLD) {
+      setNextAction(() => action); // Store the action to be performed after the ad
+      setShowAdGate(true);
+    } else {
+      action(); // Perform the action immediately
     }
-  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
+  };
 
-  const handlePrev = useCallback(() => {
-    if (characterSet.length > 0) {
-      const newIndex = (currentIndex - 1 + characterSet.length) % characterSet.length;
-      navigateAndPlaySound(newIndex);
-    }
-  }, [characterSet.length, currentIndex, navigateAndPlaySound]);
+  const handleNext = () => {
+    gateAction(attemptNext);
+  };
+
+  const handlePrev = () => {
+    gateAction(attemptPrev);
+  };
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -440,16 +461,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
     }
     setCompletions((prev) => prev + 1);
     
-    const newCompletionCount = completionCountForAd + 1;
-    setCompletionCountForAd(newCompletionCount);
+    // The ad gate is now handled by the handleNext function called from here
+    handleNext();
 
-    if (mode !== 'drawing' && newCompletionCount >= AD_GATE_THRESHOLD) {
-      setShowAdGate(true);
-    } else {
-      handleNext();
-    }
-
-  }, [handleNext, startTime, completionCountForAd, mode]);
+  }, [handleNext, startTime]);
 
   const handleAdWatched = () => {
     setCompletionCountForAd(0); // Reset counter
@@ -458,7 +473,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
         title: "Thank you!",
         description: "You've unlocked more fun activities."
     });
-    handleNext(); // Proceed to next item
+    if (nextAction) {
+        nextAction(); // Perform the stored action (e.g., attemptNext or attemptPrev)
+        setNextAction(null); // Clear the stored action
+    }
   };
 
   
@@ -531,7 +549,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
           <PahadaDisplay
             key={`${mode}-${currentIndex}`}
             table={table}
-            onComplete={handleCompletion}
+            onComplete={handleNext}
             onReplayAudio={handleReplaySound}
             isAudioAvailable={soundEnabled}
             isSpeaking={isSpeaking}
@@ -545,7 +563,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
           <PoemDisplay
             key={`${mode}-${currentIndex}`}
             poem={poem}
-            onComplete={handleCompletion}
+            onComplete={handleNext}
             onReplayAudio={handleReplaySound}
             isAudioAvailable={soundEnabled}
             isSpeaking={isSpeaking}
@@ -574,7 +592,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
             word={itemForStory?.word || ''}
             story={itemForStory?.story || 'No story available.'}
             isLoading={isSpeaking}
-            onComplete={handleCompletion}
+            onComplete={handleNext}
             onReplayAudio={handleReplaySound}
             isAudioAvailable={soundEnabled}
           />
@@ -672,7 +690,10 @@ export default function GameClient({ mode }: {mode: Mode}) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setShowAdGate(false)}>Maybe Later</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => {
+              setShowAdGate(false);
+              setNextAction(null); // Clear action if user cancels
+            }}>Maybe Later</AlertDialogCancel>
             <AlertDialogAction onClick={handleAdWatched}>
               <Gift className="mr-2" /> Watch Ad & Continue
             </AlertDialogAction>
@@ -682,7 +703,3 @@ export default function GameClient({ mode }: {mode: Mode}) {
     </>
   );
 }
-
-    
-
-    
