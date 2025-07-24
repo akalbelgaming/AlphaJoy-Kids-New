@@ -13,9 +13,9 @@ export function AppLogo({ className }: { className?: string }) {
         <Image
             src="/logo.png"
             alt="Play Pad App Logo"
-            width={40}
-            height={40}
+            fill
             className="object-contain"
+            sizes="(max-width: 768px) 40px, 64px"
         />
     </div>
   );
