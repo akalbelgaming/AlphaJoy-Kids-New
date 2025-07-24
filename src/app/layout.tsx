@@ -5,7 +5,7 @@ import { InterstitialWrapper } from '@/components/interstitial-wrapper';
 import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
-  title: 'AlphaJoy Kids: ABC, 123 & Art',
+  title: 'AlphaJoy Kids: ABC, Stories & Art',
   description: 'A fun game for kids to trace letters, count numbers, draw, and listen to stories!',
   manifest: '/manifest.json',
 };

@@ -131,7 +131,7 @@ export default function Home() {
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="w-full flex items-center justify-center gap-3">
            <AppLogo className="h-10 w-10 flex-shrink-0" />
-           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center">AlphaJoy Kids: ABC, 123 & Art</h1>
+           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center">AlphaJoy Kids: ABC, Stories & Art</h1>
         </div>
       </header>
       

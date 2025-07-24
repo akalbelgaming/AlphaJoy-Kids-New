@@ -1,4 +1,4 @@
-# AlphaJoy Kids: ABC, 123 & Art
+# AlphaJoy Kids: ABC, Stories & Art
 
 A fun and educational game for kids to learn letters, numbers, and more by tracing, with an interactive story time feature.
 
