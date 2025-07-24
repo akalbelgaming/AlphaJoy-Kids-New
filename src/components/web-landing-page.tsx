@@ -24,9 +24,7 @@ export function WebLandingPage() {
           <div className="grid md:grid-cols-2">
             <div className="p-8 space-y-6 flex flex-col justify-center">
               <div className="flex items-center gap-4">
-                <div className="flex-shrink-0">
-                  <AppLogo className="h-16 w-16" />
-                </div>
+                <AppLogo className="h-16 w-16 flex-shrink-0" />
                 <div>
                   <h1 className="text-4xl font-bold text-primary tracking-tight">Play Pad: ABC, Stories & Art</h1>
                   <p className="text-lg text-muted-foreground mt-1">The complete fun-learning app for kids.</p>
