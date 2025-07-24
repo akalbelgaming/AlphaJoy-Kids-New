@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2 } from 'lucide-react';
+import { AppLogo } from './app-logo';
 
 const features = [
   { icon: <Fingerprint className="h-6 w-6 text-primary" />, title: "Tracing Games", description: "Learn to write letters (ABC), numbers (123), and Hindi alphabets (कखग) with guided tracing." },
@@ -23,7 +24,9 @@ export function WebLandingPage() {
           <div className="grid md:grid-cols-2">
             <div className="p-8 space-y-6 flex flex-col justify-center">
               <div className="flex items-center gap-4">
-                <div className="text-5xl flex-shrink-0 p-3 bg-primary/10 rounded-full">📖</div>
+                <div className="flex-shrink-0">
+                  <AppLogo className="h-16 w-16" />
+                </div>
                 <div>
                   <h1 className="text-4xl font-bold text-primary tracking-tight">Play Pad: ABC, Stories & Art</h1>
                   <p className="text-lg text-muted-foreground mt-1">The complete fun-learning app for kids.</p>

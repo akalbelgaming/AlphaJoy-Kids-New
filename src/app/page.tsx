@@ -8,6 +8,7 @@ import { AdBanner } from '@/components/ad-placeholder';
 import { cn } from '@/lib/utils';
 import { WebLandingPage } from '@/components/web-landing-page';
 import { Loader2 } from 'lucide-react';
+import { AppLogo } from '@/components/app-logo';
 
 const activities = [
   {
@@ -129,7 +130,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
         <div className="w-full flex items-center justify-center gap-3">
-           <div className="text-3xl flex-shrink-0">📖</div>
+           <AppLogo className="h-10 w-10 flex-shrink-0" />
            <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-headline text-center">Play Pad: ABC, Stories & Art</h1>
         </div>
       </header>
