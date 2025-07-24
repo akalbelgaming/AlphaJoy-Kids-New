@@ -2,25 +2,27 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React from "react";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogAction,
-} from "@/components/ui/alert-dialog";
+import React, { useEffect } from "react";
+
+declare global {
+  interface Window {
+    adsbygoogle: any;
+  }
+}
 
 /**
- * A component that renders a real Google AdSense banner ad unit.
+ * A component that renders a real Google AdMob banner ad unit.
  */
 export function AdBanner({ className }: { className?: string }) {
-  // This component now simply renders the ad slot.
-  // The main AdSense script loaded in layout.tsx will automatically
-  // find and fill this slot. This avoids the race condition
-  // that was causing the "availableWidth=0" error.
+
+  useEffect(() => {
+    try {
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
   return (
     <div
       className={cn(
@@ -31,11 +33,16 @@ export function AdBanner({ className }: { className?: string }) {
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-3781633352100587"
-        data-ad-slot="YOUR_AD_SLOT_ID" // TODO: Replace with your Ad Unit ID
+        data-ad-client="ca-app-pub-9307441315088203" // Your AdMob App ID's publisher part
+        data-ad-slot="6590213011" // Your AdMob Banner Ad Unit ID
         data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
+       <script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-app-pub-9307441315088203"
+        crossOrigin="anonymous"
+      ></script>
     </div>
   );
 }
