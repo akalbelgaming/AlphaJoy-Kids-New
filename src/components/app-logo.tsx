@@ -15,7 +15,7 @@ export function AppLogo({ className }: { className?: string }) {
             alt="AlphaJoy Kids App Logo"
             width={120}
             height={120}
-            className="object-contain h-full w-full"
+            className="object-contain h-full w-full rounded-full"
         />
     </div>
   );
