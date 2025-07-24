@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 import withPWAInit from "@ducanh2912/next-pwa";
 
@@ -24,6 +25,20 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+  },
+  // Add a cache-busting mechanism for the logo
+  async headers() {
+    return [
+      {
+        source: '/logo.png',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0',
+          },
+        ],
+      },
+    ]
   },
 };
 
