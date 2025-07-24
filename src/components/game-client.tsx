@@ -118,7 +118,14 @@ export default function GameClient({ mode }: {mode: Mode}) {
   const [showAdGate, setShowAdGate] = useState(false);
   const [completionCountForAd, setCompletionCountForAd] = useState(0);
   const [nextAction, setNextAction] = useState<(() => void) | null>(null);
-  const AD_GATE_THRESHOLD = 5; // Show ad after every 5 completions
+  
+  // Define threshold based on mode
+  let AD_GATE_THRESHOLD = 5;
+  if (mode === 'poem' || mode === 'kabita') {
+    AD_GATE_THRESHOLD = 2;
+  } else if (mode === 'pahada') {
+    AD_GATE_THRESHOLD = 1;
+  }
 
   const { toast } = useToast();
 
@@ -431,14 +438,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
     const newCompletionCount = completionCountForAd + 1;
     setCompletionCountForAd(newCompletionCount);
 
-    let threshold = AD_GATE_THRESHOLD;
-    if (mode === 'poem' || mode === 'kabita') {
-      threshold = 2;
-    } else if (mode === 'pahada') {
-      threshold = 1;
-    }
-
-    if (mode !== 'drawing' && newCompletionCount >= threshold) {
+    if (mode !== 'drawing' && newCompletionCount >= AD_GATE_THRESHOLD) {
       setNextAction(() => action); // Store the action to be performed after the ad
       setShowAdGate(true);
     } else {
@@ -474,6 +474,17 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [handleNext, startTime]);
 
   const handleAdWatched = () => {
+    // Check for internet connection before proceeding
+    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+        toast({
+            variant: "destructive",
+            title: "No Internet Connection",
+            description: "Please check your internet connection to continue.",
+            duration: 5000,
+        });
+        return;
+    }
+      
     setCompletionCountForAd(0); // Reset counter
     setShowAdGate(false);
     toast({
