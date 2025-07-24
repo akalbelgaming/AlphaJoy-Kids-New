@@ -9,7 +9,7 @@ import Image from 'next/image';
  */
 export function AppLogo({ className }: { className?: string }) {
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative rounded-full overflow-hidden", className)}>
         <Image
             src="/logo.png"
             alt="Play Pad App Logo"
