@@ -1,12 +1,13 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import {
-  BookOpen,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { AdBanner } from '@/components/ad-placeholder';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import { WebLandingPage } from '@/components/web-landing-page';
+import { Loader2 } from 'lucide-react';
 
 const activities = [
   {
@@ -89,7 +90,41 @@ const activities = [
   }
 ];
 
+// Simple hook to detect mobile based on user agent
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    // This code only runs on the client
+    const userAgent = typeof window.navigator === 'undefined' ? '' : navigator.userAgent;
+    const mobile = Boolean(userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i));
+    setIsMobile(mobile);
+  }, []);
+
+  return isMobile;
+}
+
 export default function Home() {
+  const [isClient, setIsClient] = useState(false);
+  const isMobile = useIsMobile();
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
+        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!isMobile) {
+    return <WebLandingPage />;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
