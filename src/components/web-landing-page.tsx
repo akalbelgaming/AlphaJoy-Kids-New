@@ -1,38 +1,123 @@
-
 "use client";
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart } from 'lucide-react';
+import { Card, CardContent } from './ui/card';
+import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart, Languages } from 'lucide-react';
 import { AppLogo } from './app-logo';
 import Image from 'next/image';
 
-const features = [
-  { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters (ABC), numbers (123), and Hindi alphabets (कखग) with guided tracing.", bgColor: "bg-blue-500" },
-  { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Color beautiful shapes or enjoy free-drawing on a digital canvas.", bgColor: "bg-green-500" },
-  { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI Coloring Pages", description: "Type any word and let our AI create a unique coloring page for you instantly!", bgColor: "bg-purple-500" },
-  { icon: <BookOpen className="h-8 w-8 text-white" />, title: "Story Time", description: "Listen to fun, short audio stories for different words to build vocabulary.", bgColor: "bg-red-500" },
-  { icon: <Mic className="h-8 w-8 text-white" />, title: "Fun Poems (Kabita)", description: "Listen to classic English and Hindi nursery rhymes and poems.", bgColor: "bg-yellow-500" },
-  { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "And Much More!", description: "Counting games, learning multiplication tables (Pahada), and more activities.", bgColor: "bg-pink-500" },
-];
+type Language = 'en' | 'hi';
+
+const content = {
+  en: {
+    header: {
+      download: "Download Now",
+      toggle: "हिंदी में देखें",
+    },
+    hero: {
+      title: "Where Learning is a Game!",
+      subtitle: "Play Pad is a fun and safe world for kids to learn through letters, numbers, colors, and stories.",
+      download_google: "Download from Google Play"
+    },
+    features: {
+      title: "What's Special in Play Pad?",
+      list: [
+        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters (ABC), numbers (123), and Hindi alphabets (कखग) with guided tracing.", bgColor: "bg-blue-500" },
+        { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Color beautiful shapes or enjoy free-drawing on a digital canvas.", bgColor: "bg-green-500" },
+        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI Coloring Pages", description: "Type any word and let our AI create a unique coloring page for you instantly!", bgColor: "bg-purple-500" },
+        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "Story Time", description: "Listen to fun, short audio stories for different words to build vocabulary.", bgColor: "bg-red-500" },
+        { icon: <Mic className="h-8 w-8 text-white" />, title: "Fun Poems (Kabita)", description: "Listen to classic English and Hindi nursery rhymes and poems.", bgColor: "bg-yellow-500" },
+        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "And Much More!", description: "Counting games, learning multiplication tables (Pahada), and more activities.", bgColor: "bg-pink-500" },
+      ]
+    },
+    why: {
+      title: "Why Choose Play Pad?",
+      list: [
+        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "Safe for Kids", description: "We have implemented safe ads following AdSense policies to ensure a child-friendly environment." },
+        { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "Parent-Approved", description: "This app is designed under parental guidance to provide a positive and educational experience for children." },
+        { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "Learning Through Play", description: "Our interactive games keep children engaged, allowing them to learn new things while having fun." },
+      ]
+    },
+    gallery: {
+      title: "A Glimpse of Our App",
+    },
+    footer: {
+      copyright: "© 2024 Play Pad. All rights reserved.",
+      privacy: "Privacy Policy",
+    }
+  },
+  hi: {
+    header: {
+      download: "अभी डाउनलोड करें",
+      toggle: "View in English",
+    },
+    hero: {
+      title: "जहाँ सीखना एक खेल है!",
+      subtitle: "Play Pad बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।",
+      download_google: "Google Play से डाउनलोड करें"
+    },
+    features: {
+      title: "Play Pad में क्या है खास?",
+      list: [
+        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग के साथ अक्षर (ABC), अंक (123), और हिंदी अक्षर (कखग) लिखना सीखें।", bgColor: "bg-blue-500" },
+        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "सुंदर आकृतियों में रंग भरें या डिजिटल कैनवास पर मुफ्त ड्राइंग का आनंद लें।", bgColor: "bg-green-500" },
+        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI कलरिंग पेज", description: "कोई भी शब्द टाइप करें और हमारे AI को तुरंत आपके लिए एक अनूठा कलरिंग पेज बनाने दें!", bgColor: "bg-purple-500" },
+        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "कहानी का समय", description: "शब्दावली बनाने के लिए विभिन्न शब्दों के लिए मजेदार, छोटी ऑडियो कहानियां सुनें।", bgColor: "bg-red-500" },
+        { icon: <Mic className="h-8 w-8 text-white" />, title: "मजेदार कविताएं", description: "क्लासिक अंग्रेजी और हिंदी नर्सरी राइम और कविताएं सुनें।", bgColor: "bg-yellow-500" },
+        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "और भी बहुत कुछ!", description: "गिनती के खेल, गुणा सारणी (पहाड़ा) सीखना, और अधिक गतिविधियाँ।", bgColor: "bg-pink-500" },
+      ]
+    },
+    why: {
+      title: "Play Pad क्यों चुनें?",
+      list: [
+        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "बच्चों के लिए सुरक्षित", description: "हमने बच्चों की सुरक्षा को ध्यान में रखते हुए, AdSense की नीतियों का पालन करते हुए, केवल सुरक्षित विज्ञापन लगाए हैं।"},
+        { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "माता-पिता द्वारा प्रमाणित", description: "यह ऐप माता-पिता की देखरेख में बनाया गया है ताकि बच्चों को एक सकारात्मक और सीखने योग्य माहौल मिल सके।"},
+        { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "खेल-खेल में पढ़ाई", description: "हमारे इंटरैक्टिव गेम्स बच्चों को बोर नहीं होने देते और वे खेल-खेल में ही बहुत कुछ सीख जाते हैं।"},
+      ]
+    },
+    gallery: {
+      title: "हमारे App की एक झलक",
+    },
+    footer: {
+      copyright: "© 2024 प्ले पैड। सर्वाधिकार सुरक्षित।",
+      privacy: "गोपनीयता नीति",
+    }
+  }
+};
+
 
 export function WebLandingPage() {
+  const [language, setLanguage] = useState<Language>('hi');
+
+  const toggleLanguage = () => {
+    setLanguage(prevLang => (prevLang === 'hi' ? 'en' : 'hi'));
+  };
+  
+  const currentContent = content[language];
+
   return (
     <div className="flex flex-col min-h-screen bg-sky-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-md">
         <div className="container mx-auto flex justify-between items-center p-4">
           <div className="flex items-center gap-3">
-            <AppLogo className="h-12 w-12" />
+            <AppLogo className="h-12 w-12 flex-shrink-0" />
             <h1 className="text-xl font-bold text-primary">Play Pad</h1>
           </div>
-          <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
-            <Button className="bg-green-600 hover:bg-green-700">
-              <Download className="mr-2 h-5 w-5" />
-              Download Now
+          <div className="flex items-center gap-2">
+             <Button variant="outline" size="sm" onClick={toggleLanguage}>
+                <Languages className="mr-2 h-4 w-4" />
+                {currentContent.header.toggle}
             </Button>
-          </a>
+            <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
+              <Button className="bg-green-600 hover:bg-green-700">
+                <Download className="mr-2 h-5 w-5" />
+                {currentContent.header.download}
+              </Button>
+            </a>
+          </div>
         </div>
       </header>
 
@@ -41,16 +126,16 @@ export function WebLandingPage() {
         <section className="text-center py-16 md:py-24 px-4 bg-white">
           <div className="container mx-auto">
             <h2 className="text-4xl md:text-6xl font-extrabold text-primary tracking-tight">
-              जहाँ सीखना एक खेल है!
+              {currentContent.hero.title}
             </h2>
             <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
-              Play Pad बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।
+              {currentContent.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
                <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-10 bg-green-600 hover:bg-green-700 shadow-lg">
                     <Download className="mr-3 h-6 w-6" />
-                    Download from Google Play
+                    {currentContent.hero.download_google}
                   </Button>
                 </a>
             </div>
@@ -71,9 +156,9 @@ export function WebLandingPage() {
         {/* Features Section */}
         <section id="features" className="py-16 md:py-24 px-4">
           <div className="container mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">Play Pad में क्या है खास?</h3>
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.features.title}</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
+              {currentContent.features.list.map((feature, index) => (
                 <Card key={index} className="text-center shadow-lg hover:shadow-xl hover:-translate-y-2 transition-transform duration-300">
                   <CardContent className="p-6">
                     <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${feature.bgColor}`}>
@@ -93,29 +178,17 @@ export function WebLandingPage() {
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <h3 className="text-3xl md:text-4xl font-bold text-primary mb-6">Play Pad क्यों चुनें?</h3>
+                <h3 className="text-3xl md:text-4xl font-bold text-primary mb-6">{currentContent.why.title}</h3>
                  <ul className="space-y-4">
-                    <li className="flex items-start gap-4">
-                        <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />
-                        <div>
-                            <h4 className="font-semibold text-lg">बच्चों के लिए सुरक्षित</h4>
-                            <p className="text-muted-foreground">हमने बच्चों की सुरक्षा को ध्यान में रखते हुए, AdSense की नीतियों का पालन करते हुए, केवल सुरक्षित विज्ञापन लगाए हैं।</p>
-                        </div>
-                    </li>
-                    <li className="flex items-start gap-4">
-                        <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />
-                        <div>
-                            <h4 className="font-semibold text-lg">माता-पिता द्वारा प्रमाणित</h4>
-                            <p className="text-muted-foreground">यह ऐप माता-पिता की देखरेख में बनाया गया है ताकि बच्चों को एक सकारात्मक और सीखने योग्य माहौल मिल सके।</p>
-                        </div>
-                    </li>
-                    <li className="flex items-start gap-4">
-                        <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />
-                        <div>
-                            <h4 className="font-semibold text-lg">खेल-खेल में पढ़ाई</h4>
-                            <p className="text-muted-foreground">हमारे इंटरैक्टिव गेम्स बच्चों को बोर नहीं होने देते और वे खेल-खेल में ही बहुत कुछ सीख जाते हैं।</p>
-                        </div>
-                    </li>
+                    {currentContent.why.list.map((item, index) => (
+                       <li key={index} className="flex items-start gap-4">
+                          {item.icon}
+                          <div>
+                              <h4 className="font-semibold text-lg">{item.title}</h4>
+                              <p className="text-muted-foreground">{item.description}</p>
+                          </div>
+                      </li>
+                    ))}
                  </ul>
               </div>
               <div className="rounded-2xl overflow-hidden shadow-2xl">
@@ -135,7 +208,7 @@ export function WebLandingPage() {
         {/* Gallery Section */}
         <section className="py-16 md:py-24 px-4">
             <div className="container mx-auto text-center">
-              <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">हमारे App की एक झलक</h3>
+              <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot tracing" width={300} height={500} alt="App Screenshot 1" className="w-full"/></div>
                   <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot coloring" width={300} height={500} alt="App Screenshot 2" className="w-full"/></div>
@@ -150,10 +223,10 @@ export function WebLandingPage() {
       {/* Footer */}
       <footer className="bg-primary text-primary-foreground py-8 px-4">
         <div className="container mx-auto text-center">
-          <p>© 2024 Play Pad. All rights reserved.</p>
+          <p>{currentContent.footer.copyright}</p>
           <div className="mt-4">
             <Link href="/privacy" className="text-sm text-primary-foreground/80 hover:text-white hover:underline">
-              Privacy Policy
+              {currentContent.footer.privacy}
             </Link>
           </div>
         </div>
@@ -161,5 +234,3 @@ export function WebLandingPage() {
     </div>
   );
 }
-
-    
