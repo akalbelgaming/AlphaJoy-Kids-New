@@ -43,6 +43,12 @@ type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading"
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
+declare global {
+  interface Window {
+    adsbygoogle: any;
+  }
+}
+
 // Generate tables from 2 to 20
 const pahadaTables: string[][] = [];
 for (let i = 2; i <= 20; i++) {
@@ -474,27 +480,43 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [handleNext, startTime]);
 
   const handleAdWatched = () => {
-    // Check for internet connection before proceeding
-    if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    if (window.adsbygoogle) {
+      window.adsbygoogle.push({
+        key: 'ca-app-pub-9307441315088203/1785507107', // Your Rewarded Ad Unit ID
+        onComplete: (reward: any) => {
+            console.log('Reward received', reward);
+            toast({
+                title: "Thank you!",
+                description: "You've unlocked more fun activities."
+            });
+            setCompletionCountForAd(0); // Reset counter
+            if (nextAction) {
+                nextAction(); // Perform the stored action
+                setNextAction(null); // Clear the stored action
+            }
+        },
+        onFail: () => {
+            console.error('Rewarded ad failed to load or show.');
+            toast({
+                variant: 'destructive',
+                title: 'Ad failed',
+                description: "The ad couldn't be shown. Please try again.",
+            });
+        },
+      });
+    } else {
+        console.warn("Ad provider not ready, granting reward directly for testing.");
         toast({
-            variant: "destructive",
-            title: "No Internet Connection",
-            description: "Please check your internet connection to continue.",
-            duration: 5000,
+            title: "Ad not available",
+            description: "Proceeding without ad for now."
         });
-        return;
+        setCompletionCountForAd(0);
+        if (nextAction) {
+            nextAction();
+            setNextAction(null);
+        }
     }
-      
-    setCompletionCountForAd(0); // Reset counter
     setShowAdGate(false);
-    toast({
-        title: "Thank you!",
-        description: "You've unlocked more fun activities."
-    });
-    if (nextAction) {
-        nextAction(); // Perform the stored action (e.g., attemptNext or attemptPrev)
-        setNextAction(null); // Clear the stored action
-    }
   };
 
   

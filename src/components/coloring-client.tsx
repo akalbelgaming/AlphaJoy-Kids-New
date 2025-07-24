@@ -22,6 +22,12 @@ import { cn } from '@/lib/utils';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
 
+declare global {
+  interface Window {
+    adsbygoogle: any;
+  }
+}
+
 interface ColoringClientProps {
   strokeColor: string;
   strokeWidth: number;
@@ -37,6 +43,33 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
   const [strokeWidth, setStrokeWidth] = useState(initialStrokeWidth);
 
   const { toast } = useToast();
+  
+  const generateAndSetImage = useCallback(async () => {
+      setIsLoading(true);
+      setImageUrl(null); // Clear previous image while loading
+      toast({
+        title: 'Our AI is drawing for you!',
+        description: 'Please wait a moment...',
+      });
+  
+      const response = await getColoringPage(prompt);
+      
+      setIsLoading(false);
+      if (response.success && response.data?.imageUrl) {
+        setImageUrl(response.data.imageUrl);
+        toast({
+          variant: 'default',
+          title: 'Your coloring page is ready!',
+          description: `Happy coloring this ${prompt}!`,
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Oh no! Something went wrong.',
+          description: response.error || 'The AI could not create an image. Please try another word.',
+        });
+      }
+  }, [prompt, toast]);
 
   const handleGenerateClick = () => {
     if (!prompt) {
@@ -50,32 +83,37 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
     setShowRewardDialog(true);
   };
 
-  const handleAdWatched = useCallback(async () => {
-    setIsLoading(true);
-    setImageUrl(null); // Clear previous image while loading
-    toast({
-      title: 'Our AI is drawing for you!',
-      description: 'Please wait a moment...',
-    });
-
-    const response = await getColoringPage(prompt);
-    
-    setIsLoading(false);
-    if (response.success && response.data?.imageUrl) {
-      setImageUrl(response.data.imageUrl);
-      toast({
-        variant: 'default',
-        title: 'Your coloring page is ready!',
-        description: `Happy coloring this ${prompt}!`,
-      });
+  const handleAdWatched = useCallback(() => {
+    // Show the rewarded ad
+    if (window.adsbygoogle) {
+       window.adsbygoogle.push({
+         key: 'ca-app-pub-9307441315088203/1785507107', // Your Rewarded Ad Unit ID
+         onComplete: (reward: any) => {
+           console.log('Reward received', reward);
+           toast({
+             title: 'Thank you for watching!',
+             description: `Creating a page for "${prompt}"...`
+           });
+           generateAndSetImage();
+         },
+         onFail: () => {
+            console.error('Rewarded ad failed to load or show.');
+            toast({
+              variant: 'destructive',
+              title: 'Ad failed',
+              description: "The ad couldn't be shown. Please try again.",
+            });
+         }
+       });
     } else {
-      toast({
-        variant: 'destructive',
-        title: 'Oh no! Something went wrong.',
-        description: response.error || 'The AI could not create an image. Please try another word.',
-      });
+        console.warn("Ad provider not ready, granting reward directly for testing.");
+        toast({
+            title: "Ad not available",
+            description: "Proceeding without ad for now."
+        });
+        generateAndSetImage();
     }
-  }, [prompt, toast]);
+  }, [generateAndSetImage, prompt, toast]);
 
   const handleClear = () => {
     // This is handled by the canvas, but we could add more logic here if needed
