@@ -9,13 +9,13 @@ import Image from 'next/image';
  */
 export function AppLogo({ className }: { className?: string }) {
   return (
-    <div className={cn("relative rounded-full overflow-hidden", className)}>
+    <div className={cn("relative", className)}>
         <Image
             src="/logo.png"
             alt="AlphaJoy Kids App Logo"
-            width={120}
-            height={120}
-            className="object-contain"
+            width={100}
+            height={100}
+            className="object-contain h-full w-full"
         />
     </div>
   );
