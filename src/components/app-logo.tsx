@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 /**
  * A reusable component for the app logo.
- * It uses the Next.js Image component for optimization.
+ * It uses the Next.js Image component with explicit width and height for reliability.
  * The logo image file should be placed in the `public` folder.
  */
 export function AppLogo({ className }: { className?: string }) {
@@ -13,9 +13,9 @@ export function AppLogo({ className }: { className?: string }) {
         <Image
             src="/logo.png"
             alt="Play Pad App Logo"
-            fill
+            width={120}
+            height={120}
             className="object-contain"
-            sizes="(max-width: 768px) 40px, 64px"
         />
     </div>
   );
