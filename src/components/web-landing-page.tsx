@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from 'react';
@@ -89,7 +90,7 @@ const content = {
 
 
 export function WebLandingPage() {
-  const [language, setLanguage] = useState<Language>('hi');
+  const [language, setLanguage] = useState<Language>('en');
 
   const toggleLanguage = () => {
     setLanguage(prevLang => (prevLang === 'hi' ? 'en' : 'hi'));
