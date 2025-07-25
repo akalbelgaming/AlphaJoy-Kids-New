@@ -14,8 +14,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog"
 
 
@@ -54,11 +54,11 @@ const content = {
       ]
     },
     reviews: {
-      title: "Loved by Kids & Parents Worldwide",
+      title: "Built for a Great Learning Experience",
       list: [
-        { name: "Sunita P.", text: "My 4-year-old loves this app! The tracing games have really improved his writing." },
-        { name: "Amit K.", text: "The AI coloring feature is amazing. My kids can create pages for hours. Highly recommended!" },
-        { name: "Riya S.", text: "A great collection of activities. The Hindi poems are a nice touch for teaching our native language." },
+        { name: "Perfect for Preschoolers!", text: "Designed to improve writing skills in a fun and interactive way. A great start for early learners." },
+        { name: "Endless Creativity!", text: "The AI coloring feature provides a unique new page every time. A must-have for little artists." },
+        { name: "Bilingual Fun!", text: "A great collection of activities, including Hindi poems and alphabets to help connect with native language." },
       ]
     },
     gallery: {
@@ -101,11 +101,11 @@ const content = {
       ]
     },
      reviews: {
-      title: "दुनिया भर में बच्चों और माता-पिता द्वारा पसंद किया गया",
+      title: "एक बेहतरीन सीखने के अनुभव के लिए बनाया गया",
       list: [
-        { name: "सुनीता पी.", text: "मेरी 4 साल की बेटी को यह ऐप बहुत पसंद है! ट्रेसिंग गेम्स ने वास्तव में उसकी लिखाई में सुधार किया है।" },
-        { name: "अमित के.", text: "एआई कलरिंग फीचर अद्भुत है। मेरे बच्चे घंटों तक पेज बना सकते हैं। अत्यधिक अनुशंसित!" },
-        { name: "रिया एस.", text: "गतिविधियों का एक बड़ा संग्रह। हिंदी कविताएं हमारी मातृभाषा सिखाने के लिए एक अच्छा स्पर्श हैं।" },
+        { name: "छोटे बच्चों के लिए बिल्कुल सही!", text: "मज़ेदार और इंटरैक्टिव तरीके से लिखने के कौशल में सुधार करने के लिए डिज़ाइन किया गया। छोटे बच्चों के लिए एक बेहतरीन शुरुआत।" },
+        { name: "अंतहीन रचनात्मकता!", text: "AI कलरिंग सुविधा हर बार एक अनूठा नया पेज प्रदान करती है। छोटे कलाकारों के लिए यह ज़रूरी है।" },
+        { name: "द्विभाषी मज़ा!", text: "मातृभाषा से जुड़ने में मदद करने के लिए हिंदी कविताओं और अक्षरों सहित गतिविधियों का एक बड़ा संग्रह।" },
       ]
     },
     gallery: {
@@ -294,8 +294,8 @@ export function WebLandingPage() {
               {currentContent.reviews.list.map((review, index) => (
                 <Card key={index} className="text-left shadow-lg">
                   <CardContent className="p-6">
-                    <p className="text-muted-foreground italic">"{review.text}"</p>
-                    <p className="mt-4 font-semibold text-right">- {review.name}</p>
+                    <p className="font-bold text-lg text-gray-800">{review.name}</p>
+                    <p className="text-muted-foreground mt-2">"{review.text}"</p>
                   </CardContent>
                 </Card>
               ))}
@@ -319,7 +319,5 @@ export function WebLandingPage() {
     </div>
   );
 }
-
-    
 
     
