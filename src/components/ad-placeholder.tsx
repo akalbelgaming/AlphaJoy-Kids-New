@@ -40,8 +40,8 @@ export function AdBanner({ className }: { className?: string }) {
       <ins
         className="adsbygoogle"
         style={{ display: "block" }}
-        data-ad-client="ca-pub-3781633352100587" // Your AdSense Publisher ID
-        data-ad-slot="6590213011" // Your AdMob Banner Ad Unit ID
+        data-ad-client="ca-pub-3781633352100587" // Your AdSense Publisher ID for the website
+        data-ad-slot="6590213011" // Your Ad Unit ID for the website banner
         data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
