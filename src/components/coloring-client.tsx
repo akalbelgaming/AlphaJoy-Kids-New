@@ -86,7 +86,7 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
   const handleAdWatched = useCallback(() => {
     // Show the rewarded ad
     if (window.adsbygoogle) {
-       window.adsbygoogle.push({
+       (window.adsbygoogle = window.adsbygoogle || []).push({
          key: 'ca-app-pub-9307441315088203/1785507107', // Your Rewarded Ad Unit ID
          onComplete: (reward: any) => {
            console.log('Reward received', reward);

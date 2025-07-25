@@ -481,7 +481,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   const handleAdWatched = () => {
     if (window.adsbygoogle) {
-      window.adsbygoogle.push({
+      (window.adsbygoogle = window.adsbygoogle || []).push({
         key: 'ca-app-pub-9307441315088203/1785507107', // Your Rewarded Ad Unit ID
         onComplete: (reward: any) => {
             console.log('Reward received', reward);
