@@ -1,6 +1,7 @@
 
 "use client";
 
+import * as React from 'react';
 import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from './ui/button';
@@ -31,17 +32,17 @@ const content = {
       subtitle: "AlphaJoy Kids is a fun and safe world for kids to learn through letters, numbers, colors, and stories.",
       download_google: "Download from Google Play",
       rating: "4.8/5 Star Rating",
-      downloads: "500,000+ Downloads",
+      downloads: "50k+ Downloads",
     },
     features: {
       title: "What's Special in AlphaJoy Kids?",
       list: [
-        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters, numbers, and more with guided tracing activities.", bgColor: "bg-blue-500", details: "Our app offers a wide variety of tracing activities, including English letters (ABC), numbers (1-100), and Hindi alphabets (vowels and consonants). The guided tracing helps children develop fine motor skills and learn the correct formation of each character in a fun, interactive way." },
-        { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Unleash creativity with colors and shapes, or draw anything you can imagine.", bgColor: "bg-green-500", details: "Kids can color beautiful pre-defined shapes like circles, stars, and hearts, or let their imagination run wild in the free-draw mode. With multiple colors and adjustable pencil sizes, it's a complete digital canvas for your little artist." },
-        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI Coloring Pages", description: "Instantly create unique coloring pages from any word you can think of.", bgColor: "bg-purple-500", details: "A truly magical feature! Just type any word like 'apple' or 'car', and our advanced AI will generate a brand new, custom coloring page for you in seconds. It provides endless coloring fun and helps kids associate words with images." },
-        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "Story Time", description: "Listen to fun, short audio stories that build vocabulary and listening skills.", bgColor: "bg-red-500", details: "Build vocabulary and listening skills with our collection of short, engaging stories. Each story is based on a word, helping children learn its meaning and context in an entertaining format. Just click 'Listen' and enjoy!" },
-        { icon: <Mic className="h-8 w-8 text-white" />, title: "Fun Poems (Kabita)", description: "Enjoy classic English and Hindi nursery rhymes with audio.", bgColor: "bg-yellow-500", details: "Enjoy a collection of timeless nursery rhymes and poems in both English and Hindi. This feature is perfect for improving pronunciation and language skills while listening to familiar classics like 'Twinkle, Twinkle' and 'Machli Jal Ki Rani'." },
-        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "And Much More!", description: "Includes interactive counting games, multiplication tables, and more!", bgColor: "bg-pink-500", details: "The fun never stops! AlphaJoy Kids also includes interactive counting games to learn numbers visually and a complete section for learning multiplication tables (Pahada) from 2 to 20, making math easy and enjoyable." },
+        { icon: <Fingerprint className="h-8 w-8 text-blue-500" />, title: "Tracing Games", description: "Learn to write letters, numbers, and more with guided tracing activities.", bgColor: "bg-blue-100", details: "Our app offers a wide variety of tracing activities, including English letters (ABC), numbers (1-100), and Hindi alphabets (vowels and consonants). The guided tracing helps children develop fine motor skills and learn the correct formation of each character in a fun, interactive way." },
+        { icon: <Palette className="h-8 w-8 text-green-500" />, title: "Coloring & Drawing", description: "Unleash creativity with colors and shapes, or draw anything you can imagine.", bgColor: "bg-green-100", details: "Kids can color beautiful pre-defined shapes like circles, stars, and hearts, or let their imagination run wild in the free-draw mode. With multiple colors and adjustable pencil sizes, it's a complete digital canvas for your little artist." },
+        { icon: <Wand2 className="h-8 w-8 text-purple-500" />, title: "AI Coloring Pages", description: "Instantly create unique coloring pages from any word you can think of.", bgColor: "bg-purple-100", details: "A truly magical feature! Just type any word like 'apple' or 'car', and our advanced AI will generate a brand new, custom coloring page for you in seconds. It provides endless coloring fun and helps kids associate words with images." },
+        { icon: <BookOpen className="h-8 w-8 text-red-500" />, title: "Story Time", description: "Listen to fun, short audio stories that build vocabulary and listening skills.", bgColor: "bg-red-100", details: "Build vocabulary and listening skills with our collection of short, engaging stories. Each story is based on a word, helping children learn its meaning and context in an entertaining format. Just click 'Listen' and enjoy!" },
+        { icon: <Mic className="h-8 w-8 text-yellow-500" />, title: "Fun Poems (Kabita)", description: "Enjoy classic English and Hindi nursery rhymes with audio.", bgColor: "bg-yellow-100", details: "Enjoy a collection of timeless nursery rhymes and poems in both English and Hindi. This feature is perfect for improving pronunciation and language skills while listening to familiar classics like 'Twinkle, Twinkle' and 'Machli Jal Ki Rani'." },
+        { icon: <CheckCircle2 className="h-8 w-8 text-pink-500" />, title: "And Much More!", description: "Includes interactive counting games, multiplication tables, and more!", bgColor: "bg-pink-100", details: "The fun never stops! AlphaJoy Kids also includes interactive counting games to learn numbers visually and a complete section for learning multiplication tables (Pahada) from 2 to 20, making math easy and enjoyable." },
       ]
     },
      why: {
@@ -70,7 +71,7 @@ const content = {
   },
   hi: {
     header: {
-      download: "अभी डाउनलोड करें",
+      download: " अभी डाउनलोड करें",
       toggle: "View in English",
     },
     hero: {
@@ -78,17 +79,17 @@ const content = {
       subtitle: "AlphaJoy Kids बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।",
       download_google: "Google Play से डाउनलोड करें",
       rating: "4.8/5 स्टार रेटिंग",
-      downloads: "500,000+ डाउनलोड",
+      downloads: "50k+ डाउनलोड",
     },
     features: {
       title: "AlphaJoy Kids में क्या है खास?",
       list: [
-        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग गतिविधियों के साथ अक्षर, अंक, और बहुत कुछ लिखना सीखें।", bgColor: "bg-blue-500", details: "हमारा ऐप कई तरह की ट्रेसिंग गतिविधियाँ प्रदान करता है, जिसमें अंग्रेजी अक्षर (ABC), संख्याएँ (1-100), और हिंदी अक्षर (स्वर और व्यंजन) शामिल हैं। निर्देशित ट्रेसिंग बच्चों को ठीक मोटर कौशल विकसित करने और मजेदार, इंटरैक्टिव तरीके से प्रत्येक अक्षर का सही गठन सीखने में मदद करती है।" },
-        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "रंगों और आकृतियों के साथ रचनात्मकता दिखाएँ, या अपनी कल्पना से कुछ भी बनाएं।", bgColor: "bg-green-500", details: "बच्चे सुंदर पूर्व-निर्धारधारित आकृतियों जैसे वृत्त, तारे और दिल में रंग भर सकते हैं, या फ्री-ड्रा मोड में अपनी कल्पना को उड़ान दे सकते हैं। कई रंगों और समायोज्य पेंसिल आकारों के साथ, यह आपके छोटे कलाकार के लिए एक संपूर्ण डिजिटल कैनवास है।" },
-        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI कलरिंग पेज", description: "किसी भी शब्द से तुरंत अद्वितीय कलरिंग पेज बनाएं।", bgColor: "bg-purple-500", details: "एक जादुई सुविधा! बस 'सेब' या 'गाड़ी' जैसा कोई भी शब्द टाइप करें, और हमारा उन्नत AI सेकंडों में आपके लिए एक नया, कस्टम कलरिंग पेज बना देगा। यह अंतहीन रंग भरने का मज़ा प्रदान करता है और बच्चों को शब्दों को छवियों से जोड़ने में मदद करता है।" },
-        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "कहानी का समय", description: "मजेदार, छोटी ऑडियो कहानियाँ सुनें जो शब्दावली और सुनने के कौशल का निर्माण करती हैं।", bgColor: "bg-red-500", details: "छोटी, आकर्षक कहानियों के हमारे संग्रह के साथ शब्दावली और सुनने के कौशल का निर्माण करें। प्रत्येक कहानी एक शब्द पर आधारित है, जो बच्चों को मनोरंजक प्रारूप में उसका अर्थ और संदर्भ सीखने में मदद करती है। बस 'सुनो' पर क्लिक करें और आनंद लें!" },
-        { icon: <Mic className="h-8 w-8 text-white" />, title: "मजेदार कविताएं", description: "ऑडियो के साथ क्लासिक अंग्रेजी और हिंदी कविताओं का आनंद लें।", bgColor: "bg-yellow-500", details: "अंग्रेजी और हिंदी दोनों में सदाबहार कविताओं और कविताओं के संग्रह का आनंद लें। यह सुविधा 'मछली जल की रानी' और 'ट्विंकल, ट्विंकल' जैसे परिचित क्लासिक्स को सुनते हुए उच्चारण और भाषा कौशल में सुधार के लिए एकदम सही है।" },
-        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "और भी बहुत कुछ!", description: "इसमें इंटरैक्टिव गिनती के खेल, पहाड़ा, और बहुत कुछ शामिल है!", bgColor: "bg-pink-500", details: "मज़ा कभी खत्म नहीं होता! AlphaJoy Kids में संख्याओं को सीखने के लिए इंटरैक्टिव गिनती के खेल और 2 से 20 तक गुणा सारणी (पहाड़ा) सीखने के लिए एक पूरा खंड भी शामिल है, जो गणित को आसान और मनोरंजक बनाता है।" },
+        { icon: <Fingerprint className="h-8 w-8 text-blue-500" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग गतिविधियों के साथ अक्षर, अंक, और बहुत कुछ लिखना सीखें।", bgColor: "bg-blue-100", details: "हमारा ऐप कई तरह की ट्रेसिंग गतिविधियाँ प्रदान करता है, जिसमें अंग्रेजी अक्षर (ABC), संख्याएँ (1-100), और हिंदी अक्षर (स्वर और व्यंजन) शामिल हैं। निर्देशित ट्रेसिंग बच्चों को ठीक मोटर कौशल विकसित करने और मजेदार, इंटरैक्टिव तरीके से प्रत्येक अक्षर का सही गठन सीखने में मदद करती है।" },
+        { icon: <Palette className="h-8 w-8 text-green-500" />, title: "रंग भरना और ड्राइंग", description: "रंगों और आकृतियों के साथ रचनात्मकता दिखाएँ, या अपनी कल्पना से कुछ भी बनाएं।", bgColor: "bg-green-100", details: "बच्चे सुंदर पूर्व-निर्धारधारित आकृतियों जैसे वृत्त, तारे और दिल में रंग भर सकते हैं, या फ्री-ड्रा मोड में अपनी कल्पना को उड़ान दे सकते हैं। कई रंगों और समायोज्य पेंसिल आकारों के साथ, यह आपके छोटे कलाकार के लिए एक संपूर्ण डिजिटल कैनवास है।" },
+        { icon: <Wand2 className="h-8 w-8 text-purple-500" />, title: "AI कलरिंग पेज", description: "किसी भी शब्द से तुरंत अद्वितीय कलरिंग पेज बनाएं।", bgColor: "bg-purple-100", details: "एक जादुई सुविधा! बस 'सेब' या 'गाड़ी' जैसा कोई भी शब्द टाइप करें, और हमारा उन्नत AI सेकंडों में आपके लिए एक नया, कस्टम कलरिंग पेज बना देगा। यह अंतहीन रंग भरने का मज़ा प्रदान करता है और बच्चों को शब्दों को छवियों से जोड़ने में मदद करता है।" },
+        { icon: <BookOpen className="h-8 w-8 text-red-500" />, title: "कहानी का समय", description: "मजेदार, छोटी ऑडियो कहानियाँ सुनें जो शब्दावली और सुनने के कौशल का निर्माण करती हैं।", bgColor: "bg-red-100", details: "छोटी, आकर्षक कहानियों के हमारे संग्रह के साथ शब्दावली और सुनने के कौशल का निर्माण करें। प्रत्येक कहानी एक शब्द पर आधारित है, जो बच्चों को मनोरंजक प्रारूप में उसका अर्थ और संदर्भ सीखने में मदद करती है। बस 'सुनो' पर क्लिक करें और आनंद लें!" },
+        { icon: <Mic className="h-8 w-8 text-yellow-500" />, title: "मजेदार कविताएं", description: "ऑडियो के साथ क्लासिक अंग्रेजी और हिंदी कविताओं का आनंद लें।", bgColor: "bg-yellow-100", details: "अंग्रेजी और हिंदी दोनों में सदाबहार कविताओं और कविताओं के संग्रह का आनंद लें। यह सुविधा 'मछली जल की रानी' और 'ट्विंकल, ट्विंकल' जैसे परिचित क्लासिक्स को सुनते हुए उच्चारण और भाषा कौशल में सुधार के लिए एकदम सही है।" },
+        { icon: <CheckCircle2 className="h-8 w-8 text-pink-500" />, title: "और भी बहुत कुछ!", description: "इसमें इंटरैक्टिव गिनती के खेल, पहाड़ा, और बहुत कुछ शामिल है!", bgColor: "bg-pink-100", details: "मज़ा कभी खत्म नहीं होता! AlphaJoy Kids में संख्याओं को सीखने के लिए इंटरैक्टिव गिनती के खेल और 2 से 20 तक गुणा सारणी (पहाड़ा) सीखने के लिए एक पूरा खंड भी शामिल है, जो गणित को आसान और मनोरंजक बनाता है।" },
       ]
     },
     why: {
@@ -198,31 +199,27 @@ export function WebLandingPage() {
         
         {/* Features Section */}
         <section id="features" className="py-12 md:py-24 px-4">
-          <div className="container mx-auto">
-            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">{currentContent.features.title}</h3>
+          <div className="container mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.features.title}</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {currentContent.features.list.map((feature, index) => (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
-                    <Card className="text-left shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden">
-                      <div className={`h-32 flex items-center justify-center ${feature.bgColor}`}>
+                    <Card className="text-center shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden p-6 flex flex-col items-center gap-4">
+                      <div className={`w-20 h-20 rounded-full flex items-center justify-center ${feature.bgColor}`}>
                         {feature.icon}
                       </div>
-                      <CardContent className="p-6">
-                        <h4 className="font-bold text-lg text-gray-800">{feature.title}</h4>
-                        <p className="text-muted-foreground mt-1 text-sm">{feature.description}</p>
-                        <div className="flex items-center text-xs text-blue-600 font-semibold mt-4">
-                          <Info className="mr-1 h-3 w-3" />
-                          <span>Click to learn more</span>
-                        </div>
-                      </CardContent>
+                      <div className="mt-2">
+                         <h4 className="font-bold text-xl text-gray-800">{feature.title}</h4>
+                         <p className="text-muted-foreground mt-1 text-sm">{feature.description}</p>
+                      </div>
                     </Card>
                   </DialogTrigger>
                   <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-3">
                         <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center ${feature.bgColor}`}>
-                          {feature.icon}
+                          {React.cloneElement(feature.icon, {className: "h-6 w-6"})}
                         </div>
                         <span className="text-2xl">{feature.title}</span>
                       </DialogTitle>
@@ -322,3 +319,7 @@ export function WebLandingPage() {
     </div>
   );
 }
+
+    
+
+    
