@@ -229,7 +229,7 @@ export function WebLandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 px-4">
+      <footer className="bg-primary text-primary-foreground py-8 px-4 pb-20">
         <div className="container mx-auto text-center">
           <p>{currentContent.footer.copyright}</p>
           <div className="mt-4">
