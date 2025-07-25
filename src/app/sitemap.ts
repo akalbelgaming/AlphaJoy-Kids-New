@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 // Replace with your final domain
-const URL = 'https://play-pad.vercel.app';
+const URL = 'https://alphajoy-kids.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [

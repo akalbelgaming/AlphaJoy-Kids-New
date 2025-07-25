@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/api/', // Disallow crawling of API routes
     },
-    sitemap: 'https://play-pad.vercel.app/sitemap.xml', // Replace with your final domain
+    sitemap: 'https://alphajoy-kids.vercel.app/sitemap.xml', // Replace with your final domain
   };
 }
