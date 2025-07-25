@@ -1,22 +1,21 @@
-
 {
-  "name": "Play Pad: ABC, Stories & Art",
-  "short_name": "Play Pad",
+  "name": "AlphaJoy Kids: ABC, Stories & Art",
+  "short_name": "AlphaJoy Kids",
   "description": "A fun and educational game for kids to learn letters, numbers, and more by tracing, with an interactive story time feature.",
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/logo-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/logo-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ],
-  "theme_color": "#ff5c8a",
-  "background_color": "#f8f9fa",
+  "theme_color": "#F43F5E",
+  "background_color": "#FEF2F2",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait"
