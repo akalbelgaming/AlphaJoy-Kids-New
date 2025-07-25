@@ -25,6 +25,7 @@ import { Label } from './ui/label';
 declare global {
   interface Window {
     adsbygoogle: any;
+    showRewardedAd: (onComplete: () => void, onFail: () => void) => void;
   }
 }
 
@@ -84,34 +85,33 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
   };
 
   const handleAdWatched = useCallback(() => {
-    // Show the rewarded ad
-    if (window.adsbygoogle) {
-       (window.adsbygoogle = window.adsbygoogle || []).push({
-         key: 'ca-app-pub-9307441315088203/1785507107', // Your Rewarded Ad Unit ID
-         onComplete: (reward: any) => {
-           console.log('Reward received', reward);
-           toast({
-             title: 'Thank you for watching!',
-             description: `Creating a page for "${prompt}"...`
-           });
-           generateAndSetImage();
-         },
-         onFail: () => {
-            console.error('Rewarded ad failed to load or show.');
-            toast({
-              variant: 'destructive',
-              title: 'Ad failed',
-              description: "The ad couldn't be shown. Please try again.",
-            });
-         }
-       });
+    // This is a placeholder for web testing.
+    // The actual Rewarded Ad logic will be injected by a native wrapper (e.g., Capacitor).
+    const onComplete = () => {
+      console.log('Reward received');
+      toast({
+        title: 'Thank you for watching!',
+        description: `Creating a page for "${prompt}"...`
+      });
+      generateAndSetImage();
+    };
+
+    const onFail = () => {
+      console.error('Rewarded ad failed to load or show.');
+      toast({
+        variant: 'destructive',
+        title: 'Ad failed',
+        description: "The ad couldn't be shown right now. Please try again later.",
+      });
+    };
+    
+    // In a real mobile app build, `window.showRewardedAd` would be provided by a native script.
+    if (typeof window.showRewardedAd === 'function') {
+      window.showRewardedAd(onComplete, onFail);
     } else {
-        console.warn("Ad provider not ready, granting reward directly for testing.");
-        toast({
-            title: "Ad not available",
-            description: "Proceeding without ad for now."
-        });
-        generateAndSetImage();
+      console.warn("Rewarded ad function not found. Simulating success for web testing.");
+      // Fallback for web development: grant the reward directly.
+      onComplete();
     }
   }, [generateAndSetImage, prompt, toast]);
 
