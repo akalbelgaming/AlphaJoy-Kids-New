@@ -8,6 +8,13 @@ import { Card, CardContent } from './ui/card';
 import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart, Languages } from 'lucide-react';
 import { AppLogo } from './app-logo';
 import Image from 'next/image';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 
 type Language = 'en' | 'hi';
 
@@ -20,7 +27,9 @@ const content = {
     hero: {
       title: "Where Learning is a Game!",
       subtitle: "AlphaJoy Kids is a fun and safe world for kids to learn through letters, numbers, colors, and stories.",
-      download_google: "Download from Google Play"
+      download_google: "Download from Google Play",
+      rating: "4.8/5 Star Rating",
+      downloads: "500,000+ Downloads",
     },
     features: {
       title: "What's Special in AlphaJoy Kids?",
@@ -43,8 +52,6 @@ const content = {
     },
     reviews: {
       title: "Loved by Kids & Parents Worldwide",
-      rating: "4.8/5 Star Rating",
-      downloads: "500,000+ Downloads",
       list: [
         { name: "Sunita P.", text: "My 4-year-old loves this app! The tracing games have really improved his writing." },
         { name: "Amit K.", text: "The AI coloring feature is amazing. My kids can create pages for hours. Highly recommended!" },
@@ -67,7 +74,9 @@ const content = {
     hero: {
       title: "जहाँ सीखना एक खेल है!",
       subtitle: "AlphaJoy Kids बच्चों के लिए एक मजेदार और सुरक्षित दुनिया है जहाँ वे अक्षर, अंक, रंग और कहानियों के माध्यम से सीखते हैं।",
-      download_google: "Google Play से डाउनलोड करें"
+      download_google: "Google Play से डाउनलोड करें",
+      rating: "4.8/5 स्टार रेटिंग",
+      downloads: "500,000+ डाउनलोड",
     },
     features: {
       title: "AlphaJoy Kids में क्या है खास?",
@@ -90,8 +99,6 @@ const content = {
     },
      reviews: {
       title: "दुनिया भर में बच्चों और माता-पिता द्वारा पसंद किया गया",
-      rating: "4.8/5 स्टार रेटिंग",
-      downloads: "500,000+ डाउनलोड",
       list: [
         { name: "सुनीता पी.", text: "मेरी 4 साल की बेटी को यह ऐप बहुत पसंद है! ट्रेसिंग गेम्स ने वास्तव में उसकी लिखाई में सुधार किया है।" },
         { name: "अमित के.", text: "एआई कलरिंग फीचर अद्भुत है। मेरे बच्चे घंटों तक पेज बना सकते हैं। अत्यधिक अनुशंसित!" },
@@ -161,6 +168,19 @@ export function WebLandingPage() {
                   </Button>
                 </a>
             </div>
+
+            <div className="mt-8 flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-gray-600">
+              <div className="flex items-center gap-2 font-semibold">
+                <Star className="w-6 h-6 text-yellow-500 fill-current" />
+                <span>{currentContent.hero.rating}</span>
+              </div>
+              <div className="hidden md:block">|</div>
+              <div className="flex items-center gap-2 font-semibold">
+                <Download className="w-6 h-6 text-green-600" />
+                <span>{currentContent.hero.downloads}</span>
+              </div>
+            </div>
+
              <div className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-primary/20">
                 <Image 
                   src="/hero-image.png"
@@ -176,19 +196,28 @@ export function WebLandingPage() {
         
         {/* Features Section */}
         <section id="features" className="py-12 md:py-24 px-4">
-          <div className="container mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.features.title}</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="container mx-auto max-w-4xl">
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">{currentContent.features.title}</h3>
+            <Accordion type="single" collapsible className="w-full space-y-4">
               {currentContent.features.list.map((feature, index) => (
-                <Card key={index} className="text-center shadow-lg border p-6 flex flex-col items-center">
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${feature.bgColor} mb-4`}>
-                    {feature.icon}
-                  </div>
-                  <h4 className="font-bold text-lg mb-2">{feature.title}</h4>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                </Card>
+                 <AccordionItem key={index} value={`item-${index}`} className="bg-white rounded-lg shadow-lg border">
+                   <AccordionTrigger className="p-6 text-left hover:no-underline">
+                     <div className="flex items-center gap-4">
+                       <div className={`w-16 h-16 rounded-full flex-shrink-0 flex items-center justify-center ${feature.bgColor}`}>
+                         {feature.icon}
+                       </div>
+                       <div className="flex-1">
+                         <h4 className="font-bold text-lg text-gray-800">{feature.title}</h4>
+                         <p className="text-muted-foreground mt-1">{feature.description}</p>
+                       </div>
+                     </div>
+                   </AccordionTrigger>
+                   <AccordionContent className="px-6 pb-6 pt-0">
+                     <p className="text-muted-foreground ml-20">{feature.details}</p>
+                   </AccordionContent>
+                 </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           </div>
         </section>
 
@@ -247,20 +276,7 @@ export function WebLandingPage() {
         {/* Reviews Section */}
         <section className="bg-white py-12 md:py-24 px-4">
           <div className="container mx-auto text-center">
-            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-4">{currentContent.reviews.title}</h3>
-            
-            <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 mb-8">
-              <div className="flex items-center gap-2 text-2xl font-bold text-yellow-500">
-                <Star className="w-8 h-8 fill-current" />
-                <span>{currentContent.reviews.rating}</span>
-              </div>
-              <div className="text-2xl font-bold text-gray-600">|</div>
-              <div className="flex items-center gap-2 text-2xl font-bold text-green-600">
-                <Download className="w-8 h-8" />
-                <span>{currentContent.reviews.downloads}</span>
-              </div>
-            </div>
-
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.reviews.title}</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {currentContent.reviews.list.map((review, index) => (
                 <Card key={index} className="text-left shadow-lg">
@@ -277,7 +293,7 @@ export function WebLandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 px-4">
+      <footer className="bg-primary text-primary-foreground py-8 px-4 pb-20">
         <div className="container mx-auto text-center">
           <p>{currentContent.footer.copyright}</p>
           <div className="mt-4">
@@ -290,3 +306,5 @@ export function WebLandingPage() {
     </div>
   );
 }
+
+    
