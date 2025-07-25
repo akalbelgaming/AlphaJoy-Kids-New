@@ -16,11 +16,18 @@ declare global {
 export function AdBanner({ className }: { className?: string }) {
 
   useEffect(() => {
-    try {
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error("AdSense error:", err);
-    }
+    const pushAd = () => {
+      try {
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      } catch (err) {
+        console.error("AdSense error:", err);
+      }
+    };
+
+    // Delay the push to ensure the container is rendered and has a width.
+    const timeout = setTimeout(pushAd, 50);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
