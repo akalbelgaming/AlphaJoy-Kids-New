@@ -10,6 +10,7 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  output: 'export',
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -30,4 +31,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+// Temporarily disabling PWA to ensure `output: 'export'` works correctly.
+// export default withPWA(nextConfig);
+export default nextConfig;
