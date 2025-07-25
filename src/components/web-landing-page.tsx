@@ -143,12 +143,11 @@ export function WebLandingPage() {
             </div>
              <div className="mt-12 w-full max-w-4xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-4 border-primary/20">
                 <Image 
-                  src="https://placehold.co/1200x600.png"
+                  src="/hero-image.png"
                   alt="Kids playing with AlphaJoy Kids app on a tablet"
                   width={1200}
                   height={600}
                   className="w-full h-auto object-cover"
-                  data-ai-hint="children playing tablet"
                   priority
                 />
              </div>
@@ -195,12 +194,11 @@ export function WebLandingPage() {
               </div>
               <div className="rounded-2xl overflow-hidden shadow-2xl order-1 md:order-2">
                  <Image 
-                      src="https://placehold.co/600x400.png"
+                      src="/why-us-image.png"
                       alt="A happy child using the app"
                       width={600}
                       height={400}
                       className="w-full h-auto object-cover"
-                      data-ai-hint="happy child tablet"
                   />
               </div>
             </div>
@@ -212,10 +210,10 @@ export function WebLandingPage() {
             <div className="container mx-auto text-center">
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
-                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot tracing" width={300} height={500} alt="App Screenshot 1" className="w-full"/></div>
-                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot coloring" width={300} height={500} alt="App Screenshot 2" className="w-full"/></div>
-                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot story" width={300} height={500} alt="App Screenshot 3" className="w-full"/></div>
-                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot poem" width={300} height={500} alt="App Screenshot 4" className="w-full"/></div>
+                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="/screenshot-1.png" width={300} height={500} alt="App Screenshot 1" className="w-full"/></div>
+                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="/screenshot-2.png" width={300} height={500} alt="App Screenshot 2" className="w-full"/></div>
+                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="/screenshot-3.png" width={300} height={500} alt="App Screenshot 3" className="w-full"/></div>
+                  <div className="rounded-lg overflow-hidden shadow-lg"><Image src="/screenshot-4.png" width={300} height={500} alt="App Screenshot 4" className="w-full"/></div>
               </div>
             </div>
         </section>
@@ -236,5 +234,7 @@ export function WebLandingPage() {
     </div>
   );
 }
+
+    
 
     
