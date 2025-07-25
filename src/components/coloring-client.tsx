@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ColoringCanvas } from '@/components/coloring-canvas';
 import { useToast } from '@/hooks/use-toast';
-import { getColoringPage } from '@/app/actions';
+// import { getColoringPage } from '@/app/actions'; // Temporarily disabled for static export
 import { Wand2, Gift, Palette, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -53,7 +53,8 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
         description: 'Please wait a moment...',
       });
   
-      const response = await getColoringPage(prompt);
+      // const response = await getColoringPage(prompt); // Temporarily disabled
+      const response = { success: false, error: 'AI feature is temporarily disabled for this build.' }; // Mock response
       
       setIsLoading(false);
       if (response.success && response.data?.imageUrl) {
@@ -81,7 +82,13 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
       });
       return;
     }
-    setShowRewardDialog(true);
+    // Temporarily disable the ad gate and generation for static build
+    toast({
+        variant: 'destructive',
+        title: 'Feature Disabled',
+        description: 'The AI coloring page feature is temporarily disabled to create the app build.',
+    });
+    // setShowRewardDialog(true);
   };
 
   const handleAdWatched = useCallback(() => {
@@ -145,7 +152,7 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
                 className="text-lg h-12"
                 disabled={isLoading}
             />
-            <Button onClick={handleGenerateClick} className="w-full" size="lg" disabled={isLoading}>
+            <Button onClick={handleGenerateClick} className="w-full" size="lg" disabled={true || isLoading}>
                 {isLoading ? <Loader2 className="animate-spin" /> : <Gift className="mr-2" />}
                 Get New Page (Ad)
             </Button>

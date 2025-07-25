@@ -24,7 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { getAdaptiveDifficulty } from "@/app/actions";
+// import { getAdaptiveDifficulty } from "@/app/actions"; // Temporarily disabled for static export
 import React from "react";
 import { Separator } from "./ui/separator";
 import { Switch } from "./ui/switch";
@@ -67,6 +67,15 @@ export function CustomizationPanel({
   const { toast } = useToast();
 
   const handleUpdateDifficulty = async () => {
+    // Temporarily disable the AI feature for static export
+    toast({
+        variant: "destructive",
+        title: "Feature Disabled",
+        description: "The AI adaptive difficulty feature is temporarily disabled to create the app build.",
+    });
+    return;
+
+    /*
     if (completions === 0) {
       toast({ title: "Not enough data!", description: "Complete a few tracings first to adapt difficulty." });
       return;
@@ -86,6 +95,7 @@ export function CustomizationPanel({
     } else {
       toast({ variant: "destructive", title: "Uh oh! Something went wrong.", description: response.error });
     }
+    */
   };
 
   return (
@@ -211,6 +221,7 @@ export function CustomizationPanel({
             onClick={handleUpdateDifficulty}
             className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
             suppressHydrationWarning
+            disabled={true}
           >
             <Sparkles className="mr-2 h-4 w-4" /> Adapt Difficulty
           </Button>

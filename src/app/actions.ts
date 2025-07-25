@@ -1,4 +1,8 @@
+// This file is temporarily disabled to allow for static export.
+// The AI features that used these server actions are not compatible
+// with the `output: 'export'` configuration in next.config.ts.
 
+/*
 import {
   adaptiveDifficulty,
   type AdaptiveDifficultyInput,
@@ -18,3 +22,4 @@ export async function getAdaptiveDifficulty(input: AdaptiveDifficultyInput) {
 export async function getColoringPage(prompt: string) {
   return fetchColoringPage(prompt);
 }
+*/
