@@ -211,16 +211,16 @@ export function WebLandingPage() {
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-1.png" alt="App Screenshot 1" width={300} height={500} className="w-full h-auto" />
+                    <img src="/screenshot-1.png.png" alt="App Screenshot 1" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-2.png" alt="App Screenshot 2" width={300} height={500} className="w-full h-auto" />
+                    <img src="/screenshot-2.png.png" alt="App Screenshot 2" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-3.png" alt="App Screenshot 3" width={300} height={500} className="w-full h-auto" />
+                    <img src="/screenshot-3.png.png" alt="App Screenshot 3" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-4.png" alt="App Screenshot 4" width={300} height={500} className="w-full h-auto" />
+                    <img src="/screenshot-4.png.png" alt="App Screenshot 4" width="300" height="500" className="w-full h-auto" />
                   </div>
               </div>
             </div>
