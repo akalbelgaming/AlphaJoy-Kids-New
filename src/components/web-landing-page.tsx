@@ -8,6 +8,13 @@ import { Card, CardContent } from './ui/card';
 import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart, Languages } from 'lucide-react';
 import { AppLogo } from './app-logo';
 import Image from 'next/image';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
 
 type Language = 'en' | 'hi';
 
@@ -25,20 +32,28 @@ const content = {
     features: {
       title: "What's Special in AlphaJoy Kids?",
       list: [
-        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters (ABC), numbers (123), and Hindi alphabets (कखग) with guided tracing.", bgColor: "bg-blue-500" },
-        { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Color beautiful shapes or enjoy free-drawing on a digital canvas.", bgColor: "bg-green-500" },
-        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI Coloring Pages", description: "Type any word and let our AI create a unique coloring page for you instantly!", bgColor: "bg-purple-500" },
-        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "Story Time", description: "Listen to fun, short audio stories for different words to build vocabulary.", bgColor: "bg-red-500" },
-        { icon: <Mic className="h-8 w-8 text-white" />, title: "Fun Poems (Kabita)", description: "Listen to classic English and Hindi nursery rhymes and poems.", bgColor: "bg-yellow-500" },
-        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "And Much More!", description: "Counting games, learning multiplication tables (Pahada), and more activities.", bgColor: "bg-pink-500" },
+        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "Tracing Games", description: "Learn to write letters, numbers, and more.", bgColor: "bg-blue-500", details: "Our app offers a wide variety of tracing activities, including English letters (ABC), numbers (1-100), and Hindi alphabets (vowels and consonants). The guided tracing helps children develop fine motor skills and learn the correct formation of each character in a fun, interactive way." },
+        { icon: <Palette className="h-8 w-8 text-white" />, title: "Coloring & Drawing", description: "Unleash creativity with colors and shapes.", bgColor: "bg-green-500", details: "Kids can color beautiful pre-defined shapes like circles, stars, and hearts, or let their imagination run wild in the free-draw mode. With multiple colors and adjustable pencil sizes, it's a complete digital canvas for your little artist." },
+        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI Coloring Pages", description: "Instantly create unique coloring pages.", bgColor: "bg-purple-500", details: "A truly magical feature! Just type any word like 'apple' or 'car', and our advanced AI will generate a brand new, custom coloring page for you in seconds. It provides endless coloring fun and helps kids associate words with images." },
+        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "Story Time", description: "Listen to fun, short audio stories.", bgColor: "bg-red-500", details: "Build vocabulary and listening skills with our collection of short, engaging stories. Each story is based on a word, helping children learn its meaning and context in an entertaining format. Just click 'Listen' and enjoy!" },
+        { icon: <Mic className="h-8 w-8 text-white" />, title: "Fun Poems (Kabita)", description: "Classic English and Hindi nursery rhymes.", bgColor: "bg-yellow-500", details: "Enjoy a collection of timeless nursery rhymes and poems in both English and Hindi. This feature is perfect for improving pronunciation and language skills while listening to familiar classics like 'Twinkle, Twinkle' and 'Machli Jal Ki Rani'." },
+        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "And Much More!", description: "Counting games, tables, and more.", bgColor: "bg-pink-500", details: "The fun never stops! AlphaJoy Kids also includes interactive counting games to learn numbers visually and a complete section for learning multiplication tables (Pahada) from 2 to 20, making math easy and enjoyable." },
       ]
     },
-    why: {
+     why: {
       title: "Why Choose AlphaJoy Kids?",
       list: [
         { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "Safe for Kids", description: "We have implemented safe ads following AdSense policies to ensure a child-friendly environment." },
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "Parent-Approved", description: "This app is designed under parental guidance to provide a positive and educational experience for children." },
         { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "Learning Through Play", description: "Our interactive games keep children engaged, allowing them to learn new things while having fun." },
+      ]
+    },
+    reviews: {
+      title: "What Our Users Say",
+      list: [
+        { name: "Sunita P.", rating: 5, text: "My 4-year-old loves this app! The tracing games have really improved his writing." },
+        { name: "Amit K.", rating: 5, text: "The AI coloring feature is amazing. My kids can create pages for hours. Highly recommended!" },
+        { name: "Riya S.", rating: 4, text: "A great collection of activities. The Hindi poems are a nice touch for teaching our native language." },
       ]
     },
     gallery: {
@@ -62,12 +77,12 @@ const content = {
     features: {
       title: "AlphaJoy Kids में क्या है खास?",
       list: [
-        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग के साथ अक्षर (ABC), अंक (123), और हिंदी अक्षर (कखग) लिखना सीखें।", bgColor: "bg-blue-500" },
-        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "सुंदर आकृतियों में रंग भरें या डिजिटल कैनवास पर मुफ्त ड्राइंग का आनंद लें।", bgColor: "bg-green-500" },
-        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI कलरिंग पेज", description: "कोई भी शब्द टाइप करें और हमारे AI को तुरंत आपके लिए एक अनूठा कलरिंग पेज बनाने दें!", bgColor: "bg-purple-500" },
-        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "कहानी का समय", description: "शब्दावली बनाने के लिए विभिन्न शब्दों के लिए मजेदार, छोटी ऑडियो कहानियां सुनें।", bgColor: "bg-red-500" },
-        { icon: <Mic className="h-8 w-8 text-white" />, title: "मजेदार कविताएं", description: "क्लासिक अंग्रेजी और हिंदी नर्सरी राइम और कविताएं सुनें।", bgColor: "bg-yellow-500" },
-        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "और भी बहुत कुछ!", description: "गिनती के खेल, गुणा सारणी (पहाड़ा) सीखना, और अधिक गतिविधियाँ।", bgColor: "bg-pink-500" },
+        { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "अक्षर, अंक, और बहुत कुछ लिखना सीखें।", bgColor: "bg-blue-500", details: "हमारा ऐप कई तरह की ट्रेसिंग गतिविधियाँ प्रदान करता है, जिसमें अंग्रेजी अक्षर (ABC), संख्याएँ (1-100), और हिंदी अक्षर (स्वर और व्यंजन) शामिल हैं। निर्देशित ट्रेसिंग बच्चों को ठीक मोटर कौशल विकसित करने और मजेदार, इंटरैक्टिव तरीके से प्रत्येक अक्षर का सही गठन सीखने में मदद करती है।" },
+        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "रंगों और आकृतियों के साथ रचनात्मकता दिखाएँ।", bgColor: "bg-green-500", details: "बच्चे सुंदर पूर्व-निर्धारित आकृतियों जैसे वृत्त, तारे और दिल में रंग भर सकते हैं, या फ्री-ड्रा मोड में अपनी कल्पना को उड़ान दे सकते हैं। कई रंगों और समायोज्य पेंसिल आकारों के साथ, यह आपके छोटे कलाकार के लिए एक संपूर्ण डिजिटल कैनवास है।" },
+        { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI कलरिंग पेज", description: "तुरंत अद्वितीय कलरिंग पेज बनाएं।", bgColor: "bg-purple-500", details: "एक जादुई सुविधा! बस 'सेब' या 'गाड़ी' जैसा कोई भी शब्द टाइप करें, और हमारा उन्नत AI सेकंडों में आपके लिए एक नया, कस्टम कलरिंग पेज बना देगा। यह अंतहीन रंग भरने का मज़ा प्रदान करता है और बच्चों को शब्दों को छवियों से जोड़ने में मदद करता है।" },
+        { icon: <BookOpen className="h-8 w-8 text-white" />, title: "कहानी का समय", description: "मजेदार, छोटी ऑडियो कहानियाँ सुनें।", bgColor: "bg-red-500", details: "छोटी, आकर्षक कहानियों के हमारे संग्रह के साथ शब्दावली और सुनने के कौशल का निर्माण करें। प्रत्येक कहानी एक शब्द पर आधारित है, जो बच्चों को मनोरंजक प्रारूप में उसका अर्थ और संदर्भ सीखने में मदद करती है। बस 'सुनो' पर क्लिक करें और आनंद लें!" },
+        { icon: <Mic className="h-8 w-8 text-white" />, title: "मजेदार कविताएं", description: "क्लासिक अंग्रेजी और हिंदी कविताएँ।", bgColor: "bg-yellow-500", details: "अंग्रेजी और हिंदी दोनों में सदाबहार कविताओं और कविताओं के संग्रह का आनंद लें। यह सुविधा 'मछली जल की रानी' और 'ट्विंकल, ट्विंकल' जैसे परिचित क्लासिक्स को सुनते हुए उच्चारण और भाषा कौशल में सुधार के लिए एकदम सही है।" },
+        { icon: <CheckCircle2 className="h-8 w-8 text-white" />, title: "और भी बहुत कुछ!", description: "गिनती के खेल, पहाड़ा, और बहुत कुछ।", bgColor: "bg-pink-500", details: "मज़ा कभी खत्म नहीं होता! AlphaJoy Kids में संख्याओं को सीखने के लिए इंटरैक्टिव गिनती के खेल और 2 से 20 तक गुणा सारणी (पहाड़ा) सीखने के लिए एक पूरा खंड भी शामिल है, जो गणित को आसान और मनोरंजक बनाता है।" },
       ]
     },
     why: {
@@ -76,6 +91,14 @@ const content = {
         { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "बच्चों के लिए सुरक्षित", description: "हमने बच्चों की सुरक्षा को ध्यान में रखते हुए, AdSense की नीतियों का पालन करते हुए, केवल सुरक्षित विज्ञापन लगाए हैं।"},
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "माता-पिता द्वारा प्रमाणित", description: "यह ऐप माता-पिता की देखरेख में बनाया गया है ताकि बच्चों को एक सकारात्मक और सीखने योग्य माहौल मिल सके।"},
         { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "खेल-खेल में पढ़ाई", description: "हमारे इंटरैक्टिव गेम्स बच्चों को बोर नहीं होने देते और वे खेल-खेल में ही बहुत कुछ सीख जाते हैं।"},
+      ]
+    },
+     reviews: {
+      title: "हमारे उपयोगकर्ता क्या कहते हैं",
+      list: [
+        { name: "सुनीता पी.", rating: 5, text: "मेरी 4 साल की बेटी को यह ऐप बहुत पसंद है! ट्रेसिंग गेम्स ने वास्तव में उसकी लिखाई में सुधार किया है।" },
+        { name: "अमित के.", rating: 5, text: "एआई कलरिंग फीचर अद्भुत है। मेरे बच्चे घंटों तक पेज बना सकते हैं। अत्यधिक अनुशंसित!" },
+        { name: "रिया एस.", rating: 4, text: "गतिविधियों का एक बड़ा संग्रह। हिंदी कविताएं हमारी मातृभाषा सिखाने के लिए एक अच्छा स्पर्श हैं।" },
       ]
     },
     gallery: {
@@ -158,18 +181,24 @@ export function WebLandingPage() {
         <section id="features" className="py-12 md:py-24 px-4">
           <div className="container mx-auto text-center">
             <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.features.title}</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {currentContent.features.list.map((feature, index) => (
-                <Card key={index} className="text-center shadow-lg hover:shadow-xl hover:-translate-y-2 transition-transform duration-300">
-                  <CardContent className="p-6">
-                    <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${feature.bgColor}`}>
-                      {feature.icon}
-                    </div>
-                    <h4 className="mt-5 text-xl font-semibold text-foreground">{feature.title}</h4>
-                    <p className="mt-2 text-muted-foreground">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="max-w-3xl mx-auto text-left">
+              <Accordion type="single" collapsible className="w-full space-y-4">
+                {currentContent.features.list.map((feature, index) => (
+                  <AccordionItem value={`item-${index}`} key={index} className="bg-white rounded-lg shadow-md border">
+                    <AccordionTrigger className="p-6 text-lg hover:no-underline">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center ${feature.bgColor}`}>
+                          {feature.icon}
+                        </div>
+                        <span className="font-semibold text-foreground">{feature.title}</span>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-6 pb-6 text-muted-foreground">
+                      {feature.details}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
             </div>
           </div>
         </section>
@@ -204,9 +233,31 @@ export function WebLandingPage() {
             </div>
           </div>
         </section>
+
+        {/* Reviews Section */}
+        <section className="py-12 md:py-24 px-4">
+          <div className="container mx-auto text-center">
+            <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.reviews.title}</h3>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {currentContent.reviews.list.map((review, index) => (
+                <Card key={index} className="text-left shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-1 mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star key={i} className={`h-5 w-5 ${i < review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground italic">"{review.text}"</p>
+                    <p className="mt-4 font-semibold text-right">- {review.name}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
         
         {/* Gallery Section */}
-        <section className="py-12 md:py-24 px-4">
+        <section className="bg-white py-12 md:py-24 px-4">
             <div className="container mx-auto text-center">
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
