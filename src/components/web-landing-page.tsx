@@ -5,15 +5,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
-import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart, Languages } from 'lucide-react';
+import { CheckCircle2, Download, BookOpen, Palette, Mic, Fingerprint, Wand2, Star, Shield, Heart, Languages, Info } from 'lucide-react';
 import { AppLogo } from './app-logo';
 import Image from 'next/image';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog"
 
 
 type Language = 'en' | 'hi';
@@ -82,7 +84,7 @@ const content = {
       title: "AlphaJoy Kids में क्या है खास?",
       list: [
         { icon: <Fingerprint className="h-8 w-8 text-white" />, title: "ट्रेसिंग गेम्स", description: "निर्देशित ट्रेसिंग गतिविधियों के साथ अक्षर, अंक, और बहुत कुछ लिखना सीखें।", bgColor: "bg-blue-500", details: "हमारा ऐप कई तरह की ट्रेसिंग गतिविधियाँ प्रदान करता है, जिसमें अंग्रेजी अक्षर (ABC), संख्याएँ (1-100), और हिंदी अक्षर (स्वर और व्यंजन) शामिल हैं। निर्देशित ट्रेसिंग बच्चों को ठीक मोटर कौशल विकसित करने और मजेदार, इंटरैक्टिव तरीके से प्रत्येक अक्षर का सही गठन सीखने में मदद करती है।" },
-        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "रंगों और आकृतियों के साथ रचनात्मकता दिखाएँ, या अपनी कल्पना से कुछ भी बनाएं।", bgColor: "bg-green-500", details: "बच्चे सुंदर पूर्व-निर्धारित आकृतियों जैसे वृत्त, तारे और दिल में रंग भर सकते हैं, या फ्री-ड्रा मोड में अपनी कल्पना को उड़ान दे सकते हैं। कई रंगों और समायोज्य पेंसिल आकारों के साथ, यह आपके छोटे कलाकार के लिए एक संपूर्ण डिजिटल कैनवास है।" },
+        { icon: <Palette className="h-8 w-8 text-white" />, title: "रंग भरना और ड्राइंग", description: "रंगों और आकृतियों के साथ रचनात्मकता दिखाएँ, या अपनी कल्पना से कुछ भी बनाएं।", bgColor: "bg-green-500", details: "बच्चे सुंदर पूर्व-निर्धारधारित आकृतियों जैसे वृत्त, तारे और दिल में रंग भर सकते हैं, या फ्री-ड्रा मोड में अपनी कल्पना को उड़ान दे सकते हैं। कई रंगों और समायोज्य पेंसिल आकारों के साथ, यह आपके छोटे कलाकार के लिए एक संपूर्ण डिजिटल कैनवास है।" },
         { icon: <Wand2 className="h-8 w-8 text-white" />, title: "AI कलरिंग पेज", description: "किसी भी शब्द से तुरंत अद्वितीय कलरिंग पेज बनाएं।", bgColor: "bg-purple-500", details: "एक जादुई सुविधा! बस 'सेब' या 'गाड़ी' जैसा कोई भी शब्द टाइप करें, और हमारा उन्नत AI सेकंडों में आपके लिए एक नया, कस्टम कलरिंग पेज बना देगा। यह अंतहीन रंग भरने का मज़ा प्रदान करता है और बच्चों को शब्दों को छवियों से जोड़ने में मदद करता है।" },
         { icon: <BookOpen className="h-8 w-8 text-white" />, title: "कहानी का समय", description: "मजेदार, छोटी ऑडियो कहानियाँ सुनें जो शब्दावली और सुनने के कौशल का निर्माण करती हैं।", bgColor: "bg-red-500", details: "छोटी, आकर्षक कहानियों के हमारे संग्रह के साथ शब्दावली और सुनने के कौशल का निर्माण करें। प्रत्येक कहानी एक शब्द पर आधारित है, जो बच्चों को मनोरंजक प्रारूप में उसका अर्थ और संदर्भ सीखने में मदद करती है। बस 'सुनो' पर क्लिक करें और आनंद लें!" },
         { icon: <Mic className="h-8 w-8 text-white" />, title: "मजेदार कविताएं", description: "ऑडियो के साथ क्लासिक अंग्रेजी और हिंदी कविताओं का आनंद लें।", bgColor: "bg-yellow-500", details: "अंग्रेजी और हिंदी दोनों में सदाबहार कविताओं और कविताओं के संग्रह का आनंद लें। यह सुविधा 'मछली जल की रानी' और 'ट्विंकल, ट्विंकल' जैसे परिचित क्लासिक्स को सुनते हुए उच्चारण और भाषा कौशल में सुधार के लिए एकदम सही है।" },
@@ -196,28 +198,42 @@ export function WebLandingPage() {
         
         {/* Features Section */}
         <section id="features" className="py-12 md:py-24 px-4">
-          <div className="container mx-auto max-w-4xl">
+          <div className="container mx-auto">
             <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12 text-center">{currentContent.features.title}</h3>
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {currentContent.features.list.map((feature, index) => (
-                 <AccordionItem key={index} value={`item-${index}`} className="bg-white rounded-lg shadow-lg border">
-                   <AccordionTrigger className="p-6 text-left hover:no-underline">
-                     <div className="flex items-center gap-4">
-                       <div className={`w-16 h-16 rounded-full flex-shrink-0 flex items-center justify-center ${feature.bgColor}`}>
-                         {feature.icon}
-                       </div>
-                       <div className="flex-1">
-                         <h4 className="font-bold text-lg text-gray-800">{feature.title}</h4>
-                         <p className="text-muted-foreground mt-1">{feature.description}</p>
-                       </div>
-                     </div>
-                   </AccordionTrigger>
-                   <AccordionContent className="px-6 pb-6 pt-0">
-                     <p className="text-muted-foreground ml-20">{feature.details}</p>
-                   </AccordionContent>
-                 </AccordionItem>
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    <Card className="text-left shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer overflow-hidden">
+                      <div className={`h-32 flex items-center justify-center ${feature.bgColor}`}>
+                        {feature.icon}
+                      </div>
+                      <CardContent className="p-6">
+                        <h4 className="font-bold text-lg text-gray-800">{feature.title}</h4>
+                        <p className="text-muted-foreground mt-1 text-sm">{feature.description}</p>
+                        <div className="flex items-center text-xs text-blue-600 font-semibold mt-4">
+                          <Info className="mr-1 h-3 w-3" />
+                          <span>Click to learn more</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-3">
+                        <div className={`w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center ${feature.bgColor}`}>
+                          {feature.icon}
+                        </div>
+                        <span className="text-2xl">{feature.title}</span>
+                      </DialogTitle>
+                      <DialogDescription className="pt-4 text-base text-muted-foreground">
+                        {feature.details}
+                      </DialogDescription>
+                    </DialogHeader>
+                  </DialogContent>
+                </Dialog>
               ))}
-            </Accordion>
+            </div>
           </div>
         </section>
 
@@ -258,16 +274,16 @@ export function WebLandingPage() {
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <img src="/screenshot-1.png.png" alt="App Screenshot 1" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-1.png.png" alt="App Screenshot 1" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <img src="/screenshot-2.png.png" alt="App Screenshot 2" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-2.png.png" alt="App Screenshot 2" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <img src="/screenshot-3.png.png" alt="App Screenshot 3" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-3.png.png" alt="App Screenshot 3" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <img src="/screenshot-4.png.png" alt="App Screenshot 4" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-4.png.png" alt="App Screenshot 4" width="300" height="500" className="w-full h-auto" />
                   </div>
               </div>
             </div>
@@ -306,5 +322,3 @@ export function WebLandingPage() {
     </div>
   );
 }
-
-    
