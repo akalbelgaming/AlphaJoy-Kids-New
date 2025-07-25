@@ -102,20 +102,21 @@ export function WebLandingPage() {
     <div className="flex flex-col min-h-screen bg-sky-50">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-sm shadow-md">
-        <div className="container mx-auto flex justify-between items-center p-4">
-          <div className="flex items-center gap-3">
-            <AppLogo className="h-12 w-12 flex-shrink-0" />
-            <h1 className="text-xl font-bold text-primary">AlphaJoy Kids</h1>
+        <div className="container mx-auto flex justify-between items-center p-2 md:p-4">
+          <div className="flex items-center gap-2 md:gap-3">
+            <AppLogo className="h-10 w-10 md:h-12 md:w-12 flex-shrink-0" />
+            <h1 className="text-lg md:text-xl font-bold text-primary">AlphaJoy Kids</h1>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
              <Button variant="outline" size="sm" onClick={toggleLanguage}>
-                <Languages className="mr-2 h-4 w-4" />
-                {currentContent.header.toggle}
+                <Languages className="mr-1 md:mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">{currentContent.header.toggle}</span>
             </Button>
             <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
-              <Button className="bg-green-600 hover:bg-green-700">
-                <Download className="mr-2 h-5 w-5" />
-                {currentContent.header.download}
+              <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                <Download className="mr-1 md:mr-2 h-4 w-4" />
+                <span className="hidden sm:inline">{currentContent.header.download}</span>
+                <span className="sm:hidden">Download</span>
               </Button>
             </a>
           </div>
@@ -124,18 +125,18 @@ export function WebLandingPage() {
 
       <main>
         {/* Hero Section */}
-        <section className="text-center py-16 md:py-24 px-4 bg-white">
+        <section className="text-center py-12 md:py-24 px-4 bg-white">
           <div className="container mx-auto">
             <h2 className="text-4xl md:text-6xl font-extrabold text-primary tracking-tight">
               {currentContent.hero.title}
             </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
+            <p className="mt-4 max-w-2xl mx-auto text-base md:text-xl text-muted-foreground">
               {currentContent.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
                <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
-                  <Button size="lg" className="w-full sm:w-auto text-lg h-14 px-10 bg-green-600 hover:bg-green-700 shadow-lg">
-                    <Download className="mr-3 h-6 w-6" />
+                  <Button size="lg" className="w-full sm:w-auto text-base md:text-lg h-12 md:h-14 px-8 md:px-10 bg-green-600 hover:bg-green-700 shadow-lg">
+                    <Download className="mr-2 md:mr-3 h-5 w-5 md:h-6 md:w-6" />
                     {currentContent.hero.download_google}
                   </Button>
                 </a>
@@ -155,10 +156,10 @@ export function WebLandingPage() {
         </section>
         
         {/* Features Section */}
-        <section id="features" className="py-16 md:py-24 px-4">
+        <section id="features" className="py-12 md:py-24 px-4">
           <div className="container mx-auto text-center">
             <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.features.title}</h3>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {currentContent.features.list.map((feature, index) => (
                 <Card key={index} className="text-center shadow-lg hover:shadow-xl hover:-translate-y-2 transition-transform duration-300">
                   <CardContent className="p-6">
@@ -175,10 +176,10 @@ export function WebLandingPage() {
         </section>
 
         {/* Why Choose AlphaJoy Kids Section */}
-        <section className="bg-white py-16 md:py-24 px-4">
+        <section className="bg-white py-12 md:py-24 px-4">
           <div className="container mx-auto">
             <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
+              <div className="order-2 md:order-1">
                 <h3 className="text-3xl md:text-4xl font-bold text-primary mb-6">{currentContent.why.title}</h3>
                  <ul className="space-y-4">
                     {currentContent.why.list.map((item, index) => (
@@ -192,7 +193,7 @@ export function WebLandingPage() {
                     ))}
                  </ul>
               </div>
-              <div className="rounded-2xl overflow-hidden shadow-2xl">
+              <div className="rounded-2xl overflow-hidden shadow-2xl order-1 md:order-2">
                  <Image 
                       src="https://placehold.co/600x400.png"
                       alt="A happy child using the app"
@@ -207,10 +208,10 @@ export function WebLandingPage() {
         </section>
         
         {/* Gallery Section */}
-        <section className="py-16 md:py-24 px-4">
+        <section className="py-12 md:py-24 px-4">
             <div className="container mx-auto text-center">
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
                   <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot tracing" width={300} height={500} alt="App Screenshot 1" className="w-full"/></div>
                   <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot coloring" width={300} height={500} alt="App Screenshot 2" className="w-full"/></div>
                   <div className="rounded-lg overflow-hidden shadow-lg"><Image src="https://placehold.co/300x500.png" data-ai-hint="app screenshot story" width={300} height={500} alt="App Screenshot 3" className="w-full"/></div>
@@ -235,3 +236,5 @@ export function WebLandingPage() {
     </div>
   );
 }
+
+    
