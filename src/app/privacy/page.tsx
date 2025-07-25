@@ -60,18 +60,18 @@ export default function PrivacyPolicyPage() {
               Our app uses Artificial Intelligence (AI) to provide a better experience.
             </p>
             <ul className="list-disc list-inside space-y-1">
-              <li><strong>Coloring Page Generation:</strong> When you enter a word (e.g., "Apple") to create a coloring page, that word is sent to an AI service to generate an image. We do not store these words.</li>
-               <li><strong>Adaptive Difficulty:</strong> The app analyzes anonymous gameplay data (like success rate and time taken) to suggest a more suitable difficulty level. This data is not linked to any individual.</li>
+              <li><strong>Coloring Page Generation:</strong> When a user enters a word (e.g., "Apple") to create a coloring page, that word is sent to an AI service to generate an image. We do not store these words or the generated images.</li>
+               <li><strong>Adaptive Difficulty:</strong> The app analyzes anonymous gameplay data (like success rate and time taken in tracing games) to suggest a more suitable difficulty level. This data is not linked to any individual and is processed ephemerally.</li>
             </ul>
 
             <h2 className="text-lg font-semibold text-foreground">4. Advertisements</h2>
             <p>
-              Our app displays advertisements through Google AdSense. Google may use cookies to serve ads. We have configured our ad settings to be suitable for a family and child-friendly audience. For more information, please see Google's advertising policies.
+             To keep the app free, we display advertisements within the application using Google AdMob. We have configured our ad settings to be suitable for a family and child-friendly audience. Google may use cookies and other identifiers to serve ads. For more information on how Google handles data, please review Google's Privacy & Terms.
             </p>
 
             <h2 className="text-lg font-semibold text-foreground">5. Children's Privacy</h2>
             <p>
-              Our application is designed for children. We are committed to protecting children's privacy and do not knowingly collect any personal information from them. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us so we can take appropriate action.
+              Our application is designed for children. We are committed to protecting children's privacy and do not knowingly collect any personal information from them in compliance with the Children's Online Privacy Protection Act (COPPA) and other applicable regulations. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us so we can take appropriate action.
             </p>
 
             <h2 className="text-lg font-semibold text-foreground">6. Changes to This Privacy Policy</h2>
@@ -81,7 +81,7 @@ export default function PrivacyPolicyPage() {
 
             <h2 className="text-lg font-semibold text-foreground">7. Contact Us</h2>
             <p>
-              If you have any questions about this Privacy Policy, you can contact us through the app store listing page.
+              If you have any questions about this Privacy Policy, you can contact us through our app store listing page.
             </p>
           </CardContent>
         </Card>
