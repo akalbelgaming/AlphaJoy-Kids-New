@@ -2,14 +2,15 @@
 import type {NextConfig} from 'next';
 import withPWAInit from "@ducanh2912/next-pwa";
 
-const isDevelopment = process.env.NODE_ENV === "development";
-
 const withPWA = withPWAInit({
   dest: "public",
-  disable: isDevelopment,
+  disable: process.env.NODE_ENV === "development",
+  // add your own icons to src/app/manifest.json
+  // to re-generate manifest.json, you can visit https://tomitm.github.io/appmanifest/
 });
 
 const nextConfig: NextConfig = {
+  /* config options here */
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -25,20 +26,6 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
-  },
-  // Add a cache-busting mechanism for the logo
-  async headers() {
-    return [
-      {
-        source: '/logo.png',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, max-age=0',
-          },
-        ],
-      },
-    ]
   },
 };
 
