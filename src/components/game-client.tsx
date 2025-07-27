@@ -10,6 +10,7 @@ import {
   Loader2,
   Gift,
 } from "lucide-react";
+import { App as CapacitorApp } from '@capacitor/app';
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter, englishPoems, hindiKabitas, type Poem } from "@/lib/characters";
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
@@ -439,6 +440,19 @@ export default function GameClient({ mode }: {mode: Mode}) {
   useEffect(() => {
     // Set soundEnabled state only on the client
     setSoundEnabled(true);
+
+    // Back button listener
+    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (!canGoBack || window.location.pathname === '/') {
+        CapacitorApp.exitApp();
+      } else {
+        window.history.back();
+      }
+    });
+
+    return () => {
+      backButtonListener.remove();
+    };
   }, []);
 
   const gateAction = (action: () => void) => {
