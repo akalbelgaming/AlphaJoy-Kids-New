@@ -24,38 +24,32 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 
 const activities = [
-  { href: '/letters', icon: <Type className="h-10 w-10" />, title: 'ABC Letters', description: 'Trace uppercase & lowercase letters', color: 'text-blue-500', bgColor: 'bg-blue-100' },
-  { href: '/numbers', icon: <Calculator className="h-10 w-10" />, title: '123 Numbers', description: 'Learn to write numbers 1 to 100', color: 'text-green-500', bgColor: 'bg-green-100' },
-  { href: '/shapes', icon: <Shapes className="h-10 w-10" />, title: 'Color Shapes', description: 'Fill beautiful shapes with colors', color: 'text-purple-500', bgColor: 'bg-purple-100' },
-  { href: '/counting', icon: <Fingerprint className="h-10 w-10" />, title: 'Counting Fun', description: 'Count objects from 1 to 100', color: 'text-red-500', bgColor: 'bg-red-100' },
-  { href: '/drawing', icon: <Brush className="h-10 w-10" />, title: 'Free Drawing', description: 'Unleash your inner artist', color: 'text-yellow-500', bgColor: 'bg-yellow-100' },
-  { href: '/coloring', icon: <Palette className="h-10 w-10" />, title: 'AI Coloring', description: 'Create coloring pages with AI', color: 'text-pink-500', bgColor: 'bg-pink-100' },
-  { href: '/reading', icon: <SpellCheck className="h-10 w-10" />, title: 'Word Tracing', description: 'Practice spelling and reading', color: 'text-orange-500', bgColor: 'bg-orange-100' },
-  { href: '/story', icon: <BookOpen className="h-10 w-10" />, title: 'Story Time', description: 'Listen to short audio stories', color: 'text-teal-500', bgColor: 'bg-teal-100' },
-  { href: '/hindi', icon: <Languages className="h-10 w-10" />, title: 'Hindi Letters', description: 'Trace Hindi varnmala (अ, आ)', color: 'text-indigo-500', bgColor: 'bg-indigo-100' },
-  { href: '/hindivowels', icon: <Type className="h-10 w-10" />, title: 'Hindi Vowels', description: 'Learn Hindi vowels & pronunciation', color: 'text-cyan-500', bgColor: 'bg-cyan-100' },
-  { href: '/pahada', icon: <Calculator className="h-10 w-10" />, title: 'Math Tables', description: 'Learn tables from 2 to 20', color: 'text-lime-500', bgColor: 'bg-lime-100' },
-  { href: '/poem', icon: <Mic className="h-10 w-10" />, title: 'English Poems', description: 'Listen to classic nursery rhymes', color: 'text-rose-500', bgColor: 'bg-rose-100' },
-  { href: '/kabita', icon: <Mic className="h-10 w-10" />, title: 'Hindi Kabita', description: 'Listen to fun Hindi poems', color: 'text-fuchsia-500', bgColor: 'bg-fuchsia-100' },
+  { href: '/letters', title: 'Letters', icon: 'A', color: 'bg-red-500' },
+  { href: '/numbers', title: 'Numbers', icon: '123', color: 'bg-blue-500' },
+  { href: '/hindi', title: 'Hindi', icon: 'अ', color: 'bg-orange-500' },
+  { href: '/hindivowels', title: 'Hindi Swar', icon: 'अa', color: 'bg-pink-500' },
+  { href: '/pahada', title: 'Tables', icon: '2x1', color: 'bg-cyan-500' },
+  { href: '/shapes', title: 'Shapes', icon: <Shapes className="h-12 w-12" />, color: 'bg-yellow-500' },
+  { href: '/counting', title: 'Counting', icon: <Fingerprint className="h-12 w-12" />, color: 'bg-green-500' },
+  { href: '/drawing', title: 'Drawing', icon: <Brush className="h-12 w-12" />, color: 'bg-indigo-500' },
+  { href: '/coloring', title: 'AI Coloring', icon: <Palette className="h-12 w-12" />, color: 'bg-purple-500' },
+  { href: '/reading', title: 'Reading', icon: <SpellCheck className="h-12 w-12" />, color: 'bg-teal-500' },
+  { href: '/story', title: 'Story Time', icon: <BookOpen className="h-12 w-12" />, color: 'bg-amber-500' },
+  { href: '/poem', title: 'English Poem', icon: <Mic className="h-12 w-12" />, color: 'bg-rose-500' },
+  { href: '/kabita', title: 'Hindi Kabita', icon: <Mic className="h-12 w-12" />, color: 'bg-fuchsia-500' },
 ];
 
 export function MobileHomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <header className="p-4 bg-primary text-primary-foreground shadow-lg sticky top-0 z-50">
+    <div className="flex flex-col min-h-screen bg-gray-100">
+      <header className="p-3 bg-red-500 text-white shadow-md sticky top-0 z-50">
         <div className="container mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <AppLogo className="h-12 w-12 flex-shrink-0" />
-            <div>
-              <h1 className="text-2xl font-bold font-headline tracking-tight">AlphaJoy Kids</h1>
-              <p className="text-sm text-primary-foreground/90">Learning is a game!</p>
+            <div className="bg-white p-1 rounded-md">
+              <AppLogo className="h-10 w-10 flex-shrink-0" />
             </div>
+            <h1 className="text-xl font-bold tracking-tight">AlphaJoy Kids: ABC, 123 & Art</h1>
           </div>
-           <Link href="/privacy" passHref>
-             <Button variant="ghost" size="icon" className="text-yellow-300 hover:text-yellow-400 hover:bg-primary/80">
-                <Star className="h-7 w-7" />
-             </Button>
-           </Link>
         </div>
       </header>
       
@@ -64,15 +58,16 @@ export function MobileHomePage() {
           <div className="grid grid-cols-2 gap-4">
             {activities.map((activity) => (
               <Link href={activity.href} key={activity.href} passHref>
-                <Card className={cn("shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 h-full flex flex-col items-center text-center overflow-hidden border-2", activity.bgColor.replace('bg-','border-'))}>
-                  <CardContent className="p-4 flex-1 flex flex-col justify-center items-center gap-3 w-full">
-                    <div className={cn("w-16 h-16 rounded-full flex items-center justify-center", activity.bgColor)}>
-                       {React.cloneElement(activity.icon, { className: cn("h-8 w-8", activity.color) })}
-                    </div>
-                    <div className="text-center">
-                        <h3 className="text-base font-bold text-gray-800">{activity.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1 leading-tight">{activity.description}</p>
-                    </div>
+                <Card className={cn("shadow-lg hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 h-40 flex flex-col items-center justify-center text-center overflow-hidden border-2 border-gray-200", activity.color)}>
+                  <CardContent className="p-2 flex-1 flex flex-col justify-center items-center gap-2 w-full text-white">
+                    {typeof activity.icon === 'string' ? (
+                      <div className="text-6xl font-bold">
+                        {activity.icon}
+                      </div>
+                    ) : (
+                      React.cloneElement(activity.icon, { className: "h-12 w-12" })
+                    )}
+                    <h3 className="text-lg font-semibold tracking-wide">{activity.title}</h3>
                   </CardContent>
                 </Card>
               </Link>
@@ -81,9 +76,11 @@ export function MobileHomePage() {
         </main>
       </ScrollArea>
       
-      <div className="sticky bottom-0 left-0 right-0 p-2 bg-background/80 backdrop-blur-sm border-t z-10">
-        <AdBanner className="max-w-4xl mx-auto" />
-      </div>
+      <footer className="text-center py-3 bg-gray-100">
+        <Link href="/privacy" className="text-sm text-gray-600 hover:underline">
+          Privacy Policy
+        </Link>
+      </footer>
     </div>
   );
 }
