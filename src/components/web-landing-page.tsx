@@ -48,7 +48,7 @@ const content = {
      why: {
       title: "Why Choose AlphaJoy Kids?",
       list: [
-        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "Safe for Kids", description: "We have implemented safe ads following AdSense policies to ensure a child-friendly environment." },
+        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "Safe for Kids", description: "We use Google AdMob for ads and have configured them to be child-friendly, ensuring a safe environment." },
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "Parent-Approved", description: "This app is designed under parental guidance to provide a positive and educational experience for children." },
         { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "Learning Through Play", description: "Our interactive games keep children engaged, allowing them to learn new things while having fun." },
       ]
@@ -95,7 +95,7 @@ const content = {
     why: {
       title: "AlphaJoy Kids क्यों चुनें?",
       list: [
-        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "बच्चों के लिए सुरक्षित", description: "हमने बच्चों की सुरक्षा को ध्यान में रखते हुए, AdSense की नीतियों का पालन करते हुए, केवल सुरक्षित विज्ञापन लगाए हैं।"},
+        { icon: <Shield className="h-8 w-8 text-green-500 flex-shrink-0 mt-1" />, title: "बच्चों के लिए सुरक्षित", description: "हमने बच्चों के लिए सुरक्षित विज्ञापन दिखाने के लिए Google AdMob का उपयोग किया है, ताकि एक सुरक्षित माहौल बना रहे।"},
         { icon: <Heart className="h-8 w-8 text-red-500 flex-shrink-0 mt-1" />, title: "माता-पिता द्वारा प्रमाणित", description: "यह ऐप माता-पिता की देखरेख में बनाया गया है ताकि बच्चों को एक सकारात्मक और सीखने योग्य माहौल मिल सके।"},
         { icon: <Star className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />, title: "खेल-खेल में पढ़ाई", description: "हमारे इंटरैक्टिव गेम्स बच्चों को बोर नहीं होने देते और वे खेल-खेल में ही बहुत कुछ सीख जाते हैं।"},
       ]
@@ -142,7 +142,7 @@ export function WebLandingPage() {
                 <Languages className="mr-1 md:mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{currentContent.header.toggle}</span>
             </Button>
-            <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
+            <a href="https://play.google.com/store/apps/details?id=com.alphajoy.kids.app" target="_blank" rel="noopener noreferrer">
               <Button size="sm" className="bg-green-600 hover:bg-green-700">
                 <Download className="mr-1 md:mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">{currentContent.header.download}</span>
@@ -164,7 +164,7 @@ export function WebLandingPage() {
               {currentContent.hero.subtitle}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
-               <a href="https://play.google.com/store/apps/details?id=YOUR_APP_ID" target="_blank" rel="noopener noreferrer">
+               <a href="https://play.google.com/store/apps/details?id=com.alphajoy.kids.app" target="_blank" rel="noopener noreferrer">
                   <Button size="lg" className="w-full sm:w-auto text-base md:text-lg h-12 md:h-14 px-8 md:px-10 bg-green-600 hover:bg-green-700 shadow-lg">
                     <Download className="mr-2 md:mr-3 h-5 w-5 md:h-6 md:w-6" />
                     {currentContent.hero.download_google}
@@ -271,16 +271,16 @@ export function WebLandingPage() {
               <h3 className="text-3xl md:text-4xl font-bold text-primary mb-12">{currentContent.gallery.title}</h3>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4">
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-1.png.png" alt="App Screenshot 1" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-1.png" alt="App Screenshot 1" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-2.png.png" alt="App Screenshot 2" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-2.png" alt="App Screenshot 2" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-3.png.png" alt="App Screenshot 3" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-3.png" alt="App Screenshot 3" width="300" height="500" className="w-full h-auto" />
                   </div>
                   <div className="rounded-lg overflow-hidden shadow-lg">
-                    <Image src="/screenshot-4.png.png" alt="App Screenshot 4" width="300" height="500" className="w-full h-auto" />
+                    <Image src="/screenshot-4.png" alt="App Screenshot 4" width="300" height="500" className="w-full h-auto" />
                   </div>
               </div>
             </div>
@@ -306,7 +306,7 @@ export function WebLandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-primary text-primary-foreground py-8 px-4 pb-20">
+      <footer className="bg-primary text-primary-foreground py-8 px-4">
         <div className="container mx-auto text-center">
           <p>{currentContent.footer.copyright}</p>
           <div className="mt-4">
@@ -319,5 +319,3 @@ export function WebLandingPage() {
     </div>
   );
 }
-
-    
