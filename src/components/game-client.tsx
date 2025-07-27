@@ -440,19 +440,6 @@ export default function GameClient({ mode }: {mode: Mode}) {
   useEffect(() => {
     // Set soundEnabled state only on the client
     setSoundEnabled(true);
-
-    // Back button listener
-    const backButtonListener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-      if (!canGoBack || window.location.pathname === '/') {
-        CapacitorApp.exitApp();
-      } else {
-        window.history.back();
-      }
-    });
-
-    return () => {
-      backButtonListener.remove();
-    };
   }, []);
 
   const gateAction = (action: () => void) => {

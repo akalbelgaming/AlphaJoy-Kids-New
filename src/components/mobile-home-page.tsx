@@ -1,7 +1,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -17,7 +17,17 @@ import { AppLogo } from '@/components/app-logo';
 import { ScrollArea } from './ui/scroll-area';
 import { AdBanner } from './ad-placeholder';
 import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
+import { App as CapacitorApp } from '@capacitor/app';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const activities = [
   { href: '/letters', title: 'Letters', icon: 'A', color: 'bg-red-500' },
@@ -36,50 +46,88 @@ const activities = [
 ];
 
 export function MobileHomePage() {
+  const [showExitDialog, setShowExitDialog] = useState(false);
+
+  useEffect(() => {
+    const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+      if (window.location.pathname === '/') {
+        // If on the home page, show the exit confirmation dialog
+        setShowExitDialog(true);
+      } else if (canGoBack) {
+        // If there's history, go back
+        window.history.back();
+      }
+      // If none of the above, do nothing (to prevent closing the app)
+    });
+
+    return () => {
+      listener.remove();
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      <header className="p-3 bg-red-500 text-white shadow-md sticky top-0 z-40">
-        <div className="container mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="bg-white p-1 rounded-md">
-              <AppLogo className="h-10 w-10 flex-shrink-0" />
+    <>
+      <div className="flex flex-col h-screen bg-gray-100">
+        <header className="p-3 bg-red-500 text-white shadow-md sticky top-0 z-40">
+          <div className="container mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-white p-1 rounded-md">
+                <AppLogo className="h-10 w-10 flex-shrink-0" />
+              </div>
+              <h1 className="text-lg font-bold tracking-tight">AlphaJoy Kids: ABC, Stories &amp; Art</h1>
             </div>
-            <h1 className="text-xl font-bold tracking-tight">AlphaJoy Kids</h1>
           </div>
-        </div>
-      </header>
-      
-      <ScrollArea className="flex-1">
-        <main className="p-4 pb-24">
-          <div className="grid grid-cols-2 gap-4">
-            {activities.map((activity) => (
-              <Link href={activity.href} key={activity.href} passHref>
-                <Card className={cn("shadow-lg hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 h-40 flex flex-col items-center justify-center text-center overflow-hidden border-2 border-gray-200", activity.color)}>
-                  <CardContent className="p-2 flex-1 flex flex-col justify-center items-center gap-2 w-full text-white">
-                    {typeof activity.icon === 'string' ? (
-                      <div className="text-6xl font-bold">
-                        {activity.icon}
-                      </div>
-                    ) : (
-                      React.cloneElement(activity.icon, { className: "h-12 w-12" })
-                    )}
-                    <h3 className="text-lg font-semibold tracking-wide">{activity.title}</h3>
-                  </CardContent>
-                </Card>
+        </header>
+        
+        <ScrollArea className="flex-1">
+          <main className="p-4 pb-24">
+            <div className="grid grid-cols-2 gap-4">
+              {activities.map((activity) => (
+                <Link href={activity.href} key={activity.href} passHref>
+                  <Card className={cn("shadow-lg hover:shadow-xl hover:-translate-y-1 transition-transform duration-300 h-40 flex flex-col items-center justify-center text-center overflow-hidden border-2 border-gray-200", activity.color)}>
+                    <CardContent className="p-2 flex-1 flex flex-col justify-center items-center gap-2 w-full text-white">
+                      {typeof activity.icon === 'string' ? (
+                        <div className="text-6xl font-bold">
+                          {activity.icon}
+                        </div>
+                      ) : (
+                        React.cloneElement(activity.icon, { className: "h-12 w-12" })
+                      )}
+                      <h3 className="text-lg font-semibold tracking-wide">{activity.title}</h3>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </main>
+        </ScrollArea>
+        
+        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t">
+          <AdBanner />
+          <div className="text-center py-1 bg-gray-100">
+              <Link href="/privacy" className="text-xs text-gray-500 hover:underline">
+              Privacy Policy
               </Link>
-            ))}
           </div>
-        </main>
-      </ScrollArea>
-      
-      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t">
-         <AdBanner />
-         <div className="text-center py-1 bg-gray-100">
-            <Link href="/privacy" className="text-xs text-gray-500 hover:underline">
-             Privacy Policy
-            </Link>
-         </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+
+      <AlertDialog open={showExitDialog} onOpenChange={setShowExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Exit App?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to close AlphaJoy Kids?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => CapacitorApp.exitApp()}>
+              Exit
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
