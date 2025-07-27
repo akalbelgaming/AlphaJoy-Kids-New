@@ -6,9 +6,6 @@ const config: CapacitorConfig = {
   appName: 'AlphaJoy Kids',
   webDir: 'out',
   
-  // bundledWebRuntime is deprecated. It can be safely removed.
-  // bundledWebRuntime: false, 
-
   plugins: {
     SplashScreen: {
       launchShowDuration: 2000,
@@ -22,7 +19,6 @@ const config: CapacitorConfig = {
     },
   },
   android: {
-    // This allows Capacitor to override the default WebView behavior.
     allowMixedContent: true, 
   }
 };

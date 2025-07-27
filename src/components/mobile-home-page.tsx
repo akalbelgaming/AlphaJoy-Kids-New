@@ -6,15 +6,11 @@ import Link from 'next/link';
 import {
   BookOpen,
   Brush,
-  Calculator,
   Fingerprint,
-  Languages,
   Mic,
   Palette,
   Shapes,
   SpellCheck,
-  Star,
-  Type
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { AppLogo } from '@/components/app-logo';
@@ -41,20 +37,20 @@ const activities = [
 
 export function MobileHomePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      <header className="p-3 bg-red-500 text-white shadow-md sticky top-0 z-50">
+    <div className="flex flex-col h-screen bg-gray-100">
+      <header className="p-3 bg-red-500 text-white shadow-md sticky top-0 z-40">
         <div className="container mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="bg-white p-1 rounded-md">
               <AppLogo className="h-10 w-10 flex-shrink-0" />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">AlphaJoy Kids: ABC, 123 & Art</h1>
+            <h1 className="text-xl font-bold tracking-tight">AlphaJoy Kids</h1>
           </div>
         </div>
       </header>
       
       <ScrollArea className="flex-1">
-        <main className="p-4">
+        <main className="p-4 pb-24">
           <div className="grid grid-cols-2 gap-4">
             {activities.map((activity) => (
               <Link href={activity.href} key={activity.href} passHref>
@@ -76,10 +72,13 @@ export function MobileHomePage() {
         </main>
       </ScrollArea>
       
-      <footer className="text-center py-3 bg-gray-100">
-        <Link href="/privacy" className="text-sm text-gray-600 hover:underline">
-          Privacy Policy
-        </Link>
+      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t">
+         <AdBanner />
+         <div className="text-center py-1 bg-gray-100">
+            <Link href="/privacy" className="text-xs text-gray-500 hover:underline">
+             Privacy Policy
+            </Link>
+         </div>
       </footer>
     </div>
   );

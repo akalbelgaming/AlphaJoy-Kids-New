@@ -7,18 +7,18 @@ import { WebLandingPage } from '@/components/web-landing-page';
 import { Capacitor } from '@capacitor/core';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// This component is the entry point for the app.
-// It detects if the app is running on a native device (Capacitor) or in a web browser.
 export default function Home() {
-  const [isNative, setIsNative] = useState<boolean | null>(null);
+  const [isNative, setIsNative] = useState(true); // Default to native to avoid flicker
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // This check only runs on the client-side after hydration.
+    // This check only runs on the client-side.
     setIsNative(Capacitor.isNativePlatform());
+    setIsChecking(false);
   }, []);
 
-  // Show a loading skeleton while we determine the platform to prevent UI flicker.
-  if (isNative === null) {
+  if (isChecking) {
+    // Show a loading skeleton only while we determine the platform.
     return (
       <div className="w-screen h-screen flex flex-col items-center justify-center p-4 gap-4 bg-background">
         <Skeleton className="h-16 w-full max-w-sm" />
