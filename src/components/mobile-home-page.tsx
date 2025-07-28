@@ -49,7 +49,7 @@ export function MobileHomePage() {
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   useEffect(() => {
-    let listenerHandle: PluginListenerHandle;
+    let listenerHandle: PluginListenerHandle | null = null;
 
     const addListener = async () => {
       listenerHandle = await CapacitorApp.addListener('backButton', ({ canGoBack }) => {
