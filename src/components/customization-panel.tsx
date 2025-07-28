@@ -131,9 +131,8 @@ export function CustomizationPanel({
             <Select
               onValueChange={(v) => onFontFamilyChange(v as FontFamily)}
               defaultValue={fontFamily}
-              suppressHydrationWarning
             >
-              <SelectTrigger id="font-family" suppressHydrationWarning>
+              <SelectTrigger id="font-family">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
