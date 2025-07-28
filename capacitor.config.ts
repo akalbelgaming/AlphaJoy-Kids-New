@@ -20,10 +20,6 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: true,
-  },
-  icon: {
-    android: "public/icon.png",
-    ios: "public/icon.png"
   }
 };
 

@@ -8,13 +8,13 @@
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
-    "build:android": "next build && npx cap sync android && npx cap open android",
+    "build:android": "npm run pwa-assets && next build && npx cap sync android && npx cap open android",
     "sync:android": "npx cap sync android",
     "open:android": "npx cap open android",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "pwa-assets": "pwa-assets-generator --preset minimal public/icons/icon-512x512.png"
+    "pwa-assets": "pwa-assets-generator --preset minimal public/icon.png"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.0",
