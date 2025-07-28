@@ -13,7 +13,8 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "pwa-assets": "pwa-assets-generator --preset minimal public/icon.png"
+    "pwa-assets": "pwa-assets-generator --preset minimal public/icon.png",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.0",
