@@ -20,8 +20,8 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: true,
-    // Pointing directly to the high-resolution icon as specified by the user.
-    iconPath: 'public/icon-512x512.png'
+    // Pointing directly to the high-resolution logo in the public folder.
+    iconPath: 'public/logo.png'
   }
 };
 
