@@ -20,7 +20,7 @@ const config: CapacitorConfig = {
   },
   android: {
     allowMixedContent: true,
-    iconPath: 'public/icons/icon-512x512.png'
+    iconPath: 'public/icon-512x512.png'
   }
 };
 
