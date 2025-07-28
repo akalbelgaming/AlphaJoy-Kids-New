@@ -54,7 +54,11 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
       });
   
       // const response = await getColoringPage(prompt); // Temporarily disabled
-      const response = { success: false, error: 'AI feature is temporarily disabled for this build.' }; // Mock response
+      // This is the mock response causing the build error. We'll type it correctly.
+      const response: { success: boolean; data?: { imageUrl: string }; error?: string } = { 
+        success: false, 
+        error: 'AI feature is temporarily disabled for this build.' 
+      };
       
       setIsLoading(false);
       if (response.success && response.data?.imageUrl) {
