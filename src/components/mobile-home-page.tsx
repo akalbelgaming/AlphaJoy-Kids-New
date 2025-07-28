@@ -17,7 +17,7 @@ import { AppLogo } from '@/components/app-logo';
 import { ScrollArea } from './ui/scroll-area';
 import { AdBanner } from './ad-placeholder';
 import { cn } from '@/lib/utils';
-import { App as CapacitorApp } from '@capacitor/app';
+import { App as CapacitorApp, type PluginListenerHandle } from '@capacitor/app';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,19 +49,27 @@ export function MobileHomePage() {
   const [showExitDialog, setShowExitDialog] = useState(false);
 
   useEffect(() => {
-    const listener = CapacitorApp.addListener('backButton', ({ canGoBack }) => {
-      if (window.location.pathname === '/') {
-        // If on the home page, show the exit confirmation dialog
-        setShowExitDialog(true);
-      } else if (canGoBack) {
-        // If there's history, go back
-        window.history.back();
-      }
-      // If none of the above, do nothing (to prevent closing the app)
-    });
+    let listenerHandle: PluginListenerHandle;
+
+    const addListener = async () => {
+      listenerHandle = await CapacitorApp.addListener('backButton', ({ canGoBack }) => {
+        if (window.location.pathname === '/') {
+          // If on the home page, show the exit confirmation dialog
+          setShowExitDialog(true);
+        } else if (canGoBack) {
+          // If there's history, go back
+          window.history.back();
+        }
+        // If none of the above, do nothing (to prevent closing the app)
+      });
+    };
+
+    addListener();
 
     return () => {
-      listener.remove();
+      if (listenerHandle) {
+        listenerHandle.remove();
+      }
     };
   }, []);
 
