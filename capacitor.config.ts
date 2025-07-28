@@ -22,8 +22,8 @@ const config: CapacitorConfig = {
     allowMixedContent: true,
   },
   icon: {
-    android: "public/icon-512x512.png",
-    ios: "public/icon-512x512.png"
+    android: "public/icon.png",
+    ios: "public/icon.png"
   }
 };
 
