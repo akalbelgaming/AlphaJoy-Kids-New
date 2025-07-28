@@ -8,7 +8,7 @@
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "next build",
-    "rebuild:android": "rm -rf android && npx cap add android && npm run pwa-assets && npx cap sync android && npx cap open android",
+    "rebuild:android": "rmdir /s /q android && npx cap add android && npm run pwa-assets && npx cap sync android && npx cap open android",
     "build:android": "npm run pwa-assets && next build && npx cap sync android && npx cap open android",
     "sync:android": "npx cap sync android",
     "open:android": "npx cap open android",
