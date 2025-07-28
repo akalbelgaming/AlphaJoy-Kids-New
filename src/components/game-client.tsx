@@ -225,7 +225,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }, [mode, currentCharacter]);
 
   const itemForPoem = useMemo(() => {
-    if (mode !== 'poem' && mode !== 'kabita' || !currentCharacter || !('lines' in currentCharacter)) return null;
+    if (mode !== 'poem' && mode !== 'kabita' || typeof currentCharacter !== 'object' || !currentCharacter || !('lines' in currentCharacter)) return null;
     return currentCharacter as Poem;
   }, [mode, currentCharacter]);
 
