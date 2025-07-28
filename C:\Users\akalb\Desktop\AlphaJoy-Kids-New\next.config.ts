@@ -31,6 +31,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Temporarily disabling PWA to ensure `output: 'export'` works correctly.
 export default withPWA(nextConfig);
-// export default nextConfig;
