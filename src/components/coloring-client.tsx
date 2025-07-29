@@ -1,13 +1,15 @@
 
 "use client";
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ColoringCanvas } from '@/components/coloring-canvas';
 import { useToast } from '@/hooks/use-toast';
 // import { getColoringPage } from '@/app/actions'; // Temporarily disabled for static export
 import { Wand2, Gift, Palette, Loader2 } from 'lucide-react';
+import { AdMob, RewardAdOptions, RewardAdPluginEvents } from '@capacitor-community/admob';
+import { Capacitor } from '@capacitor/core';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,12 +24,7 @@ import { cn } from '@/lib/utils';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
 
-declare global {
-  interface Window {
-    adsbygoogle: any;
-    showRewardedAd: (onComplete: () => void, onFail: () => void) => void;
-  }
-}
+const REWARDED_AD_ID = 'ca-app-pub-9307441315088203/8422169437';
 
 interface ColoringClientProps {
   strokeColor: string;
@@ -39,11 +36,14 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showRewardDialog, setShowRewardDialog] = useState(false);
+  const [isAdLoading, setIsAdLoading] = useState(false);
   
   const [strokeColor, setStrokeColor] = useState(initialStrokeColor);
   const [strokeWidth, setStrokeWidth] = useState(initialStrokeWidth);
 
   const { toast } = useToast();
+
+  const isNative = Capacitor.isNativePlatform();
   
   const generateAndSetImage = useCallback(async () => {
       setIsLoading(true);
@@ -87,44 +87,61 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
       return;
     }
     // Temporarily disable the ad gate and generation for static build
-    toast({
-        variant: 'destructive',
-        title: 'Feature Disabled',
-        description: 'The AI coloring page feature is temporarily disabled to create the app build.',
-    });
-    // setShowRewardDialog(true);
+    // toast({
+    //     variant: 'destructive',
+    //     title: 'Feature Disabled',
+    //     description: 'The AI coloring page feature is temporarily disabled to create the app build.',
+    // });
+    setShowRewardDialog(true);
   };
-
-  const handleAdWatched = useCallback(() => {
-    // This is a placeholder for web testing.
-    // The actual Rewarded Ad logic will be injected by a native wrapper (e.g., Capacitor).
-    const onComplete = () => {
-      console.log('Reward received');
-      toast({
+  
+  const onReward = useCallback(() => {
+    console.log('Reward received');
+    toast({
         title: 'Thank you for watching!',
         description: `Creating a page for "${prompt}"...`
-      });
-      generateAndSetImage();
-    };
-
-    const onFail = () => {
-      console.error('Rewarded ad failed to load or show.');
-      toast({
-        variant: 'destructive',
-        title: 'Ad failed',
-        description: "The ad couldn't be shown right now. Please try again later.",
-      });
-    };
-    
-    // In a real mobile app build, `window.showRewardedAd` would be provided by a native script.
-    if (typeof window.showRewardedAd === 'function') {
-      window.showRewardedAd(onComplete, onFail);
-    } else {
-      console.warn("Rewarded ad function not found. Simulating success for web testing.");
-      // Fallback for web development: grant the reward directly.
-      onComplete();
-    }
+    });
+    generateAndSetImage();
   }, [generateAndSetImage, prompt, toast]);
+  
+  useEffect(() => {
+      if (!isNative) return;
+
+      const rewardListener = AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
+          console.log('Reward ad event: REWARDED', reward);
+          onReward();
+      });
+
+      const failedListener = AdMob.addListener(RewardAdPluginEvents.FailedToShow, (error) => {
+          console.error('Reward ad event: FAILED_TO_SHOW', error);
+          toast({ variant: 'destructive', title: 'Ad failed', description: 'Could not show the ad. Please try again later.' });
+      });
+
+      return () => {
+          rewardListener.remove();
+          failedListener.remove();
+      };
+  }, [isNative, onReward, toast]);
+
+  const handleAdWatched = useCallback(async () => {
+    if (!isNative) {
+      console.warn("AdMob is not available on web. Simulating success.");
+      onReward();
+      return;
+    }
+
+    try {
+        setIsAdLoading(true);
+        const options: RewardAdOptions = { adId: REWARDED_AD_ID };
+        await AdMob.prepareRewardVideoAd(options);
+        await AdMob.showRewardVideoAd();
+    } catch (e) {
+        console.error("Error showing rewarded ad:", e);
+        toast({ variant: 'destructive', title: 'Ad Error', description: "The ad couldn't be shown. Please try again." });
+    } finally {
+        setIsAdLoading(false);
+    }
+  }, [isNative, onReward, toast]);
 
   const handleClear = () => {
     // This is handled by the canvas, but we could add more logic here if needed
@@ -156,8 +173,8 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
                 className="text-lg h-12"
                 disabled={isLoading}
             />
-            <Button onClick={handleGenerateClick} className="w-full" size="lg" disabled={true || isLoading}>
-                {isLoading ? <Loader2 className="animate-spin" /> : <Gift className="mr-2" />}
+            <Button onClick={handleGenerateClick} className="w-full" size="lg" disabled={isLoading || isAdLoading}>
+                {isAdLoading ? <Loader2 className="animate-spin" /> : <Gift className="mr-2" />}
                 Get New Page (Ad)
             </Button>
          </div>
@@ -228,7 +245,10 @@ export function ColoringClient({ strokeColor: initialStrokeColor, strokeWidth: i
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Maybe Later</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAdWatched}>
+            <AlertDialogAction onClick={() => {
+              setShowRewardDialog(false);
+              handleAdWatched();
+            }}>
               Watch Ad & Create
             </AlertDialogAction>
           </AlertDialogFooter>

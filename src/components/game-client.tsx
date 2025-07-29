@@ -11,6 +11,8 @@ import {
   Gift,
 } from "lucide-react";
 import { App as CapacitorApp } from '@capacitor/app';
+import { AdMob, RewardAdOptions, RewardAdPluginEvents } from '@capacitor-community/admob';
+import { Capacitor } from '@capacitor/core';
 import { numbers, alphabet, shapes, readingWords, type ShapeCharacter, type AlphabetCharacter, englishPoems, hindiKabitas, type Poem } from "@/lib/characters";
 import { hindiCharacters, hindiTransliteratedCharacters, type HindiCharacter, type HindiTransliteratedCharacter } from "@/lib/hindi-characters";
 import { TracingCanvas } from "@/components/tracing-canvas";
@@ -44,12 +46,7 @@ type Mode = "numbers" | "alphabet" | "story" | "shapes" | "counting" | "reading"
 type Difficulty = "easy" | "medium" | "hard";
 type FontFamily = "'PT Sans'" | "Verdana" | "'Comic Sans MS'";
 
-declare global {
-  interface Window {
-    adsbygoogle: any;
-    showRewardedAd: (onComplete: () => void, onFail: () => void) => void;
-  }
-}
+const REWARDED_AD_ID = 'ca-app-pub-9307441315088203/8422169437';
 
 // Generate tables from 2 to 20
 const pahadaTables: string[][] = [];
@@ -124,6 +121,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   
   // State for the rewarded ad gate
   const [showAdGate, setShowAdGate] = useState(false);
+  const [isAdLoading, setIsAdLoading] = useState(false);
   const [completionCountForAd, setCompletionCountForAd] = useState(0);
   const [nextAction, setNextAction] = useState<(() => void) | null>(null);
   
@@ -136,6 +134,7 @@ export default function GameClient({ mode }: {mode: Mode}) {
   }
 
   const { toast } = useToast();
+  const isNative = Capacitor.isNativePlatform();
 
   const characterSet = useMemo(() => {
     switch (mode) {
@@ -481,43 +480,57 @@ export default function GameClient({ mode }: {mode: Mode}) {
 
   }, [handleNext, startTime]);
 
-  const handleAdWatched = () => {
-    // This is a placeholder for web testing.
-    // The actual Rewarded Ad logic will be injected by a native wrapper (e.g., Capacitor).
-    const onComplete = () => {
-      console.log('Reward received');
-      toast({
+  const onReward = useCallback(() => {
+    console.log('Reward received, performing next action.');
+    toast({
         title: "Thank you!",
         description: "You've unlocked more fun activities."
-      });
-      setCompletionCountForAd(0); // Reset counter
-      if (nextAction) {
+    });
+    setCompletionCountForAd(0); // Reset counter
+    if (nextAction) {
         nextAction(); // Perform the stored action
         setNextAction(null); // Clear the stored action
-      }
-    };
-
-    const onFail = () => {
-      console.error('Rewarded ad failed to load or show.');
-      toast({
-        variant: 'destructive',
-        title: 'Ad failed',
-        description: "The ad couldn't be shown right now. Please try again later.",
-      });
-    };
-
-    // In a real mobile app build, `window.showRewardedAd` would be provided by a native script.
-    if (typeof window.showRewardedAd === 'function') {
-      window.showRewardedAd(onComplete, onFail);
-    } else {
-      console.warn("Rewarded ad function not found. Simulating success for web testing.");
-      // Fallback for web development: grant the reward directly.
-      onComplete();
     }
-    
-    setShowAdGate(false);
-  };
+  }, [nextAction, toast]);
+  
+  useEffect(() => {
+      if (!isNative) return;
 
+      const rewardListener = AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
+          console.log('Reward ad event: REWARDED', reward);
+          onReward();
+      });
+
+      const failedListener = AdMob.addListener(RewardAdPluginEvents.FailedToShow, (error) => {
+          console.error('Reward ad event: FAILED_TO_SHOW', error);
+          toast({ variant: 'destructive', title: 'Ad failed', description: 'Could not show the ad. Please try again later.' });
+      });
+
+      return () => {
+          rewardListener.remove();
+          failedListener.remove();
+      };
+  }, [isNative, onReward, toast]);
+
+  const handleAdWatched = useCallback(async () => {
+    if (!isNative) {
+      console.warn("AdMob is not available on web. Simulating success.");
+      onReward();
+      return;
+    }
+
+    try {
+        setIsAdLoading(true);
+        const options: RewardAdOptions = { adId: REWARDED_AD_ID };
+        await AdMob.prepareRewardVideoAd(options);
+        await AdMob.showRewardVideoAd();
+    } catch (e) {
+        console.error("Error showing rewarded ad:", e);
+        toast({ variant: 'destructive', title: 'Ad Error', description: "The ad couldn't be shown. Please try again." });
+    } finally {
+        setIsAdLoading(false);
+    }
+  }, [isNative, onReward, toast]);
   
   const handleClear = useCallback(() => {
     setClears((prev) => prev + 1);
@@ -733,8 +746,12 @@ export default function GameClient({ mode }: {mode: Mode}) {
               setShowAdGate(false);
               setNextAction(null); // Clear action if user cancels
             }}>Maybe Later</AlertDialogCancel>
-            <AlertDialogAction onClick={handleAdWatched}>
-              <Gift className="mr-2" /> Watch Ad & Continue
+            <AlertDialogAction onClick={() => {
+                setShowAdGate(false);
+                handleAdWatched();
+            }}>
+              {isAdLoading ? <Loader2 className="mr-2 animate-spin" /> : <Gift className="mr-2" />}
+              {isAdLoading ? 'Loading Ad...' : 'Watch Ad & Continue'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
